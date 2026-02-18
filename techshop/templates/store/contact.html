@@ -1,0 +1,212 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Contact Us - TechShop{% endblock %}
+
+{% block extra_css %}
+<style>
+    .contact-header {
+        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+        padding: 60px 0;
+    }
+
+    .contact-card {
+        border: none;
+        border-radius: 15px;
+        padding: 30px;
+        background: #fff;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        transition: all 0.3s ease;
+    }
+
+    .contact-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+    }
+
+    .contact-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: rgba(13, 110, 253, 0.1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        color: #0d6efd;
+        margin-bottom: 15px;
+    }
+
+    .form-control,
+    .form-select {
+        border-radius: 10px;
+        padding: 12px 15px;
+        border: 2px solid #e9ecef;
+        transition: all 0.3s ease;
+    }
+
+    .form-control:focus,
+    .form-select:focus {
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 4px rgba(13, 110, 253, 0.1);
+    }
+
+    .btn {
+        border-radius: 10px;
+        padding: 12px 25px;
+        transition: all 0.3s ease;
+    }
+
+    .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .map-container {
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    }
+
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .animate-delay-1 {
+        animation: fadeInUp 0.6s ease 0.1s forwards;
+        opacity: 0;
+    }
+
+    .animate-delay-2 {
+        animation: fadeInUp 0.6s ease 0.2s forwards;
+        opacity: 0;
+    }
+
+    .animate-delay-3 {
+        animation: fadeInUp 0.6s ease 0.3s forwards;
+        opacity: 0;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Header -->
+<section class="contact-header">
+    <div class="container">
+        <div class="row">
+            <div class="col-12 text-center text-white">
+                <h1 class="display-4 mb-3 animate-delay-1">Contact Us</h1>
+                <p class="lead animate-delay-2">We're here to help! Get in touch with our team</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Contact Info & Form -->
+<section class="py-5">
+    <div class="container">
+        <div class="row g-4">
+            <!-- Contact Information -->
+            <div class="col-lg-4">
+                <div class="contact-card mb-4 animate-delay-1">
+                    <div class="contact-icon">
+                        <i class="bi bi-geo-alt"></i>
+                    </div>
+                    <h5>Visit Our Store</h5>
+                    <p class="text-muted mb-0">
+                        123 Tech Street<br>
+                        Dhaka 1200, Bangladesh
+                    </p>
+                </div>
+
+                <div class="contact-card mb-4 animate-delay-2">
+                    <div class="contact-icon">
+                        <i class="bi bi-telephone"></i>
+                    </div>
+                    <h5>Call Us</h5>
+                    <p class="text-muted mb-0">
+                        +880 1234 567890<br>
+                        +880 9876 543210
+                    </p>
+                </div>
+
+                <div class="contact-card animate-delay-3">
+                    <div class="contact-icon">
+                        <i class="bi bi-envelope"></i>
+                    </div>
+                    <h5>Email Us</h5>
+                    <p class="text-muted mb-0">
+                        info@techshop.com<br>
+                        support@techshop.com
+                    </p>
+                </div>
+            </div>
+
+            <!-- Contact Form -->
+            <div class="col-lg-8">
+                <div class="contact-card">
+                    <h4 class="mb-4">Send us a Message</h4>
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Your Name</label>
+                                <input type="text" name="name" class="form-control" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Email Address</label>
+                                <input type="email" name="email" class="form-control" required>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Subject</label>
+                                <select name="subject" class="form-select">
+                                    <option value="">Select a topic</option>
+                                    <option value="general">General Inquiry</option>
+                                    <option value="order">Order Related</option>
+                                    <option value="product">Product Information</option>
+                                    <option value="support">Technical Support</option>
+                                    <option value="business">Business Inquiry</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Message</label>
+                                <textarea name="message" class="form-control" rows="5" required></textarea>
+                            </div>
+                            <div class="col-12">
+                                <button type="submit" class="btn btn-primary btn-lg">
+                                    <i class="bi bi-send me-2"></i>Send Message
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Map Section -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <div class="map-container">
+                    <iframe
+                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d365.0!2d90.4!3d23.8!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMjPCsDQ4JzAwLjAiTiA5MMKwMjQnMDAuMCJF!5e0!3m2!1sen!2sbd!4v1234567890"
+                        width="100%" height="400" style="border:0;" allowfullscreen="" loading="lazy">
+                    </iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

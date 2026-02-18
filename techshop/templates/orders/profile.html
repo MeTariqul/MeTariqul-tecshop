@@ -1,0 +1,381 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}My Profile - TechShop{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Hide store navbar on profile page */
+    .navbar.navbar-expand-lg.navbar-light.bg-white.border-top {
+        display: none !important;
+    }
+    
+    .profile-card {
+        border: none;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        border-radius: 12px;
+        overflow: hidden;
+    }
+
+    .profile-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 2rem;
+    }
+
+    .avatar-wrapper {
+        position: relative;
+        display: inline-block;
+    }
+
+    .avatar-circle {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 4px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .avatar-letter {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #fff;
+        border: 4px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .avatar-upload-btn {
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: #fff;
+        color: #667eea;
+        border: 2px solid #667eea;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.3s;
+        font-size: 0.9rem;
+    }
+
+    .avatar-upload-btn:hover {
+        background: #667eea;
+        color: #fff;
+    }
+
+    .info-label {
+        font-weight: 600;
+        color: #6c757d;
+        font-size: 0.9rem;
+    }
+
+    .info-value {
+        color: #212529;
+    }
+
+    .nav-pills .nav-link.active,
+    .list-group-item.active {
+        background-color: #667eea;
+        border-color: #667eea;
+    }
+
+    .nav-pills .nav-link,
+    .list-group-item {
+        color: #495057;
+    }
+
+    .form-control:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+    }
+
+    .btn-gradient {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: #fff;
+        border: none;
+        padding: 0.6rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 600;
+        transition: all 0.3s;
+    }
+
+    .btn-gradient:hover {
+        opacity: 0.9;
+        color: #fff;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    }
+
+    .picture-preview {
+        max-width: 200px;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row">
+        <!-- Profile Sidebar -->
+        <div class="col-lg-3 mb-4">
+            <div class="card profile-card">
+                <div class="card-header profile-header text-center">
+                    <div class="avatar-wrapper mx-auto">
+                        {% if customer.profile_picture %}
+                        <img src="{{ customer.profile_picture.url }}" alt="Profile Picture" class="avatar-circle">
+                        {% else %}
+                        <div class="avatar-letter">
+                            {{ user.username|make_list|first|upper }}
+                        </div>
+                        {% endif %}
+                    </div>
+                    <h4 class="mt-3 mb-1">{{ user.username }}</h4>
+                    <small class="opacity-75">{{ user.email }}</small>
+                </div>
+                <div class="card-body p-0">
+                    <div class="list-group list-group-flush">
+                        <a href="#profile-info" class="list-group-item list-group-item-action active"
+                            data-bs-toggle="pill">
+                            <i class="bi bi-person me-2"></i>Profile Info
+                        </a>
+                        <a href="{% url 'orders:order_history' %}" class="list-group-item list-group-item-action">
+                            <i class="bi bi-bag me-2"></i>My Orders
+                        </a>
+                        <a href="{% url 'wishlist:wishlist_view' %}" class="list-group-item list-group-item-action">
+                            <i class="bi bi-heart me-2"></i>Wishlist
+                        </a>
+                        {% if user.is_staff %}
+                        <a href="{% url 'admin_dashboard:dashboard' %}"
+                            class="list-group-item list-group-item-action text-success">
+                            <i class="bi bi-speedometer2 me-2"></i>Admin Dashboard
+                        </a>
+                        {% endif %}
+                        <a href="{% url 'logout' %}" class="list-group-item list-group-item-action text-danger">
+                            <i class="bi bi-box-arrow-right me-2"></i>Logout
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Profile Content -->
+        <div class="col-lg-9">
+            <div class="tab-content">
+                <!-- Profile Info -->
+                <div class="tab-pane fade show active" id="profile-info">
+                    <div class="card profile-card">
+                        <div class="card-header bg-white py-3">
+                            <h4 class="mb-0"><i class="bi bi-person-circle me-2"></i>Profile Information</h4>
+                        </div>
+                        <div class="card-body">
+                            <form method="post" enctype="multipart/form-data">
+                                {% csrf_token %}
+
+                                <!-- Profile Picture Upload Section -->
+                                <div class="row mb-4">
+                                    <div class="col-12">
+                                        <label class="form-label fw-bold"><i class="bi bi-camera me-1"></i> Profile
+                                            Picture</label>
+                                        <div class="d-flex align-items-center gap-4">
+                                            {% if customer.profile_picture %}
+                                            <img src="{{ customer.profile_picture.url }}" alt="Current Profile Picture"
+                                                class="picture-preview" id="picturePreview">
+                                            {% else %}
+                                            <div class="avatar-letter"
+                                                style="width: 80px; height: 80px; font-size: 2rem; background: linear-gradient(135deg, #667eea, #764ba2);"
+                                                id="picturePreview">
+                                                {{ user.username|make_list|first|upper }}
+                                            </div>
+                                            {% endif %}
+                                            <div>
+                                                <input type="file" class="form-control" id="profile_picture"
+                                                    name="profile_picture" accept="image/*"
+                                                    onchange="previewImage(this)">
+                                                <small class="text-muted">JPG, PNG or GIF. Max 2MB.</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <hr class="my-4">
+
+                                <div class="row mb-4">
+                                    <div class="col-md-6">
+                                        <label class="form-label">Username</label>
+                                        <input type="text" class="form-control" value="{{ user.username }}" disabled>
+                                        <small class="text-muted">Username cannot be changed</small>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Email</label>
+                                        <input type="email" class="form-control" value="{{ user.email }}" disabled>
+                                        <small class="text-muted">Contact support to change email</small>
+                                    </div>
+                                </div>
+
+                                <hr class="my-4">
+
+                                <h5 class="mb-3">Shipping Information</h5>
+
+                                <div class="row">
+                                    <div class="col-12 mb-3">
+                                        <label for="phone" class="form-label">Phone Number</label>
+                                        <input type="tel" class="form-control" id="phone" name="phone"
+                                            value="{{ customer.phone|default:'' }}"
+                                            placeholder="Enter your phone number">
+                                    </div>
+
+                                    <div class="col-12 mb-3">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <label for="address" class="form-label">Address</label>
+                                            <button type="button" class="btn btn-sm btn-outline-primary mb-2"
+                                                onclick="getLocation()">
+                                                <i class="bi bi-geo-alt me-1"></i> Use My Location
+                                            </button>
+                                        </div>
+                                        <textarea class="form-control" id="address" name="address" rows="2"
+                                            placeholder="Enter your street address">{{ customer.address|default:'' }}</textarea>
+                                    </div>
+
+                                    <div class="col-md-6 mb-3">
+                                        <label for="city" class="form-label">City</label>
+                                        <input type="text" class="form-control" id="city" name="city"
+                                            value="{{ customer.city|default:'' }}" placeholder="Enter city">
+                                    </div>
+
+                                    <div class="col-md-6 mb-3">
+                                        <label for="state" class="form-label">State/Province</label>
+                                        <input type="text" class="form-control" id="state" name="state"
+                                            value="{{ customer.state|default:'' }}" placeholder="Enter state">
+                                    </div>
+
+                                    <div class="col-md-6 mb-3">
+                                        <label for="zip_code" class="form-label">ZIP/Postal Code</label>
+                                        <input type="text" class="form-control" id="zip_code" name="zip_code"
+                                            value="{{ customer.zip_code|default:'' }}" placeholder="Enter ZIP code">
+                                    </div>
+                                </div>
+
+                                <div class="mt-4">
+                                    <button type="submit" class="btn btn-gradient">
+                                        <i class="bi bi-check-circle me-2"></i>Save Changes
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function previewImage(input) {
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                const preview = document.getElementById('picturePreview');
+                // Replace existing element with an image
+                const img = document.createElement('img');
+                img.src = e.target.result;
+                img.alt = 'Profile Picture Preview';
+                img.className = 'picture-preview';
+                img.id = 'picturePreview';
+                img.style.width = '80px';
+                img.style.height = '80px';
+                img.style.objectFit = 'cover';
+                img.style.borderRadius = '50%';
+                preview.replaceWith(img);
+            };
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+</script>
+<script>
+    function getLocation() {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(showPosition, showError);
+        } else {
+            alert("Geolocation is not supported by this browser.");
+        }
+    }
+
+    function showPosition(position) {
+        var lat = position.coords.latitude;
+        var lon = position.coords.longitude;
+
+        // Show loading
+        var btn = event.target;
+        var originalText = btn.innerHTML;
+        btn.innerHTML = '<i class="bi bi-hourglass-split me-1"></i> Getting location...';
+        btn.disabled = true;
+
+        // Use Nominatim for reverse geocoding (free OpenStreetMap service)
+        fetch('https://nominatim.openstreetmap.org/reverse?format=json&lat=' + lat + '&lon=' + lon)
+            .then(response => response.json())
+            .then(data => {
+                if (data.address) {
+                    // Fill in address
+                    var addressParts = [];
+                    if (data.address.house_number) addressParts.push(data.address.house_number);
+                    if (data.address.road) addressParts.push(data.address.road);
+                    if (data.address.neighbourhood) addressParts.push(data.address.neighbourhood);
+                    if (data.address.suburb) addressParts.push(data.address.suburb);
+
+                    document.getElementById('address').value = addressParts.join(', ') || data.display_name.split(',').slice(0, 2).join(',');
+
+                    // Fill in city
+                    var city = data.address.city || data.address.town || data.address.village || data.address.county;
+                    document.getElementById('city').value = city || '';
+
+                    // Fill in state
+                    var state = data.address.state || data.address.division;
+                    document.getElementById('state').value = state || '';
+
+                    // Fill in zip
+                    document.getElementById('zip_code').value = data.address.postcode || '';
+                }
+
+                // Reset button
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Unable to get address from location. Please enter manually.');
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            });
+    }
+
+    function showError(error) {
+        switch (error.code) {
+            case error.PERMISSION_DENIED:
+                alert("User denied the request for Geolocation.");
+                break;
+            case error.POSITION_UNAVAILABLE:
+                alert("Location information is unavailable.");
+                break;
+            case error.TIMEOUT:
+                alert("The request to get user location timed out.");
+                break;
+            default:
+                alert("An unknown error occurred.");
+                break;
+        }
+    }
+</script>
+{% endblock %}

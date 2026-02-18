@@ -1,0 +1,146 @@
+{% extends 'admin/base.html' %}
+
+{% block admin_title %}Website Settings{% endblock %}
+
+{% block admin_content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h4 class="mb-0">Website Settings</h4>
+    <a href="{% url 'admin_dashboard:dashboard' %}" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left me-2"></i>Back to Dashboard
+    </a>
+</div>
+
+<form method="post" class="mb-4">
+    {% csrf_token %}
+
+    <div class="table-card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0"><i class="bi bi-gear me-2"></i>General Settings</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Site Name</label>
+                    <input type="text" name="site_name" class="form-control" value="{{ config.site_name }}">
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Currency Short Form</label>
+                    <input type="text" name="currency_short_form" class="form-control"
+                        value="{{ config.currency_short_form }}" placeholder="e.g., Tk, $">
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Contact Email</label>
+                    <input type="email" name="contact_email" class="form-control" value="{{ config.contact_email }}">
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Contact Phone</label>
+                    <input type="text" name="contact_phone" class="form-control" value="{{ config.contact_phone }}">
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Notification Email</label>
+                    <input type="email" name="notification_email" class="form-control"
+                        value="{{ config.notification_email }}">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="table-card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0"><i class="bi bi-chat-square-text me-2"></i>Product Reviews</h5>
+        </div>
+        <div class="card-body">
+            <div class="form-check form-switch mb-3">
+                <input class="form-check-input" type="checkbox" id="reviews_enabled" name="reviews_enabled" {% if config.reviews_enabled %}checked{% endif %}>
+                <label class="form-check-label" for="reviews_enabled">Enable Product Reviews</label>
+            </div>
+            <div class="form-check form-switch mb-3">
+                <input class="form-check-input" type="checkbox" id="require_approval"
+                    name="require_approval_for_reviews" {% if config.require_approval_for_reviews %}checked{% endif %}>
+                <label class="form-check-label" for="require_approval">Require Admin Approval for Reviews</label>
+            </div>
+        </div>
+    </div>
+
+    <div class="table-card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0"><i class="bi bi-cart-check me-2"></i>Order Status Defaults</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Default Order Status</label>
+                    <select name="default_order_status" class="form-select">
+                        <option value="pending" {% if config.default_order_status == 'pending' %}selected{% endif %}>Pending</option>
+                        <option value="confirmed" {% if config.default_order_status == 'confirmed' %}selected{% endif %}>Confirmed</option>
+                        <option value="processing" {% if config.default_order_status == 'processing' %}selected{% endif %}>Processing</option>
+                    </select>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Auto-cancel Unpaid Orders (hours)</label>
+                    <input type="number" name="auto_cancel_hours" class="form-control"
+                        value="{{ config.auto_cancel_hours }}" min="1">
+                </div>
+            </div>
+            <div class="form-check form-switch mb-3">
+                <input class="form-check-input" type="checkbox" id="auto_cancel" name="auto_cancel_unpaid_orders" {% if config.auto_cancel_unpaid_orders %}checked{% endif %}>
+                <label class="form-check-label" for="auto_cancel">Enable Auto-cancel for Unpaid Orders</label>
+            </div>
+        </div>
+    </div>
+
+    <div class="table-card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0"><i class="bi bi-envelope me-2"></i>Email Notification Settings</h5>
+        </div>
+        <div class="card-body">
+            <div class="form-check form-switch mb-3">
+                <input class="form-check-input" type="checkbox" id="email_enabled" name="email_notifications_enabled" {% if config.email_notifications_enabled %}checked{% endif %}>
+                <label class="form-check-label" for="email_enabled">Enable Email Notifications</label>
+            </div>
+            <div class="form-check form-switch mb-3">
+                <input class="form-check-input" type="checkbox" id="notify_order" name="notify_new_order" {% if config.notify_new_order %}checked{% endif %}>
+                <label class="form-check-label" for="notify_order">Notify when new order is placed</label>
+            </div>
+            <div class="form-check form-switch mb-3">
+                <input class="form-check-input" type="checkbox" id="notify_status" name="notify_order_status_change" {% if config.notify_order_status_change %}checked{% endif %}>
+                <label class="form-check-label" for="notify_status">Notify customers when order status changes</label>
+            </div>
+            <div class="form-check form-switch mb-3">
+                <input class="form-check-input" type="checkbox" id="notify_review" name="notify_new_review" {% if config.notify_new_review %}checked{% endif %}>
+                <label class="form-check-label" for="notify_review">Notify when new review is submitted</label>
+            </div>
+            <div class="form-check form-switch mb-3">
+                <input class="form-check-input" type="checkbox" id="notify_stock" name="notify_low_stock" {% if config.notify_low_stock %}checked{% endif %}>
+                <label class="form-check-label" for="notify_stock">Notify when stock is low</label>
+            </div>
+        </div>
+    </div>
+
+    <div class="table-card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0"><i class="bi bi-layout-text-window-reverse me-2"></i>Dashboard Display Settings</h5>
+        </div>
+        <div class="card-body">
+            <div class="form-check form-switch mb-3">
+                <input class="form-check-input" type="checkbox" id="show_health" name="show_system_health" {% if config.show_system_health %}checked{% endif %}>
+                <label class="form-check-label" for="show_health">Show System Health Metrics</label>
+            </div>
+            <div class="form-check form-switch mb-3">
+                <input class="form-check-input" type="checkbox" id="show_db" name="show_database_status" {% if config.show_database_status %}checked{% endif %}>
+                <label class="form-check-label" for="show_db">Show Database Connection Status</label>
+            </div>
+            <div class="form-check form-switch mb-3">
+                <input class="form-check-input" type="checkbox" id="enable_backup" name="enable_database_backup" {% if config.enable_database_backup %}checked{% endif %}>
+                <label class="form-check-label" for="enable_backup">Enable Database Backup Download</label>
+            </div>
+        </div>
+    </div>
+
+    <div class="text-end">
+        <button type="submit" class="btn btn-primary">
+            <i class="bi bi-save me-2"></i>Save Settings
+        </button>
+    </div>
+</form>
+{% endblock %}

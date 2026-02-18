@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}My Wishlist - Tech Shop{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold mb-0"><i class="bi bi-heart-fill me-2 text-danger"></i> My Wishlist</h2>
+        <span class="badge bg-primary fs-6">{{ wishlist_items|length }} items</span>
+    </div>
+
+    {% if wishlist_items %}
+    <div class="row g-3">
+        {% for item in wishlist_items %}
+        <div class="col-md-6 col-lg-4 col-xl-3">
+            <div class="product-card">
+                <div class="position-relative overflow-hidden">
+                    {% if item.product.featured_image %}
+                    <img src="{{ item.product.featured_image.url }}" class="card-img-top" alt="{{ item.product.name }}">
+                    {% else %}
+                    <div class="card-img-top bg-light d-flex align-items-center justify-content-center">
+                        <i class="bi bi-laptop display-4 text-muted"></i>
+                    </div>
+                    {% endif %}
+
+                    <!-- Remove button -->
+                    <div class="position-absolute top-0 end-0 m-2">
+                        <a href="{% url 'wishlist:remove_from_wishlist' item.product.SKU %}"
+                            class="btn btn-sm btn-light rounded-circle shadow-sm" title="Remove">
+                            <i class="bi bi-x-lg text-danger"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="card-body">
+                    <h6 class="card-title">
+                        <a href="{% url 'store:product_detail' item.product.SKU %}">{{ item.product.name }}</a>
+                    </h6>
+                    <div class="d-flex justify-content-between align-items-center mt-2">
+                        {% if item.product.has_offer %}
+                        <div>
+                            <span class="badg bg-danger text-white px-1 rounded-1 small" style="font-size: 0.7rem;">{{
+                                item.product.discount_percentage|floatformat:0 }}% OFF</span><br>
+                            <span class="price text-danger">৳{{ item.product.discounted_price }}</span>
+                            <small class="text-muted text-decoration-line-through">৳{{ item.product.selling_price
+                                }}</small>
+                        </div>
+                        {% else %}
+                        <span class="price">৳{{ item.product.selling_price }}</span>
+                        {% endif %}
+                        <small class="text-muted">Added {{ item.added_at|timesince }} ago</small>
+                    </div>
+                    <div class="d-grid mt-3">
+                        {% if item.product.inventory.has_stock %}
+                        <form method="post" action="{% url 'cart:add_to_cart' item.product.SKU %}">
+                            {% csrf_token %}
+                            <input type="hidden" name="quantity" value="1">
+                            <button type="submit" class="btn btn-tech w-100 btn-sm">
+                                <i class="bi bi-cart-plus me-1"></i> Add to Cart
+                            </button>
+                        </form>
+                        {% else %}
+                        <button class="btn btn-secondary w-100 btn-sm" disabled>Out of Stock</button>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="text-center py-5 bg-white rounded shadow-sm">
+        <i class="bi bi-heart display-1 text-muted mb-3"></i>
+        <h3>Your wishlist is empty</h3>
+        <p class="text-muted">Browse products and click the heart icon to add items here.</p>
+        <a href="{% url 'store:product_list' %}" class="btn btn-tech mt-2">
+            <i class="bi bi-shop me-2"></i> Browse Products
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,324 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}About Us - TechShop{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Page Header Animation */
+    .page-header {
+        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+        padding: 60px 0;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .page-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    }
+
+    .page-header h1 {
+        position: relative;
+        animation: fadeInUp 0.8s ease forwards;
+    }
+
+    .page-header p {
+        position: relative;
+        animation: fadeInUp 0.8s ease 0.2s forwards;
+        opacity: 0;
+    }
+
+    /* Feature Cards */
+    .feature-card {
+        border: none;
+        border-radius: 15px;
+        padding: 30px;
+        background: #fff;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        transition: all 0.3s ease;
+        height: 100%;
+    }
+
+    .feature-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.12);
+    }
+
+    .feature-icon {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        color: #fff;
+        margin: 0 auto 20px;
+        transition: transform 0.3s ease;
+    }
+
+    .feature-card:hover .feature-icon {
+        transform: scale(1.1) rotate(5deg);
+    }
+
+    /* Stats Section */
+    .stats-section {
+        background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
+        padding: 60px 0;
+    }
+
+    .stat-item {
+        text-align: center;
+        color: #fff;
+    }
+
+    .stat-item h2 {
+        font-size: 3rem;
+        font-weight: 700;
+        animation: countUp 1s ease forwards;
+    }
+
+    .stat-item p {
+        font-size: 1.1rem;
+        opacity: 0.9;
+    }
+
+    /* Team Section */
+    .team-card {
+        border: none;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        transition: all 0.3s ease;
+    }
+
+    .team-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.12);
+    }
+
+    .team-card img {
+        width: 100%;
+        height: 250px;
+        object-fit: cover;
+        transition: transform 0.5s ease;
+    }
+
+    .team-card:hover img {
+        transform: scale(1.05);
+    }
+
+    /* Animations */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes countUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .animate-on-scroll {
+        opacity: 0;
+        transform: translateY(30px);
+        transition: all 0.6s ease;
+    }
+
+    .animate-on-scroll.visible {
+        opacity: 1;
+        transform: translateY(0);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<section class="page-header">
+    <div class="container">
+        <div class="row">
+            <div class="col-12 text-center text-white">
+                <h1 class="display-4 mb-3">About TechShop</h1>
+                <p class="lead">Your Trusted Technology Partner in Bangladesh</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- About Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6 mb-4">
+                <img src="https://images.unsplash.com/photo-1550009158-9ebf69056954?w=600" alt="TechShop Store"
+                    class="img-fluid rounded-3 shadow" style="animation: fadeInUp 0.8s ease;">
+            </div>
+            <div class="col-lg-6">
+                <h2 class="mb-4 animate-on-scroll">Welcome to TechShop</h2>
+                <p class="text-muted animate-on-scroll" style="transition-delay: 0.1s;">
+                    TechShop is Bangladesh's premier destination for computers, laptops, and tech accessories.
+                    Since our establishment, we've been committed to providing authentic products at competitive
+                    prices with excellent customer service.
+                </p>
+                <p class="text-muted animate-on-scroll" style="transition-delay: 0.2s;">
+                    We specialize in offering the latest technology from top brands including HP, Dell,
+                    Lenovo, Asus, Apple, and more. Our team of experts is always ready to help you
+                    find the perfect tech solution for your needs.
+                </p>
+                <div class="mt-4 animate-on-scroll" style="transition-delay: 0.3s;">
+                    <a href="{% url 'store:contact' %}" class="btn btn-primary btn-lg">
+                        <i class="bi bi-chat-dots me-2"></i>Get in Touch
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Stats Section -->
+<section class="stats-section">
+    <div class="container">
+        <div class="row">
+            <div class="col-6 col-md-3 mb-3 mb-md-0">
+                <div class="stat-item">
+                    <h2>10K+</h2>
+                    <p>Happy Customers</p>
+                </div>
+            </div>
+            <div class="col-6 col-md-3 mb-3 mb-md-0">
+                <div class="stat-item">
+                    <h2>500+</h2>
+                    <p>Products</p>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="stat-item">
+                    <h2>5+</h2>
+                    <p>Years Experience</p>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="stat-item">
+                    <h2>24/7</h2>
+                    <p>Customer Support</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Why Choose Us -->
+<section class="py-5">
+    <div class="container">
+        <h2 class="text-center mb-5">Why Choose TechShop</h2>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="feature-card text-center">
+                    <div class="feature-icon">
+                        <i class="bi bi-shield-check"></i>
+                    </div>
+                    <h4>100% Authentic</h4>
+                    <p class="text-muted">All products are genuine with official warranty</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-card text-center">
+                    <div class="feature-icon">
+                        <i class="bi bi-truck"></i>
+                    </div>
+                    <h4>Fast Delivery</h4>
+                    <p class="text-muted">Quick delivery across Bangladesh</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-card text-center">
+                    <div class="feature-icon">
+                        <i class="bi bi-headset"></i>
+                    </div>
+                    <h4>Expert Support</h4>
+                    <p class="text-muted">24/7 technical support team</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Team Section -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <h2 class="text-center mb-5">Our Leadership Team</h2>
+        <div class="row g-4 justify-content-center">
+            <div class="col-md-4">
+                <div class="team-card">
+                    <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?w=400" alt="CEO">
+                    <div class="p-3 text-center">
+                        <h5 class="mb-1">Ahmed Hasan</h5>
+                        <p class="text-muted mb-0">CEO & Founder</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="team-card">
+                    <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400" alt="COO">
+                    <div class="p-3 text-center">
+                        <h5 class="mb-1">Fatema Khan</h5>
+                        <p class="text-muted mb-0">Chief Operations Officer</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="team-card">
+                    <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400" alt="CTO">
+                    <div class="p-3 text-center">
+                        <h5 class="mb-1">Rahim Uddin</h5>
+                        <p class="text-muted mb-0">Technical Director</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Scroll animation
+    const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+            }
+        });
+    }, observerOptions);
+
+    document.querySelectorAll('.animate-on-scroll').forEach(el => {
+        observer.observe(el);
+    });
+</script>
+{% endblock %}

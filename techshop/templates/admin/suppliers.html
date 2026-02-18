@@ -1,0 +1,53 @@
+{% extends 'admin/base.html' %}
+
+{% block admin_title %}Suppliers{% endblock %}
+
+{% block admin_content %}
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="bi bi-building me-2"></i>Suppliers</h2>
+        <a href="{% url 'admin_dashboard:create_supplier' %}" class="btn btn-primary">
+            <i class="bi bi-plus-lg me-1"></i> Add Supplier
+        </a>
+    </div>
+
+    <div class="card border-0 shadow-sm">
+        <div class="card-body p-0">
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Code</th>
+                        <th>Name</th>
+                        <th>Contact</th>
+                        <th>Phone</th>
+                        <th>Email</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for supplier in suppliers %}
+                    <tr>
+                        <td><strong>{{ supplier.code }}</strong></td>
+                        <td>{{ supplier.name }}</td>
+                        <td>{{ supplier.contact_person|default:"-" }}</td>
+                        <td>{{ supplier.phone|default:"-" }}</td>
+                        <td>{{ supplier.email|default:"-" }}</td>
+                        <td>
+                            {% if supplier.is_active %}
+                            <span class="badge bg-success">Active</span>
+                            {% else %}
+                            <span class="badge bg-secondary">Inactive</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="text-center py-4 text-muted">No suppliers yet</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

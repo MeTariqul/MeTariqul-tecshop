@@ -1,0 +1,151 @@
+{% extends 'admin/base.html' %}
+
+{% block admin_title %}Reports & Analytics{% endblock %}
+
+{% block admin_content %}
+<!-- Date Filter -->
+<div class="table-card mb-4">
+    <div class="card-header">
+        <h5 class="mb-0"><i class="bi bi-calendar me-2"></i>Filter by Date</h5>
+    </div>
+    <div class="card-body">
+        <form method="get" class="row g-3">
+            <div class="col-md-4">
+                <label class="form-label">From Date</label>
+                <input type="date" name="date_from" class="form-control" value="{{ date_from }}">
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">To Date</label>
+                <input type="date" name="date_to" class="form-control" value="{{ date_to }}">
+            </div>
+            <div class="col-md-4 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-filter me-2"></i>Apply Filter
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- Sales by Status -->
+    <div class="col-lg-6">
+        <div class="table-card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-pie-chart me-2"></i>Sales by Order Status</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Status</th>
+                                <th>Orders</th>
+                                <th>Revenue</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in sales_by_status %}
+                            <tr>
+                                <td>
+                                    <span class="status-badge {{ item.status }}">{{ item.status|title }}</span>
+                                </td>
+                                <td>{{ item.count }}</td>
+                                <td>৳{{ item.total|default:0 }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="3" class="text-center text-muted">No data available</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Top Products -->
+    <div class="col-lg-6">
+        <div class="table-card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-star me-2"></i>Top Selling Products</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-sm mb-0">
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>Sold</th>
+                                <th>Revenue</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in top_products %}
+                            <tr>
+                                <td>
+                                    <strong>{{ item.product__name }}</strong>
+                                    <br><small class="text-muted">{{ item.product__SKU }}</small>
+                                </td>
+                                <td>{{ item.total_sold }}</td>
+                                <td>৳{{ item.total_revenue|default:0 }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="3" class="text-center text-muted">No data available</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Orders by Day Chart (Text-based for now) -->
+<div class="row g-4 mt-2">
+    <div class="col-12">
+        <div class="table-card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-graph-up me-2"></i>Orders by Day</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Orders</th>
+                                <th>Revenue</th>
+                                <th>Visual</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in orders_by_day %}
+                            <tr>
+                                <td>{{ item.date }}</td>
+                                <td>{{ item.count }}</td>
+                                <td>৳{{ item.revenue|default:0 }}</td>
+                                <td>
+                                    <div class="progress" style="height: 20px; width: 100px;">
+                                        <div class="progress-bar bg-primary" role="progressbar"
+                                            style="width: {% widthratio item.count 50 100 %}%">
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4" class="text-center text-muted">No data available</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

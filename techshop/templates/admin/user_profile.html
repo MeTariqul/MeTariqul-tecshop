@@ -1,0 +1,117 @@
+{% extends 'admin/base.html' %}
+
+{% block admin_title %}My Profile{% endblock %}
+
+{% block admin_content %}
+<div class="row">
+    <!-- Profile Info -->
+    <div class="col-lg-4 mb-4">
+        <div class="table-card">
+            <div class="card-header">
+                <h5 class="mb-0">Profile Information</h5>
+            </div>
+            <div class="card-body text-center">
+                <h4>{{ user_obj.first_name }} {{ user_obj.last_name }}</h4>
+                <p class="text-muted">{{ user_obj.email }}</p>
+
+                {% if is_staff %}
+                <span class="badge bg-primary">{{ staff.get_role_display }}</span>
+                <span class="badge {% if staff.is_active %}bg-success{% else %}bg-danger{% endif %}">
+                    {% if staff.is_active %}Active{% else %}Inactive{% endif %}
+                </span>
+                {% else %}
+                <span class="badge bg-info">Customer</span>
+                {% endif %}
+
+                <hr>
+                <div class="text-start">
+                    <p><strong>Username:</strong> {{ user_obj.username }}</p>
+                    <p><strong>Member Since:</strong> {{ user_obj.date_joined|date:"F d, Y" }}</p>
+                    {% if is_staff %}
+                    <p><strong>Employee ID:</strong> {{ staff.employee_id }}</p>
+                    <p><strong>Department:</strong> {{ staff.department|default:"-" }}</p>
+                    <p><strong>Phone:</strong> {{ staff.phone|default:"-" }}</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Permissions -->
+    <div class="col-lg-4 mb-4">
+        <div class="table-card">
+            <div class="card-header">
+                <h5 class="mb-0">My Permissions</h5>
+            </div>
+            <div class="card-body">
+                <ul class="permission-list">
+                    {% for key, value in permissions.items %}
+                    <li class="{% if value %}text-success{% else %}text-muted{% endif %}">
+                        <i class="bi {% if value %}bi-check-circle-fill{% else %}bi-x-circle{% endif %} me-2"></i>
+                        {{ key|title }}
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- My Orders -->
+    <div class="col-lg-4 mb-4">
+        <div class="table-card">
+            <div class="card-header">
+                <h5 class="mb-0">My Recent Orders</h5>
+            </div>
+            <div class="card-body">
+                {% if user_orders %}
+                {% for order in user_orders %}
+                <div class="order-mini-card mb-2">
+                    <div class="d-flex justify-content-between">
+                        <strong>{{ order.order_number }}</strong>
+                        <span class="status-badge {{ order.status }}">{{ order.get_status_display }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between text-muted">
+                        <small>{{ order.created_at|date:"M d, Y" }}</small>
+                        <small>৳{{ order.total_amount }}</small>
+                    </div>
+                </div>
+                {% endfor %}
+                {% else %}
+                <p class="text-muted text-center">No orders yet</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Activity Log -->
+<div class="table-card">
+    <div class="card-header">
+        <h5 class="mb-0">My Activity</h5>
+    </div>
+    <div class="card-body p-0">
+        <table class="table table-sm mb-0">
+            <thead>
+                <tr>
+                    <th>Action</th>
+                    <th>Details</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for activity in user_obj.activities.all|slice:":10" %}
+                <tr>
+                    <td><span class="badge bg-secondary">{{ activity.action }}</span></td>
+                    <td>{{ activity.description|default:activity.model_name }}</td>
+                    <td>{{ activity.timestamp|date:"M d, Y H:i" }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="3" class="text-center text-muted">No activity yet</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

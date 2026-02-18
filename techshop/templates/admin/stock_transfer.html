@@ -1,0 +1,115 @@
+{% extends 'admin/base.html' %}
+
+{% block admin_title %}Stock Transfer - Move Inventory Between Locations{% endblock %}
+
+{% block admin_content %}
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="mb-0"><i class="bi bi-arrow-left-right me-2"></i>Stock Transfer</h2>
+            <p class="text-muted mb-0">Move stock from Back Room to Shop Floor</p>
+        </div>
+        <a href="{% url 'admin_dashboard:warehouse_dashboard' %}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left me-1"></i> Back to Warehouse
+        </a>
+    </div>
+
+    <div class="row">
+        <!-- Transfer Form -->
+        <div class="col-lg-5">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0"><i class="bi bi-box-arrow-up-right me-2"></i>New Transfer</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label class="form-label">Product</label>
+                            <select name="product" class="form-select" required>
+                                <option value="">Select Product</option>
+                                {% for product in products %}
+                                <option value="{{ product.id }}">
+                                    {{ product.name }} - {{ product.SKU }} (Stock: {{ product.inventory.quantity_on_hand }})
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Quantity</label>
+                            <input type="number" name="quantity" class="form-control" min="1" required>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-6">
+                                <label class="form-label">From Location</label>
+                                <select name="from_location" class="form-select">
+                                    <option value="Back Room">Back Room</option>
+                                    <option value="Warehouse">Warehouse</option>
+                                    <option value="Shop Floor">Shop Floor</option>
+                                </select>
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label">To Location</label>
+                                <select name="to_location" class="form-select">
+                                    <option value="Shop Floor">Shop Floor</option>
+                                    <option value="Back Room">Back Room</option>
+                                    <option value="Warehouse">Warehouse</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Notes</label>
+                            <textarea name="notes" class="form-control" rows="2" placeholder="Optional notes"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="bi bi-check2-circle me-1"></i> Transfer Stock
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Transfers -->
+        <div class="col-lg-7">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0"><i class="bi bi-clock-history me-2"></i>Recent Transfers</h5>
+                </div>
+                <div class="card-body p-0">
+                    {% if recent_transfers %}
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Product</th>
+                                    <th>Qty</th>
+                                    <th>Reference</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for transfer in recent_transfers %}
+                                <tr>
+                                    <td>
+                                        <strong>{{ transfer.product.name }}</strong><br>
+                                        <small class="text-muted">{{ transfer.notes }}</small>
+                                    </td>
+                                    <td>{{ transfer.quantity }}</td>
+                                    <td><small>{{ transfer.reference_number }}</small></td>
+                                    <td><small>{{ transfer.created_at|date:"M j, g:i A" }}</small></td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-5 text-muted">
+                        No transfers yet
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

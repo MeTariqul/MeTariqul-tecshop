@@ -1,0 +1,237 @@
+{% extends 'admin/base.html' %}
+
+{% block admin_title %}Admin Dashboard - Complete Management{% endblock %}
+
+{% block admin_content %}
+<div class="container-fluid py-4">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="mb-0"><i class="bi bi-speedometer2 me-2"></i>Admin Dashboard</h2>
+            <p class="text-muted mb-0">Complete Business Management</p>
+        </div>
+        <div class="text-end">
+            <span class="text-muted">Today: {% now "F j, Y" %}</span>
+        </div>
+    </div>
+
+    <!-- Stats Row - Executive Summary -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <p class="text-muted mb-1">Today's Sales</p>
+                    <h3 class="mb-0">৳{{ today_sales|floatformat:0 }}</h3>
+                    <small class="text-success">{{ today_order_count }} orders</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <p class="text-muted mb-1">This Month</p>
+                    <h3 class="mb-0">৳{{ revenue_month|floatformat:0 }}</h3>
+                    <small class="text-muted">{{ orders_this_month }} orders</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <p class="text-muted mb-1">Total Products</p>
+                    <h3 class="mb-0">{{ total_products }}</h3>
+                    <small class="text-warning">{{ low_stock_products }} low stock</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <p class="text-muted mb-1">Total Customers</p>
+                    <h3 class="mb-0">{{ total_customers }}</h3>
+                    <small class="text-success">+{{ new_customers_this_month }} new</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="row g-3 mb-4">
+        <div class="col-12">
+            <h5 class="mb-3"><i class="bi bi-lightning me-2"></i>Quick Actions</h5>
+        </div>
+        <div class="col-md-2 col-6">
+            <a href="{% url 'admin_dashboard:orders' %}" class="btn btn-outline-success w-100 py-2">
+                <i class="bi bi-bag d-block mb-1" style="font-size: 1.2rem;"></i>
+                Orders
+            </a>
+        </div>
+        <div class="col-md-2 col-6">
+            <a href="{% url 'admin_dashboard:products' %}" class="btn btn-outline-primary w-100 py-2">
+                <i class="bi bi-box-seam d-block mb-1" style="font-size: 1.2rem;"></i>
+                Products
+            </a>
+        </div>
+        <div class="col-md-2 col-6">
+            <a href="{% url 'admin_dashboard:customers' %}" class="btn btn-outline-info w-100 py-2">
+                <i class="bi bi-people d-block mb-1" style="font-size: 1.2rem;"></i>
+                Customers
+            </a>
+        </div>
+        <div class="col-md-2 col-6">
+            <a href="{% url 'admin_dashboard:staff_list' %}" class="btn btn-outline-warning w-100 py-2">
+                <i class="bi bi-person-badge d-block mb-1" style="font-size: 1.2rem;"></i>
+                Staff
+            </a>
+        </div>
+        <div class="col-md-2 col-6">
+            <a href="{% url 'admin_dashboard:suppliers' %}" class="btn btn-outline-secondary w-100 py-2">
+                <i class="bi bi-building d-block mb-1" style="font-size: 1.2rem;"></i>
+                Suppliers
+            </a>
+        </div>
+        <div class="col-md-2 col-6">
+            <a href="{% url 'admin_dashboard:purchase_orders' %}" class="btn btn-outline-dark w-100 py-2">
+                <i class="bi bi-cart d-block mb-1" style="font-size: 1.2rem;"></i>
+                Purchase Orders
+            </a>
+        </div>
+    </div>
+
+    <!-- Three Column Layout: Warehouse, Fulfillment, Staff -->
+    <div class="row g-4">
+        <!-- Warehouse Section -->
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="bi bi-boxes me-2 text-success"></i>Warehouse</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <a href="{% url 'admin_dashboard:stock_transfer' %}" class="btn btn-outline-success w-100 mb-2">
+                            <i class="bi bi-arrow-left-right me-1"></i> Stock Transfer
+                        </a>
+                        <a href="{% url 'admin_dashboard:cycle_count' %}" class="btn btn-outline-success w-100 mb-2">
+                            <i class="bi bi-clipboard-check me-1"></i> Cycle Count
+                        </a>
+                        <a href="{% url 'admin_dashboard:warehouse_dashboard' %}" class="btn btn-success w-100">
+                            <i class="bi bi-arrow-right me-1"></i> Full Inventory
+                        </a>
+                    </div>
+                    <hr>
+                    <h6 class="mb-2">Stock Overview</h6>
+                    <div class="d-flex justify-content-between mb-1">
+                        <span class="text-muted">In Stock</span>
+                        <span class="badge bg-success">{{ total_products|add:low_stock_products }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-1">
+                        <span class="text-muted">Low Stock</span>
+                        <span class="badge bg-warning">{{ low_stock_products }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Fulfillment Section -->
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="bi bi-scroll me-2 text-warning"></i>Fulfillment</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <a href="{% url 'admin_dashboard:scan_item' %}" class="btn btn-outline-warning w-100 mb-2">
+                            <i class="bi bi-upc-scan me-1"></i> Scan Item
+                        </a>
+                        <a href="{% url 'admin_dashboard:fulfillment_dashboard' %}" class="btn btn-warning w-100">
+                            <i class="bi bi-arrow-right me-1"></i> Full Fulfillment
+                        </a>
+                    </div>
+                    <hr>
+                    <h6 class="mb-2">Order Status</h6>
+                    <div class="d-flex justify-content-between mb-1">
+                        <span class="text-muted">Pending</span>
+                        <span class="badge bg-warning">0</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-1">
+                        <span class="text-muted">Processing</span>
+                        <span class="badge bg-info">0</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-1">
+                        <span class="text-muted">Ready to Ship</span>
+                        <span class="badge bg-success">0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Staff & Suppliers Section -->
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="bi bi-people me-2 text-info"></i>Staff & Suppliers</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <a href="{% url 'admin_dashboard:staff_list' %}" class="btn btn-outline-info w-100 mb-2">
+                            <i class="bi bi-people me-1"></i> Manage Staff
+                        </a>
+                        <a href="{% url 'admin_dashboard:suppliers' %}" class="btn btn-outline-info w-100 mb-2">
+                            <i class="bi bi-building me-1"></i> Suppliers
+                        </a>
+                    </div>
+                    <hr>
+                    <h6 class="mb-2">Purchase Orders</h6>
+                    <a href="{% url 'admin_dashboard:create_purchase_order' %}" class="btn btn-primary btn-sm w-100 mb-2">
+                        <i class="bi bi-plus-lg me-1"></i> New PO
+                    </a>
+                    <a href="{% url 'admin_dashboard:purchase_orders' %}" class="btn btn-outline-secondary btn-sm w-100">
+                        View All POs
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Orders -->
+    <div class="row g-4 mt-2">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0"><i class="bi bi-clock-history me-2"></i>Recent Orders</h5>
+                </div>
+                <div class="card-body p-0">
+                    {% if recent_orders %}
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Order #</th>
+                                    <th>Customer</th>
+                                    <th>Total</th>
+                                    <th>Status</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for order in recent_orders %}
+                                <tr>
+                                    <td><strong>{{ order.order_number }}</strong></td>
+                                    <td>{{ order.customer.user.first_name }} {{ order.customer.user.last_name }}</td>
+                                    <td>৳{{ order.total_amount }}</td>
+                                    <td><span class="badge bg-{% if order.status == 'delivered' %}success{% elif order.status == 'pending' %}warning{% elif order.status == 'cancelled' %}danger{% else %}info{% endif %}">{{ order.get_status_display }}</span></td>
+                                    <td>{{ order.created_at|date:"M j, Y" }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-4 text-muted">No orders yet</div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

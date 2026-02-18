@@ -1,0 +1,359 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Products - TechShop{% endblock %}
+
+{% block extra_css %}
+<style>
+    .product-card {
+        transition: transform 0.2s, box-shadow 0.2s;
+        border: none;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+
+    .product-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+    }
+
+    .product-image {
+        height: 200px;
+        object-fit: cover;
+    }
+
+    .category-badge {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+    }
+
+    .price-text {
+        color: #2c3e50;
+        font-weight: 600;
+    }
+
+    .original-price {
+        text-decoration: line-through;
+        color: #95a5a6;
+        font-size: 0.9rem;
+    }
+
+    .stock-badge {
+        font-size: 0.75rem;
+    }
+
+    /* Filter Styles */
+    .filter-section {
+        border-bottom: 1px solid #eee;
+        padding-bottom: 16px;
+        margin-bottom: 16px;
+    }
+
+    .filter-section:last-child {
+        border-bottom: none;
+    }
+
+    .filter-title {
+        font-weight: 600;
+        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .filter-option {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 8px;
+        cursor: pointer;
+    }
+
+    .filter-option:hover {
+        color: #0d6efd;
+    }
+
+    .price-range-inputs {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+    }
+
+    .price-range-inputs input {
+        width: 80px;
+        padding: 6px 10px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+    }
+
+    .filter-btn {
+        background: #0d6efd;
+        color: white;
+        border: none;
+        padding: 6px 16px;
+        border-radius: 4px;
+        cursor: pointer;
+        width: 100%;
+        margin-top: 8px;
+    }
+
+    .filter-btn:hover {
+        background: #0a58ca;
+    }
+
+    /* Sort Dropdown */
+    .sort-wrapper {
+        background: white;
+        padding: 12px 16px;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+
+    .sort-count {
+        color: #6c757d;
+    }
+
+    .sort-select {
+        padding: 8px 12px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        min-width: 180px;
+    }
+
+    .active-filters {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 16px;
+    }
+
+    .filter-tag {
+        background: #e7f1ff;
+        color: #0d6efd;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .filter-tag button {
+        background: none;
+        border: none;
+        color: inherit;
+        padding: 0;
+        cursor: pointer;
+        font-size: 1rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Page Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2 class="mb-3">{% if current_category %}{{ current_category.name }}{% else %}All Products{% endif %}</h2>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'store:home' %}">Home</a></li>
+                    <li class="breadcrumb-item active">Products</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Sidebar - Categories & Filters -->
+        <div class="col-lg-3 mb-4">
+            <!-- Mobile Filter Toggle -->
+            <button class="btn btn-outline-primary d-lg-none w-100 mb-3" type="button" data-bs-toggle="collapse" data-bs-target="#filterSidebar">
+                <i class="bi bi-funnel me-2"></i>Filters & Categories
+            </button>
+
+            <div class="collapse d-lg-block" id="filterSidebar">
+                <!-- Categories -->
+                <div class="card mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0"><i class="bi bi-grid me-2"></i>Categories</h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="list-group list-group-flush">
+                            <a href="{% url 'store:product_list' %}"
+                                class="list-group-item list-group-item-action {% if not current_category %}active{% endif %}">
+                                All Products
+                            </a>
+                            {% for category in categories %}
+                            <a href="{% url 'store:product_list' %}?category={{ category.id }}"
+                                class="list-group-item list-group-item-action {% if current_category == category.id|stringformat:'s' or current_category.id == category.id %}active{% endif %}">
+                                {{ category.name }}
+                            </a>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Price Filter -->
+                <div class="card mb-4">
+                    <div class="card-header bg-white">
+                        <h6 class="mb-0 fw-bold">Price Range</h6>
+                    </div>
+                    <div class="card-body">
+                        <form method="get" action="">
+                            {% if search_query %}<input type="hidden" name="search" value="{{ search_query }}">{% endif %}
+                            {% if current_category %}<input type="hidden" name="category" value="{{ current_category }}">{% endif %}
+                            <div class="price-range-inputs mb-3">
+                                <input type="number" name="min_price" placeholder="Min" value="{{ request.GET.min_price|default:'' }}">
+                                <span>−</span>
+                                <input type="number" name="max_price" placeholder="Max" value="{{ request.GET.max_price|default:'' }}">
+                            </div>
+                            <button type="submit" class="filter-btn">Apply</button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Availability Filter -->
+                <div class="card mb-4">
+                    <div class="card-header bg-white">
+                        <h6 class="mb-0 fw-bold">Availability</h6>
+                    </div>
+                    <div class="card-body">
+                        <a href="{% url 'store:product_list' %}{% if request.GET.category %}?category={{ request.GET.category }}{% endif %}" class="filter-option">
+                            <i class="bi bi-box-seam"></i> All Products
+                        </a>
+                        <a href="?{% if request.GET.search %}search={{ request.GET.search }}&{% endif %}{% if request.GET.min_price %}min_price={{ request.GET.min_price }}&{% endif %}{% if request.GET.max_price %}max_price={{ request.GET.max_price }}&{% endif %}in_stock=true" class="filter-option">
+                            <i class="bi bi-check-circle text-success"></i> In Stock Only
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Product Grid -->
+        <div class="col-lg-9">
+            <!-- Sort and Count Bar -->
+            <div class="sort-wrapper">
+                <span class="sort-count">{{ products.count }} products found</span>
+                <div class="d-flex align-items-center gap-2">
+                    <label for="sort" class="mb-0">Sort by:</label>
+                    <select id="sort" class="sort-select" onchange="window.location.href=this.value">
+                        <option value="?{% if request.GET.search %}search={{ request.GET.search }}&{% endif %}{% if request.GET.category %}category={{ request.GET.category }}&{% endif %}{% if request.GET.min_price %}min_price={{ request.GET.min_price }}&{% endif %}{% if request.GET.max_price %}max_price={{ request.GET.max_price }}&{% endif %}sort=featured" {% if request.GET.sort == 'featured' or not request.GET.sort %}selected{% endif %}>Featured</option>
+                        <option value="?{% if request.GET.search %}search={{ request.GET.search }}&{% endif %}{% if request.GET.category %}category={{ request.GET.category }}&{% endif %}{% if request.GET.min_price %}min_price={{ request.GET.min_price }}&{% endif %}{% if request.GET.max_price %}max_price={{ request.GET.max_price }}&{% endif %}sort=price_low" {% if request.GET.sort == 'price_low' %}selected{% endif %}>Price: Low to High</option>
+                        <option value="?{% if request.GET.search %}search={{ request.GET.search }}&{% endif %}{% if request.GET.category %}category={{ request.GET.category }}&{% endif %}{% if request.GET.min_price %}min_price={{ request.GET.min_price }}&{% endif %}{% if request.GET.max_price %}max_price={{ request.GET.max_price }}&{% endif %}sort=price_high" {% if request.GET.sort == 'price_high' %}selected{% endif %}>Price: High to Low</option>
+                        <option value="?{% if request.GET.search %}search={{ request.GET.search }}&{% endif %}{% if request.GET.category %}category={{ request.GET.category }}&{% endif %}{% if request.GET.min_price %}min_price={{ request.GET.min_price }}&{% endif %}{% if request.GET.max_price %}max_price={{ request.GET.max_price }}&{% endif %}sort=name" {% if request.GET.sort == 'name' %}selected{% endif %}>Name: A-Z</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Search Results Info -->
+            {% if search_query %}
+            <div class="alert alert-info mb-4">
+                <i class="bi bi-info-circle me-2"></i>
+                Showing results for "<strong>{{ search_query }}</strong>"
+                <a href="{% url 'store:product_list' %}" class="alert-link ms-2">Clear search</a>
+            </div>
+            {% endif %}
+
+            {% if products %}
+            <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4">
+                {% for product in products %}
+                <div class="col">
+                    <div class="card product-card h-100">
+                        {% if product.featured_image %}
+                        <img src="{{ product.featured_image.url }}" class="card-img-top product-image"
+                            alt="{{ product.name }}">
+                        {% else %}
+                        <div class="product-image bg-light d-flex align-items-center justify-content-center">
+                            <i class="bi bi-image text-muted" style="font-size: 3rem;"></i>
+                        </div>
+                        {% endif %}
+
+                        {% if product.category %}
+                        <span class="badge bg-secondary category-badge">{{ product.category.name }}</span>
+                        {% endif %}
+
+                        {% if product.has_offer %}
+                        <span class="badge bg-danger category-badge" style="left: auto; right: 10px;">
+                            {{ product.discount_percentage }}% OFF
+                        </span>
+                        {% endif %}
+
+                        <div class="card-body">
+                            <h5 class="card-title">{{ product.name }}</h5>
+                            {% if product.discount_label %}
+                            <small class="text-danger fw-bold"><i class="bi bi-tag-fill me-1"></i>{{
+                                product.discount_label }}</small>
+                            {% endif %}
+                            <p class="card-text text-muted small">{{ product.description|truncatewords:15 }}</p>
+
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <div>
+                                    {% if product.has_offer %}
+                                    <span class="original-price">{{ currency_short_form }} {{ product.selling_price }}</span>
+                                    <span class="price-text text-danger">{{ currency_short_form }} {{ product.discounted_price }}</span>
+                                    {% else %}
+                                    <span class="price-text">{{ currency_short_form }} {{ product.selling_price }}</span>
+                                    {% endif %}
+                                </div>
+                                {% if product.avg_rating %}
+                                <span class="text-warning">
+                                    <i class="bi bi-star-fill"></i> {{ product.avg_rating|floatformat:1 }}
+                                </span>
+                                {% endif %}
+                            </div>
+
+                            {% if product.inventory %}
+                            {% if product.inventory.quantity_on_hand > 0 %}
+                            <span class="badge bg-success stock-badge">
+                                <i class="bi bi-check-circle me-1"></i>{{ product.stock_status }}
+                            </span>
+                            </span>
+                            {% else %}
+                            <span class="badge bg-danger stock-badge">
+                                <i class="bi bi-x-circle me-1"></i>Out of Stock
+                            </span>
+                            {% endif %}
+                            {% endif %}
+                        </div>
+
+                        <div class="card-footer bg-white border-top-0">
+                            <div class="d-grid gap-2">
+                                <a href="{% url 'store:product_detail' product.SKU %}" class="btn btn-outline-primary">
+                                    <i class="bi bi-eye me-1"></i> View Details
+                                </a>
+                                {% if product.inventory and product.inventory.quantity_on_hand > 0 %}
+                                <form action="{% url 'cart:add_to_cart' product.SKU %}" method="post" class="d-grid">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="bi bi-cart-plus me-1"></i> Add to Cart
+                                    </button>
+                                </form>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="alert alert-warning">
+                <i class="bi bi-exclamation-triangle me-2"></i>
+                No products found.
+                {% if search_query %}
+                Try a different search term.
+                {% else %}
+                Check back later for new products.
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

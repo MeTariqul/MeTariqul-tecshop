@@ -1,0 +1,463 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ product.name }} - TechShop{% endblock %}
+
+{% block extra_css %}
+<style>
+    .product-gallery {
+        position: sticky;
+        top: 100px;
+    }
+
+    .main-image {
+        height: 450px;
+        object-fit: cover;
+        border-radius: 12px;
+        cursor: zoom-in;
+        transition: transform 0.3s ease;
+    }
+
+    .main-image:hover {
+        transform: scale(1.5);
+    }
+
+    .zoom-container {
+        overflow: hidden;
+        border-radius: 12px;
+    }
+
+    .thumbnail {
+        width: 80px;
+        height: 80px;
+        object-fit: cover;
+        cursor: pointer;
+        border: 2px solid transparent;
+        border-radius: 8px;
+        transition: all 0.2s;
+    }
+
+    .thumbnail:hover,
+    .thumbnail.active {
+        border-color: #0d6efd;
+        transform: scale(1.05);
+    }
+
+    .price-lg {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #2c3e50;
+    }
+
+    .stock-status {
+        font-size: 0.9rem;
+    }
+
+    .rating-stars {
+        color: #ffc107;
+        font-size: 1.2rem;
+    }
+
+    /* Trust Signals */
+    .trust-signals {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border-radius: 12px;
+        padding: 16px;
+    }
+
+    .trust-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 8px;
+    }
+
+    .trust-item:last-child {
+        margin-bottom: 0;
+    }
+
+    .trust-icon {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+    }
+
+    .trust-icon.secure { background: #d4edda; color: #155724; }
+    .trust-icon.original { background: #cce5ff; color: #004085; }
+    .trust-icon.delivery { background: #fff3cd; color: #856404; }
+    .trust-icon.return { background: #f8d7da; color: #721c24; }
+
+    /* Sticky Add to Cart for Mobile */
+    .sticky-cart-mobile {
+        display: none;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: white;
+        box-shadow: 0 -4px 20px rgba(0,0,0,0.15);
+        padding: 12px 16px;
+        z-index: 1000;
+        animation: slideUp 0.3s ease;
+    }
+
+    @keyframes slideUp {
+        from { transform: translateY(100%); }
+        to { transform: translateY(0); }
+    }
+
+    @media (max-width: 768px) {
+        .sticky-cart-mobile {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .main-image {
+            height: 300px;
+        }
+        
+        body {
+            padding-bottom: 80px;
+        }
+    }
+
+    .add-to-cart-btn {
+        background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
+        border: none;
+        padding: 12px 32px;
+        font-weight: 600;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+    }
+
+    .add-to-cart-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(13, 110, 253, 0.4);
+    }
+
+    .quantity-selector {
+        display: flex;
+        align-items: center;
+        border: 2px solid #dee2e6;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    .quantity-btn {
+        width: 40px;
+        height: 40px;
+        border: none;
+        background: #f8f9fa;
+        font-size: 1.2rem;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+
+    .quantity-btn:hover {
+        background: #e9ecef;
+    }
+
+    .quantity-value {
+        width: 50px;
+        text-align: center;
+        border: none;
+        font-weight: 600;
+    }
+
+    .quantity-value:focus {
+        outline: none;
+    }
+
+    /* Product Info Tabs */
+    .product-tabs {
+        border-bottom: 2px solid #dee2e6;
+        margin-bottom: 20px;
+    }
+
+    .product-tab {
+        padding: 12px 24px;
+        border: none;
+        background: none;
+        font-weight: 600;
+        color: #6c757d;
+        cursor: pointer;
+        position: relative;
+    }
+
+    .product-tab.active {
+        color: #0d6efd;
+    }
+
+    .product-tab.active::after {
+        content: '';
+        position: absolute;
+        bottom: -2px;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: #0d6efd;
+    }
+    
+    /* Variant Selection Styles */
+    .variant-option {
+        cursor: pointer;
+    }
+    
+    .variant-option input {
+        display: none;
+    }
+    
+    .variant-btn {
+        display: inline-block;
+        padding: 8px 16px;
+        border: 2px solid #dee2e6;
+        border-radius: 6px;
+        font-weight: 500;
+        transition: all 0.2s;
+    }
+    
+    .variant-option input:checked + .variant-btn {
+        border-color: #0d6efd;
+        background-color: #0d6efd;
+        color: white;
+    }
+    
+    .variant-option:hover .variant-btn {
+        border-color: #0d6efd;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row">
+        <!-- Product Images -->
+        <div class="col-lg-6 mb-4">
+            <div class="product-gallery">
+                {% if product.featured_image %}
+                <img src="{{ product.featured_image.url }}" class="main-image w-100 mb-3" alt="{{ product.name }}"
+                    id="mainImage">
+                {% else %}
+                <div class="main-image w-100 bg-light d-flex align-items-center justify-content-center mb-3">
+                    <i class="bi bi-image text-muted" style="font-size: 5rem;"></i>
+                </div>
+                {% endif %}
+
+                <!-- Gallery Thumbnails -->
+                {% if gallery_images %}
+                <div class="d-flex gap-2 flex-wrap">
+                    {% if product.featured_image %}
+                    <img src="{{ product.featured_image.url }}" class="thumbnail active"
+                        onclick="document.getElementById('mainImage').src=this.src" alt="{{ product.name }}">
+                    {% endif %}
+                    {% for image in gallery_images %}
+                    <img src="{{ image.image.url }}" class="thumbnail"
+                        onclick="document.getElementById('mainImage').src=this.src" alt="{{ image.alt_text }}">
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Product Details -->
+        <div class="col-lg-6">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-2">
+                    <li class="breadcrumb-item"><a href="{% url 'store:home' %}">Home</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'store:product_list' %}">Products</a></li>
+                    {% if product.category %}
+                    <li class="breadcrumb-item"><a href="{% url 'store:product_list_by_category' product.category.id %}">{{ product.category.name }}</a></li>
+                    {% endif %}
+                </ol>
+            </nav>
+            
+            <h1 class="mb-3">{{ product.name }}</h1>
+            
+            <!-- SKU and Category -->
+            <div class="mb-3">
+                <small class="text-muted">SKU: {{ product.SKU }}</small>
+            </div>
+
+            <!-- Price -->
+            <div class="mb-4">
+                {% if product.has_offer %}
+                <span class="text-muted text-decoration-line-through" style="font-size: 1.3rem;">{{ currency_short_form }} {{ product.selling_price }}</span>
+                <span class="price-lg text-danger ms-2">{{ currency_short_form }} {{ product.discounted_price }}</span>
+                <span class="badge bg-danger ms-2">{{ product.discount_percentage }}% OFF</span>
+                {% if product.discount_label %}
+                <br><span class="badge bg-warning text-dark mt-2"><i class="bi bi-tag-fill me-1"></i>{{ product.discount_label }}</span>
+                {% endif %}
+                {% else %}
+                <span class="price-lg">{{ currency_short_form }} {{ product.selling_price }}</span>
+                {% endif %}
+            </div>
+
+            <!-- Stock Status -->
+            <div class="mb-4">
+                {% if inventory and inventory.quantity_on_hand > 0 %}
+                <span class="badge bg-success stock-status">
+                    <i class="bi bi-check-circle me-1"></i>In Stock ({{ inventory.quantity_on_hand }} available)
+                </span>
+                {% else %}
+                <span class="badge bg-danger stock-status">
+                    <i class="bi bi-x-circle me-1"></i>Out of Stock
+                </span>
+                {% endif %}
+            </div>
+
+            <!-- Trust Signals -->
+            <div class="trust-signals mb-4">
+                <h6 class="fw-bold mb-3"><i class="bi bi-shield-check me-2"></i>Why Buy From Us</h6>
+                <div class="trust-item">
+                    <div class="trust-icon secure"><i class="bi bi-lock-fill"></i></div>
+                    <small>Secure SSL Encryption</small>
+                </div>
+                <div class="trust-item">
+                    <div class="trust-icon original"><i class="bi bi-patch-check-fill"></i></div>
+                    <small>100% Authentic Products</small>
+                </div>
+                <div class="trust-item">
+                    <div class="trust-icon delivery"><i class="bi bi-truck"></i></div>
+                    <small>Fast Delivery Across Bangladesh</small>
+                </div>
+                <div class="trust-item">
+                    <div class="trust-icon return"><i class="bi bi-arrow-repeat"></i></div>
+                    <small>Easy 30-Day Returns</small>
+                </div>
+            </div>
+
+            <!-- Description -->
+            <div class="mb-4">
+                <h5>Description</h5>
+                <p class="text-muted">{{ product.description|linebreaks }}</p>
+            </div>
+
+            {% if inventory and inventory.quantity_on_hand > 0 %}
+            <!-- Add to Cart Form -->
+            <form action="{% url 'cart:add_to_cart' product.SKU %}" method="post" class="mb-4">
+                {% csrf_token %}
+                
+                {% if variants %}
+                <!-- Variant Selection -->
+                <div class="mb-3">
+                    {% if available_sizes %}
+                    <div class="mb-3">
+                        <label class="fw-bold d-block mb-2">Size:</label>
+                        <div class="d-flex gap-2 flex-wrap">
+                            {% for size in available_sizes %}
+                            <label class="variant-option">
+                                <input type="radio" name="size" value="{{ size }}" required>
+                                <span class="variant-btn">{{ size }}</span>
+                            </label>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    {% if available_colors %}
+                    <div class="mb-3">
+                        <label class="fw-bold d-block mb-2">Color:</label>
+                        <div class="d-flex gap-2 flex-wrap">
+                            {% for color in available_colors %}
+                            <label class="variant-option">
+                                <input type="radio" name="color" value="{{ color }}" required>
+                                <span class="variant-btn">{{ color }}</span>
+                            </label>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+                {% endif %}
+                
+                <div class="row g-3 align-items-center">
+                    <div class="col-auto">
+                        <label class="fw-bold">Quantity:</label>
+                    </div>
+                    <div class="col-auto">
+                        <div class="quantity-selector">
+                            <button type="button" class="quantity-btn" onclick="updateQty(-1)">−</button>
+                            <input type="number" id="quantity" name="quantity" class="quantity-value" value="1" min="1" max="{{ inventory.quantity_on_hand }}" readonly>
+                            <button type="button" class="quantity-btn" onclick="updateQty(1)">+</button>
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <button type="submit" class="btn btn-primary add-to-cart-btn">
+                            <i class="bi bi-cart-plus me-2"></i>Add to Cart
+                        </button>
+                    </div>
+                </div>
+            </form>
+            {% endif %}
+
+            <!-- Wishlist Button -->
+            <div class="mb-4">
+                {% if user.is_authenticated %}
+                <a href="{% url 'wishlist:toggle_wishlist' product.SKU %}" class="btn btn-outline-danger">
+                    <i class="bi bi-heart{% if in_wishlist %}-fill{% endif %} me-2"></i>
+                    {% if in_wishlist %}Remove from Wishlist{% else %}Add to Wishlist{% endif %}
+                </a>
+                {% else %}
+                <a href="{% url 'login' %}" class="btn btn-outline-danger">
+                    <i class="bi bi-heart me-2"></i>Add to Wishlist
+                </a>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Mobile Sticky Cart -->
+        {% if inventory and inventory.quantity_on_hand > 0 %}
+        <div class="sticky-cart-mobile">
+            <div>
+                <span class="fw-bold">{{ currency_short_form }} {{ product.discounted_price|default:product.selling_price }}</span>
+            </div>
+            <form action="{% url 'cart:add_to_cart' product.SKU %}" method="post" class="d-flex align-items-center gap-2">
+                {% csrf_token %}
+                <input type="hidden" name="quantity" value="1">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-cart-plus me-1"></i>Add to Cart
+                </button>
+            </form>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+    function updateQty(delta) {
+        const input = document.getElementById('quantity');
+        const max = parseInt(input.max);
+        let newVal = parseInt(input.value) + delta;
+        if (newVal < 1) newVal = 1;
+        if (newVal > max) newVal = max;
+        input.value = newVal;
+        
+        // Update hidden input in mobile sticky cart
+        const mobileInput = document.querySelector('.sticky-cart-mobile input[name="quantity"]');
+        if (mobileInput) mobileInput.value = newVal;
+    }
+</script>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Quantity selector functionality
+    function updateQty(delta) {
+        const input = document.getElementById('quantity');
+        const max = parseInt(input.max);
+        let newVal = parseInt(input.value) + delta;
+        if (newVal < 1) newVal = 1;
+        if (newVal > max) newVal = max;
+        input.value = newVal;
+        
+        // Update hidden input in mobile sticky cart
+        const mobileInput = document.querySelector('.sticky-cart-mobile input[name="quantity"]');
+        if (mobileInput) mobileInput.value = newVal;
+    }
+</script>
+{% endblock %}

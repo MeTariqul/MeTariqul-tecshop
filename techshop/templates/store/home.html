@@ -1,0 +1,344 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}TechShop - Your Trusted Tech Store in Bangladesh{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="hero-shapes">
+        <div class="shape shape-1"></div>
+        <div class="shape shape-2"></div>
+    </div>
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <div class="hero-content">
+                    <div class="hero-badge mb-3">
+                        <span class="badge bg-primary rounded-pill">
+                            <i class="bi bi-lightning-charge-fill me-1"></i> New Collection 2026
+                        </span>
+                    </div>
+                    <h1 class="hero-title animate-fade-in-up">
+                        Your Trusted <span>Tech Store</span> in Bangladesh
+                    </h1>
+                    <p class="hero-subtitle animate-fade-in-up delay-1">
+                        Discover the latest laptops, computers, and tech accessories. 
+                        Get authentic products with official warranty and fast delivery across Bangladesh.
+                    </p>
+                    
+                    <!-- Quick Search in Hero -->
+                    <div class="hero-search animate-fade-in-up delay-2">
+                        <form action="{% url 'store:product_list' %}" method="get" class="d-flex gap-2">
+                            <input type="text" name="search" class="form-control form-control-lg" 
+                                placeholder="What are you looking for?" style="max-width: 300px;">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="bi bi-search"></i>
+                            </button>
+                        </form>
+                    </div>
+
+                    <div class="hero-buttons animate-fade-in-up delay-2 mt-4">
+                        <a href="{% url 'store:product_list' %}" class="btn-primary-custom">
+                            <i class="bi bi-shop me-2"></i>Shop Now
+                        </a>
+                        <a href="{% url 'store:about' %}" class="btn-outline-custom">
+                            Learn More
+                        </a>
+                    </div>
+                    
+                    <!-- Trust Stats -->
+                    <div class="hero-stats animate-fade-in-up delay-3 mt-4">
+                        <div class="row text-center">
+                            <div class="col-4">
+                                <h4 class="mb-0 fw-bold">500+</h4>
+                                <small class="text-muted">Products</small>
+                            </div>
+                            <div class="col-4">
+                                <h4 class="mb-0 fw-bold">10K+</h4>
+                                <small class="text-muted">Customers</small>
+                            </div>
+                            <div class="col-4">
+                                <h4 class="mb-0 fw-bold">4.8★</h4>
+                                <small class="text-muted">Rating</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="hero-image">
+                    <img src="https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=600" alt="Laptop"
+                        class="img-fluid">
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Category Section -->
+<section class="category-section">
+    <div class="container">
+        <div class="section-header">
+            <h2 class="section-title">Shop by Category</h2>
+        </div>
+        <div class="row g-3 g-md-4">
+            {% for category in categories %}
+            <div class="col-6 col-md-4 col-lg-2">
+                <a href="{% url 'store:product_list' %}?category={{ category.id }}" class="category-card">
+                    <div class="category-icon">
+                        <i class="bi bi-{% cycle 'laptop' 'display' 'cpu' 'gpu-card' 'keyboard' 'headset' %}"></i>
+                    </div>
+                    <h4>{{ category.name }}</h4>
+                    <p>Shop Now <i class="bi bi-arrow-right small"></i></p>
+                </a>
+            </div>
+            {% empty %}
+            <div class="col-6 col-md-4 col-lg-2">
+                <a href="{% url 'store:product_list' %}?category=1" class="category-card">
+                    <div class="category-icon">
+                        <i class="bi bi-laptop"></i>
+                    </div>
+                    <h4>Laptops</h4>
+                    <p>500+ Products</p>
+                </a>
+            </div>
+            <div class="col-6 col-md-4 col-lg-2">
+                <a href="{% url 'store:product_list' %}?category=2" class="category-card">
+                    <div class="category-icon">
+                        <i class="bi bi-display"></i>
+                    </div>
+                    <h4>Monitors</h4>
+                    <p>200+ Products</p>
+                </a>
+            </div>
+            <div class="col-6 col-md-4 col-lg-2">
+                <a href="{% url 'store:product_list' %}?category=3" class="category-card">
+                    <div class="category-icon">
+                        <i class="bi bi-cpu"></i>
+                    </div>
+                    <h4>Processors</h4>
+                    <p>100+ Products</p>
+                </a>
+            </div>
+            <div class="col-6 col-md-4 col-lg-2">
+                <a href="{% url 'store:product_list' %}?category=4" class="category-card">
+                    <div class="category-icon">
+                        <i class="bi bi-gpu-card"></i>
+                    </div>
+                    <h4>Graphics Card</h4>
+                    <p>80+ Products</p>
+                </a>
+            </div>
+            <div class="col-6 col-md-4 col-lg-2">
+                <a href="{% url 'store:product_list' %}?category=5" class="category-card">
+                    <div class="category-icon">
+                        <i class="bi bi-keyboard"></i>
+                    </div>
+                    <h4>Accessories</h4>
+                    <p>300+ Products</p>
+                </a>
+            </div>
+            <div class="col-6 col-md-4 col-lg-2">
+                <a href="{% url 'store:product_list' %}?category=6" class="category-card">
+                    <div class="category-icon">
+                        <i class="bi bi-headset"></i>
+                    </div>
+                    <h4>Audio</h4>
+                    <p>150+ Products</p>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Featured Products -->
+<section class="featured-section">
+    <div class="container">
+        <div class="section-header">
+            <h2 class="section-title">Featured Products</h2>
+            <a href="{% url 'store:product_list' %}" class="view-all">
+                View All <i class="bi bi-arrow-right"></i>
+            </a>
+        </div>
+
+        <div class="row g-4">
+            {% for product in featured_products %}
+            <div class="col-6 col-md-4 col-lg-3">
+                <div class="product-card">
+                    <div class="product-image-wrapper">
+                        {% if product.featured_image %}
+                        <img src="{{ product.featured_image.url }}" alt="{{ product.name }}">
+                        {% else %}
+                        <div class="d-flex align-items-center justify-content-center h-100 bg-light">
+                            <i class="bi bi-image text-muted" style="font-size: 3rem;"></i>
+                        </div>
+                        {% endif %}
+
+                        <div class="product-badges">
+                            {% if product.is_available_online %}
+                            <span class="badge-new">New</span>
+                            {% endif %}
+                        </div>
+
+                        <div class="product-actions">
+                            <button class="product-action-btn" title="Quick View" data-bs-toggle="modal" data-bs-target="#quickView{{ product.SKU }}">
+                                <i class="bi bi-eye"></i>
+                            </button>
+                            <button class="product-action-btn" title="Add to Wishlist">
+                                <i class="bi bi-heart"></i>
+                            </button>
+                            <button class="product-action-btn" title="Add to Compare">
+                                <i class="bi bi-arrow-repeat"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="product-content">
+                        {% if product.category %}
+                        <span class="product-category">{{ product.category.name }}</span>
+                        {% endif %}
+                        <h3 class="product-title">
+                            <a href="{% url 'store:product_detail' product.SKU %}">{{ product.name }}</a>
+                        </h3>
+
+                        <div class="product-rating">
+                            <span class="rating-stars">
+                                {% if product.avg_rating %}
+                                <i class="bi bi-star-fill"></i>
+                                <i class="bi bi-star-fill"></i>
+                                <i class="bi bi-star-fill"></i>
+                                <i class="bi bi-star-fill"></i>
+                                <i class="bi bi-star-half"></i>
+                                {% else %}
+                                <i class="bi bi-star"></i>
+                                <i class="bi bi-star"></i>
+                                <i class="bi bi-star"></i>
+                                <i class="bi bi-star"></i>
+                                <i class="bi bi-star"></i>
+                                {% endif %}
+                            </span>
+                            <span class="rating-count">({{ product.avg_rating|default:0 }})</span>
+                        </div>
+
+                        <div class="product-price">
+                            <span class="price-current">{{ currency_short_form }} {{ product.selling_price }}</span>
+                            {% if product.cost_price > product.selling_price %}
+                            <span class="price-old">{{ currency_short_form }} {{ product.cost_price }}</span>
+                            {% endif %}
+                        </div>
+
+                        {% if product.stock_quantity > 10 %}
+                        <span class="stock-status stock-in"><i class="bi bi-check-circle me-1"></i>In Stock</span>
+                        {% elif product.stock_quantity > 0 %}
+                        <span class="stock-status stock-low"><i class="bi bi-exclamation-triangle me-1"></i>Low
+                            Stock</span>
+                        {% else %}
+                        <span class="stock-status stock-out"><i class="bi bi-x-circle me-1"></i>Out of Stock</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12 text-center py-5">
+                <i class="bi bi-inbox" style="font-size: 3rem; color: #ccc;"></i>
+                <p class="mt-3 text-muted">No featured products available yet.</p>
+                <a href="{% url 'store:product_list' %}" class="btn btn-primary mt-2">Browse Products</a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Banner Section -->
+<section class="banner-section">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-md-6">
+                <div class="banner-card">
+                    <img src="https://images.unsplash.com/photo-1593640408182-31c70c8268f5?w=800" alt="Gaming">
+                    <div class="banner-overlay">
+                        <div class="banner-content">
+                            <h3>Gaming Collection</h3>
+                            <p>Level up your gaming experience</p>
+                            <a href="{% url 'store:product_list' %}" class="btn-primary-custom btn-sm">Shop Now</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="banner-card">
+                    <img src="https://images.unsplash.com/photo-1587831990711-23ca6441447b?w=800" alt="Office">
+                    <div class="banner-overlay">
+                        <div class="banner-content">
+                            <h3>Office Essentials</h3>
+                            <p>Everything you need for work</p>
+                            <a href="{% url 'store:product_list' %}" class="btn-primary-custom btn-sm">Shop Now</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Why Choose Us -->
+<section class="category-section">
+    <div class="container">
+        <h2 class="section-title">Why Choose TechShop?</h2>
+        <div class="row g-4">
+            <div class="col-md-3">
+                <div class="category-card">
+                    <div class="category-icon" style="background: #28a745;">
+                        <i class="bi bi-shield-check"></i>
+                    </div>
+                    <h4>100% Authentic</h4>
+                    <p>All products are genuine with official warranty</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="category-card">
+                    <div class="category-icon" style="background: #17a2b8;">
+                        <i class="bi bi-truck"></i>
+                    </div>
+                    <h4>Fast Delivery</h4>
+                    <p>Quick delivery across Bangladesh</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="category-card">
+                    <div class="category-icon" style="background: #ffc107;">
+                        <i class="bi bi-arrow-repeat"></i>
+                    </div>
+                    <h4>Easy Returns</h4>
+                    <p>30-day return policy</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="category-card">
+                    <div class="category-icon" style="background: #dc3545;">
+                        <i class="bi bi-headset"></i>
+                    </div>
+                    <h4>24/7 Support</h4>
+                    <p>Dedicated customer support</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Newsletter -->
+<section class="newsletter-section">
+    <div class="container">
+        <div class="newsletter-content">
+            <h3>Subscribe to Our Newsletter</h3>
+            <p>Get the latest deals and updates directly to your inbox</p>
+            <form class="newsletter-form">
+                <input type="email" placeholder="Enter your email address">
+                <button type="submit">Subscribe</button>
+            </form>
+        </div>
+    </div>
+</section>
+{% endblock %}

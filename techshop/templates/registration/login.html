@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Login - Tech Shop{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-5 col-lg-4">
+            <!-- Logo / Header -->
+            <div class="text-center mb-4">
+                <i class="bi bi-person-circle display-3 text-primary"></i>
+                <h3 class="fw-bold mt-2">Welcome Back</h3>
+                <p class="text-muted">Sign in to your Tech Shop account</p>
+            </div>
+
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <form method="post">
+                        {% csrf_token %}
+
+                        {% if form.non_field_errors %}
+                        <div class="alert alert-danger py-2 small">
+                            {{ form.non_field_errors }}
+                        </div>
+                        {% endif %}
+
+                        <div class="mb-3">
+                            <label for="{{ form.username.id_for_label }}" class="form-label fw-bold">Username</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light"><i class="bi bi-person"></i></span>
+                                <input type="text"
+                                    class="form-control {% if form.username.errors %}is-invalid{% endif %}"
+                                    id="{{ form.username.id_for_label }}" name="{{ form.username.name }}"
+                                    value="{{ form.username.value|default:'' }}" placeholder="Enter your username">
+                            </div>
+                            {% if form.username.errors %}
+                            <div class="text-danger small mt-1">{{ form.username.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="{{ form.password.id_for_label }}" class="form-label fw-bold">Password</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light"><i class="bi bi-lock"></i></span>
+                                <input type="password"
+                                    class="form-control {% if form.password.errors %}is-invalid{% endif %}"
+                                    id="{{ form.password.id_for_label }}" name="{{ form.password.name }}"
+                                    placeholder="Enter your password">
+                            </div>
+                            {% if form.password.errors %}
+                            <div class="text-danger small mt-1">{{ form.password.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-tech py-2 fw-bold">
+                                <i class="bi bi-box-arrow-in-right me-2"></i> Sign In
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="text-center mt-4">
+                <p class="text-muted mb-0">Don't have an account?
+                    <a href="{% url 'orders:register' %}" class="text-primary fw-bold text-decoration-none">Create
+                        one</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

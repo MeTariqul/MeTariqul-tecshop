@@ -1,0 +1,527 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Order Confirmed - TechShop{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Hide store navbar on confirmation page */
+    .navbar.navbar-expand-lg.navbar-light.bg-white.border-top {
+        display: none !important;
+    }
+    
+    /* Modern Hero Section */
+    .confirmation-hero {
+        background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        color: #fff;
+        padding: 4rem 0;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .confirmation-hero::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 60%);
+        animation: shimmer 3s infinite;
+    }
+    
+    @keyframes shimmer {
+        0% { transform: translate(-10%, -10%); }
+        100% { transform: translate(10%, 10%); }
+    }
+
+    .success-icon {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.25);
+        backdrop-filter: blur(10px);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 3rem;
+        animation: popIn 0.6s ease-out;
+        border: 3px solid rgba(255,255,255,0.3);
+    }
+
+    @keyframes popIn {
+        0% { transform: scale(0); opacity: 0; }
+        60% { transform: scale(1.2); }
+        100% { transform: scale(1); opacity: 1; }
+    }
+    
+    @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .fade-in-up {
+        animation: fadeInUp 0.6s ease-out forwards;
+    }
+    
+    .delay-1 { animation-delay: 0.1s; }
+    .delay-2 { animation-delay: 0.2s; }
+    .delay-3 { animation-delay: 0.3s; }
+    .delay-4 { animation-delay: 0.4s; }
+
+    /* Order Card */
+    .order-card {
+        border: none;
+        border-radius: 20px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+        overflow: hidden;
+    }
+
+    .order-card .card-header {
+        background: linear-gradient(135deg, #f5f7fa 0%, #ffffff 100%);
+        border-bottom: 1px solid #eee;
+        padding: 1.5rem;
+    }
+
+    .order-card .card-body {
+        padding: 2rem;
+    }
+
+    /* Order Number Badge */
+    .order-badge {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 0.75rem 1.5rem;
+        border-radius: 50px;
+        font-weight: 700;
+        font-size: 1.1rem;
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    }
+
+    /* Status Badge */
+    .status-badge {
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 0.85rem;
+    }
+    
+    .status-badge.confirmed {
+        background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        color: white;
+    }
+
+    /* Items Table */
+    .items-table {
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+
+    .items-table thead th {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border: none;
+        padding: 1rem;
+        font-weight: 700;
+        color: #495057;
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .items-table tbody td {
+        padding: 1rem;
+        vertical-align: middle;
+        border-bottom: 1px solid #f0f0f0;
+    }
+
+    .items-table tbody tr:hover {
+        background: #f8f9fa;
+    }
+
+    .items-table tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+    /* Product Card in Table */
+    .product-info {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+    
+    .product-thumb {
+        width: 60px;
+        height: 60px;
+        border-radius: 12px;
+        object-fit: cover;
+        background: #f8f9fa;
+    }
+
+    .product-name {
+        font-weight: 600;
+        color: #2c3e50;
+        text-decoration: none;
+    }
+    
+    .product-name:hover {
+        color: #11998e;
+    }
+
+    /* Totals Section */
+    .totals-section {
+        background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+        border-radius: 16px;
+        padding: 1.5rem;
+        border: 1px solid #eee;
+    }
+
+    .total-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.6rem 0;
+        font-size: 0.95rem;
+    }
+
+    .total-row.final {
+        border-top: 2px solid #11998e;
+        padding-top: 1rem;
+        margin-top: 0.5rem;
+        font-size: 1.1rem;
+    }
+
+    /* Timeline */
+    .timeline-card {
+        border: none;
+        border-radius: 20px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+    
+    .timeline-step {
+        text-align: center;
+        position: relative;
+    }
+    
+    .timeline-step .step-icon {
+        width: 70px;
+        height: 70px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(10px);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.75rem;
+        margin-bottom: 1rem;
+        border: 2px solid rgba(255,255,255,0.3);
+        transition: all 0.3s;
+    }
+    
+    .timeline-step:hover .step-icon {
+        transform: translateY(-5px);
+        background: rgba(255, 255, 255, 0.3);
+    }
+
+    .timeline-step h6 {
+        font-weight: 700;
+        margin-bottom: 0.25rem;
+    }
+    
+    .timeline-step p {
+        font-size: 0.8rem;
+        opacity: 0.85;
+        margin-bottom: 0;
+    }
+
+    /* Action Buttons */
+    .action-btn {
+        padding: 0.85rem 1.75rem;
+        border-radius: 12px;
+        font-weight: 600;
+        transition: all 0.3s;
+        font-size: 0.95rem;
+    }
+
+    .btn-download {
+        background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        color: white;
+        border: none;
+        box-shadow: 0 4px 15px rgba(17, 153, 142, 0.3);
+    }
+
+    .btn-download:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(17, 153, 142, 0.4);
+        color: white;
+    }
+
+    .btn-print {
+        background: white;
+        color: #667eea;
+        border: 2px solid #667eea;
+    }
+
+    .btn-print:hover {
+        background: #667eea;
+        color: white;
+        transform: translateY(-2px);
+    }
+
+    /* Address Card */
+    .address-card {
+        background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+        border-radius: 16px;
+        padding: 1.5rem;
+        border: 1px solid #eee;
+    }
+    
+    .address-card h6 {
+        color: #667eea;
+        font-weight: 700;
+        margin-bottom: 0.75rem;
+    }
+    
+    .address-card p {
+        color: #6c757d;
+        margin-bottom: 0;
+        line-height: 1.6;
+    }
+
+    /* Price styling */
+    .price {
+        font-weight: 700;
+        color: #2c3e50;
+    }
+    
+    .total-price {
+        font-size: 1.25rem;
+        background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    @media print {
+        .confirmation-hero, .no-print, .timeline-card { display: none !important; }
+        .order-card { box-shadow: none !important; border: 1px solid #ddd !important; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Banner -->
+<div class="confirmation-hero">
+    <div class="container text-center position-relative">
+        <div class="success-icon mx-auto mb-4 fade-in-up">
+            <i class="bi bi-check-lg"></i>
+        </div>
+        <h2 class="fw-bold mb-2 fade-in-up delay-1">Order Confirmed!</h2>
+        <p class="mb-4 opacity-90 fade-in-up delay-2">Thank you for your purchase. We're preparing your order now.</p>
+        <div class="fade-in-up delay-3">
+            <span class="order-badge">{{ order.order_number }}</span>
+        </div>
+    </div>
+</div>
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+
+            <!-- Action Buttons -->
+            <div class="d-flex justify-content-end gap-3 mb-4 no-print fade-in-up delay-4">
+                <a href="{% url 'orders:download_invoice' order.id %}" class="btn action-btn btn-download">
+                    <i class="bi bi-file-earmark-pdf me-2"></i>Download Invoice
+                </a>
+                <button onclick="printInvoice()" class="btn action-btn btn-print">
+                    <i class="bi bi-printer me-2"></i>Print
+                </button>
+            </div>
+
+            <!-- Order Details Card -->
+            <div class="order-card card mb-4 fade-in-up delay-2">
+                <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-3">
+                    <h5 class="mb-0 fw-bold"><i class="bi bi-receipt me-2 text-primary"></i>Order Details</h5>
+                    <span class="status-badge confirmed">
+                        <i class="bi bi-check-circle me-1"></i>{{ order.get_status_display }}
+                    </span>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <p class="text-muted small mb-1">Order Number</p>
+                                <p class="fw-bold mb-0" style="font-size: 1.1rem;">{{ order.order_number }}</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6 text-md-end">
+                            <div class="mb-3">
+                                <p class="text-muted small mb-1">Order Date</p>
+                                <p class="fw-bold mb-0">{{ order.created_at|date:"F d, Y • g:i A" }}</p>
+                            </div>
+                            <div class="mt-3">
+                                <p class="text-muted small mb-1">Total Amount</p>
+                                <p class="total-price fw-bold" style="font-size: 1.5rem;">{{ currency_short_form }} {{ order.total_amount }}</p>
+                            </div>
+                            {% if order.payment %}
+                            <span class="badge bg-success mt-2">
+                                <i class="bi bi-shield-check me-1"></i>Payment {{ order.payment.get_status_display }}
+                            </span>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <hr class="my-4">
+
+                    <div class="row">
+                        <!-- Shipping Address -->
+                        <div class="col-md-6 mb-4 mb-md-0">
+                            <div class="address-card">
+                                <h6><i class="bi bi-geo-alt me-2"></i>Shipping Address</h6>
+                                <p>
+                                    {{ order.shipping_address }}<br>
+                                    {{ order.shipping_city }}, {{ order.shipping_state }}<br>
+                                    {{ order.shipping_zip }}
+                                </p>
+                            </div>
+                        </div>
+                        <!-- Payment Info -->
+                        <div class="col-md-6">
+                            <div class="address-card">
+                                <h6><i class="bi bi-credit-card me-2"></i>Payment Method</h6>
+                                <p>
+                                    <i class="bi bi-credit-card-2-front me-2"></i>Credit Card<br>
+                                    <span class="text-muted">Secure payment via Stripe</span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr class="my-4">
+
+                    <!-- Items Ordered -->
+                    <h6 class="fw-bold mb-3"><i class="bi bi-box-seam me-2 text-primary"></i>Items Ordered ({{ items|length }})</h6>
+                    <div class="table-responsive">
+                        <table class="table items-table">
+                            <thead>
+                                <tr>
+                                    <th>Product</th>
+                                    <th class="text-center">Qty</th>
+                                    <th class="text-end">Price</th>
+                                    <th class="text-end">Subtotal</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in items %}
+                                <tr>
+                                    <td>
+                                        <div class="product-info">
+                                            {% if item.product.featured_image %}
+                                            <img src="{{ item.product.featured_image.url }}" class="product-thumb" alt="{{ item.product.name }}">
+                                            {% else %}
+                                            <div class="product-thumb d-flex align-items-center justify-content-center">
+                                                <i class="bi bi-image text-muted"></i>
+                                            </div>
+                                            {% endif %}
+                                            <div>
+                                                <a href="{% url 'store:product_detail' item.product.SKU %}" class="product-name">{{ item.product.name }}</a>
+                                                <br><small class="text-muted">SKU: {{ item.product.SKU }}</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="badge bg-light text-dark">{{ item.quantity }}</span>
+                                    </td>
+                                    <td class="text-end price">{{ currency_short_form }} {{ item.unit_price }}</td>
+                                    <td class="text-end price">{{ currency_short_form }} {{ item.subtotal }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Totals -->
+                    <div class="row justify-content-end mt-4">
+                        <div class="col-md-5">
+                            <div class="totals-section">
+                                <div class="total-row">
+                                    <span class="text-muted">Subtotal</span>
+                                    <span class="price">{{ currency_short_form }} {{ order.subtotal }}</span>
+                                </div>
+                                <div class="total-row">
+                                    <span class="text-muted">Shipping</span>
+                                    <span class="price">
+                                        {% if order.shipping_cost > 0 %}{{ currency_short_form }} {{ order.shipping_cost }}{% else %}<span class="text-success">FREE</span>{% endif %}
+                                    </span>
+                                </div>
+                                <div class="total-row">
+                                    <span class="text-muted">Tax</span>
+                                    <span class="price">{{ currency_short_form }} {{ order.tax_amount }}</span>
+                                </div>
+                                <div class="total-row final">
+                                    <span class="fw-bold">Total</span>
+                                    <span class="total-price fw-bold">{{ currency_short_form }} {{ order.total_amount }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Order Timeline -->
+            <div class="timeline-card card mb-4 fade-in-up delay-3">
+                <div class="card-body p-4">
+                    <div class="row g-4">
+                        <div class="col-md-4 timeline-step">
+                            <div class="step-icon">
+                                <i class="bi bi-bag-check"></i>
+                            </div>
+                            <h6>Order Placed</h6>
+                            <p>Your order has been received</p>
+                        </div>
+                        <div class="col-md-4 timeline-step">
+                            <div class="step-icon">
+                                <i class="bi bi-gear"></i>
+                            </div>
+                            <h6>Processing</h6>
+                            <p>We're preparing your items</p>
+                        </div>
+                        <div class="col-md-4 timeline-step">
+                            <div class="step-icon">
+                                <i class="bi bi-truck"></i>
+                            </div>
+                            <h6>On the Way</h6>
+                            <p>Will be delivered soon</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Navigation Buttons -->
+            <div class="d-flex justify-content-center gap-3 no-print fade-in-up delay-4">
+                <a href="{% url 'orders:order_history' %}" class="btn action-btn btn-print">
+                    <i class="bi bi-clock-history me-2"></i>View Orders
+                </a>
+                <a href="{% url 'store:home' %}" class="btn action-btn btn-download">
+                    <i class="bi bi-house-door me-2"></i>Back to Home
+                </a>
+            </div>
+            
+            <!-- Support Info -->
+            <div class="text-center mt-5 no-print fade-in-up delay-4">
+                <p class="text-muted mb-2">Need help? Contact our support team</p>
+                <a href="{% url 'store:contact' %}" class="btn btn-outline-primary btn-sm">
+                    <i class="bi bi-chat-dots me-1"></i>Contact Support
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function printInvoice() {
+        window.open("{% url 'orders:download_invoice' order.id %}?print=1", '_blank');
+    }
+</script>
+{% endblock %}

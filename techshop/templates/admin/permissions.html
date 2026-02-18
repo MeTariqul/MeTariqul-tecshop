@@ -1,0 +1,235 @@
+{% extends 'admin/base.html' %}
+
+{% block admin_title %}Manage Permissions{% endblock %}
+
+{% block admin_content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h4 class="mb-0">Manage Permissions for {{ staff.user.username }}</h4>
+    <a href="{% url 'admin_dashboard:staff_list' %}" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left me-2"></i>Back to Staff List
+    </a>
+</div>
+
+<div class="row">
+    <div class="col-lg-6">
+        <div class="table-card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Current Role: {{ staff.get_role_display }}</h5>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+
+                    <h6 class="mb-3">Management Permissions</h6>
+                    <div class="permission-grid">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" name="can_manage_products"
+                                id="can_manage_products" {% if staff.can_manage_products %}checked{% endif %}>
+                            <label class="form-check-label" for="can_manage_products">Manage Products</label>
+                        </div>
+
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" name="can_manage_orders"
+                                id="can_manage_orders" {% if staff.can_manage_orders %}checked{% endif %}>
+                            <label class="form-check-label" for="can_manage_orders">Manage Orders</label>
+                        </div>
+
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" name="can_manage_inventory"
+                                id="can_manage_inventory" {% if staff.can_manage_inventory %}checked{% endif %}>
+                            <label class="form-check-label" for="can_manage_inventory">Manage Inventory</label>
+                        </div>
+
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" name="can_manage_customers"
+                                id="can_manage_customers" {% if staff.can_manage_customers %}checked{% endif %}>
+                            <label class="form-check-label" for="can_manage_customers">Manage Customers</label>
+                        </div>
+
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" name="can_manage_staff"
+                                id="can_manage_staff" {% if staff.can_manage_staff %}checked{% endif %}>
+                            <label class="form-check-label" for="can_manage_staff">Manage Staff</label>
+                        </div>
+
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" name="can_manage_sellers"
+                                id="can_manage_sellers" {% if staff.can_manage_sellers %}checked{% endif %}>
+                            <label class="form-check-label" for="can_manage_sellers">Manage Sellers</label>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <h6 class="mb-3">Finance & Reports</h6>
+                    <div class="permission-grid">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" name="can_view_reports"
+                                id="can_view_reports" {% if staff.can_view_reports %}checked{% endif %}>
+                            <label class="form-check-label" for="can_view_reports">View Reports</label>
+                        </div>
+
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" name="can_manage_finance"
+                                id="can_manage_finance" {% if staff.can_manage_finance %}checked{% endif %}>
+                            <label class="form-check-label" for="can_manage_finance">Manage Finance</label>
+                        </div>
+
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" name="can_manage_settings"
+                                id="can_manage_settings" {% if staff.can_manage_settings %}checked{% endif %}>
+                            <label class="form-check-label" for="can_manage_settings">Manage Settings</label>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <h6 class="mb-3">Order Access</h6>
+                    <div class="permission-grid">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" name="can_view_all_orders"
+                                id="can_view_all_orders" {% if staff.can_view_all_orders %}checked{% endif %}>
+                            <label class="form-check-label" for="can_view_all_orders">View All Orders</label>
+                        </div>
+
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" name="can_view_own_orders"
+                                id="can_view_own_orders" {% if staff.can_view_own_orders %}checked{% endif %}>
+                            <label class="form-check-label" for="can_view_own_orders">View Own Orders</label>
+                        </div>
+
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" name="can_manage_delivery"
+                                id="can_manage_delivery" {% if staff.can_manage_delivery %}checked{% endif %}>
+                            <label class="form-check-label" for="can_manage_delivery">Manage Delivery</label>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <div class="d-flex justify-content-between">
+                        <a href="{% url 'admin_dashboard:staff_edit' staff.id %}" class="btn btn-outline-primary">
+                            <i class="bi bi-person me-2"></i>Change Role
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-save me-2"></i>Save Permissions
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-6">
+        <div class="table-card">
+            <div class="card-header">
+                <h5 class="mb-0">Quick Role Templates</h5>
+            </div>
+            <div class="card-body">
+                <p class="text-muted">Click a role to apply standard permissions:</p>
+                <div class="d-flex flex-wrap gap-2">
+                    <a href="#" onclick="applyRole('super_admin')" class="btn btn-sm btn-outline-dark">Super Admin</a>
+                    <a href="#" onclick="applyRole('manager')" class="btn btn-sm btn-outline-dark">Manager</a>
+                    <a href="#" onclick="applyRole('inventory_manager')" class="btn btn-sm btn-outline-dark">Inventory
+                        Manager</a>
+                    <a href="#" onclick="applyRole('order_manager')" class="btn btn-sm btn-outline-dark">Order
+                        Manager</a>
+                    <a href="#" onclick="applyRole('support')" class="btn btn-sm btn-outline-dark">Support</a>
+                    <a href="#" onclick="applyRole('accountant')" class="btn btn-sm btn-outline-dark">Accountant</a>
+                    <a href="#" onclick="applyRole('delivery_person')" class="btn btn-sm btn-outline-dark">Delivery
+                        Person</a>
+                    <a href="#" onclick="applyRole('seller')" class="btn btn-sm btn-outline-dark">Seller</a>
+                    <a href="#" onclick="applyRole('viewer')" class="btn btn-sm btn-outline-dark">Viewer</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="table-card mt-4">
+            <div class="card-header">
+                <h5 class="mb-0">Staff Information</h5>
+            </div>
+            <div class="card-body">
+                <p><strong>Name:</strong> {{ staff.user.first_name }} {{ staff.user.last_name }}</p>
+                <p><strong>Email:</strong> {{ staff.user.email }}</p>
+                <p><strong>Employee ID:</strong> {{ staff.employee_id }}</p>
+                <p><strong>Department:</strong> {{ staff.department|default:"-" }}</p>
+                <p><strong>Hire Date:</strong> {{ staff.hire_date|default:"-" }}</p>
+                <p><strong>Status:</strong>
+                    {% if staff.is_active %}
+                    <span class="badge bg-success">Active</span>
+                    {% else %}
+                    <span class="badge bg-danger">Inactive</span>
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function applyRole(role) {
+        const permissions = {
+            'super_admin': {
+                'can_manage_products': true, 'can_manage_orders': true, 'can_manage_inventory': true,
+                'can_manage_customers': true, 'can_manage_staff': true, 'can_manage_sellers': true,
+                'can_view_reports': true, 'can_manage_finance': true, 'can_manage_settings': true,
+                'can_view_all_orders': true, 'can_view_own_orders': true, 'can_manage_delivery': true
+            },
+            'manager': {
+                'can_manage_products': true, 'can_manage_orders': true, 'can_manage_inventory': true,
+                'can_manage_customers': true, 'can_manage_staff': false, 'can_manage_sellers': false,
+                'can_view_reports': true, 'can_manage_finance': true, 'can_manage_settings': true,
+                'can_view_all_orders': true, 'can_view_own_orders': true, 'can_manage_delivery': true
+            },
+            'inventory_manager': {
+                'can_manage_products': true, 'can_manage_orders': false, 'can_manage_inventory': true,
+                'can_manage_customers': false, 'can_manage_staff': false, 'can_manage_sellers': false,
+                'can_view_reports': true, 'can_manage_finance': false, 'can_manage_settings': false,
+                'can_view_all_orders': false, 'can_view_own_orders': false, 'can_manage_delivery': false
+            },
+            'order_manager': {
+                'can_manage_products': false, 'can_manage_orders': true, 'can_manage_inventory': false,
+                'can_manage_customers': true, 'can_manage_staff': false, 'can_manage_sellers': false,
+                'can_view_reports': true, 'can_manage_finance': false, 'can_manage_settings': false,
+                'can_view_all_orders': true, 'can_view_own_orders': true, 'can_manage_delivery': true
+            },
+            'support': {
+                'can_manage_products': false, 'can_manage_orders': true, 'can_manage_inventory': false,
+                'can_manage_customers': true, 'can_manage_staff': false, 'can_manage_sellers': false,
+                'can_view_reports': false, 'can_manage_finance': false, 'can_manage_settings': false,
+                'can_view_all_orders': true, 'can_view_own_orders': true, 'can_manage_delivery': false
+            },
+            'accountant': {
+                'can_manage_products': false, 'can_manage_orders': false, 'can_manage_inventory': false,
+                'can_manage_customers': false, 'can_manage_staff': false, 'can_manage_sellers': false,
+                'can_view_reports': true, 'can_manage_finance': true, 'can_manage_settings': false,
+                'can_view_all_orders': true, 'can_view_own_orders': true, 'can_manage_delivery': false
+            },
+            'delivery_person': {
+                'can_manage_products': false, 'can_manage_orders': false, 'can_manage_inventory': false,
+                'can_manage_customers': false, 'can_manage_staff': false, 'can_manage_sellers': false,
+                'can_view_reports': false, 'can_manage_finance': false, 'can_manage_settings': false,
+                'can_view_all_orders': false, 'can_view_own_orders': true, 'can_manage_delivery': true
+            },
+            'seller': {
+                'can_manage_products': true, 'can_manage_orders': false, 'can_manage_inventory': true,
+                'can_manage_customers': false, 'can_manage_staff': false, 'can_manage_sellers': false,
+                'can_view_reports': false, 'can_manage_finance': false, 'can_manage_settings': false,
+                'can_view_all_orders': false, 'can_view_own_orders': true, 'can_manage_delivery': false
+            },
+            'viewer': {
+                'can_manage_products': false, 'can_manage_orders': false, 'can_manage_inventory': false,
+                'can_manage_customers': false, 'can_manage_staff': false, 'can_manage_sellers': false,
+                'can_view_reports': true, 'can_manage_finance': false, 'can_manage_settings': false,
+                'can_view_all_orders': false, 'can_view_own_orders': true, 'can_manage_delivery': false
+            }
+        };
+
+        const perms = permissions[role];
+        for (const [key, value] of Object.entries(perms)) {
+            const checkbox = document.querySelector(`[name="${key}"]`);
+            if (checkbox) checkbox.checked = value;
+        }
+    }
+</script>
+{% endblock %}

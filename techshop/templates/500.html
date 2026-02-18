@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container my-5 text-center">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <h1 class="display-1 fw-bold text-danger">500</h1>
+            <h2 class="mb-4">Server Error</h2>
+            <p class="lead text-muted mb-5">
+                Something went wrong on our end. Please try again later.
+            </p>
+            <a href="{% url 'store:home' %}" class="btn btn-primary btn-lg">
+                <i class="bi bi-house-door me-2"></i> Go to Homepage
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

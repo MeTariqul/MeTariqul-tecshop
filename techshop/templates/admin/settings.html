@@ -1,0 +1,194 @@
+{% extends 'admin/base.html' %}
+
+{% block admin_title %}Site Settings{% endblock %}
+
+{% block admin_content %}
+<form method="post">
+    {% csrf_token %}
+
+    <div class="row g-4">
+        <!-- Site Information -->
+        <div class="col-lg-6">
+            <div class="table-card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-house me-2"></i>Site Information</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label">Site Name</label>
+                        <input type="text" name="site_name" class="form-control" value="{{ config.site_name }}">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Meta Title</label>
+                        <input type="text" name="meta_title" class="form-control" value="{{ config.meta_title }}">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Meta Description</label>
+                        <textarea name="meta_description" class="form-control"
+                            rows="2">{{ config.meta_description }}</textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Meta Keywords</label>
+                        <textarea name="meta_keywords" class="form-control"
+                            rows="2">{{ config.meta_keywords }}</textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contact Information -->
+        <div class="col-lg-6">
+            <div class="table-card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-telephone me-2"></i>Contact Information</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label">Email</label>
+                        <input type="email" name="contact_email" class="form-control"
+                            value="{{ config.contact_email }}">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Phone</label>
+                        <input type="text" name="contact_phone" class="form-control" value="{{ config.contact_phone }}">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Address</label>
+                        <textarea name="contact_address" class="form-control"
+                            rows="2">{{ config.contact_address }}</textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Social Links -->
+        <div class="col-lg-6">
+            <div class="table-card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-share me-2"></i>Social Links</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label">Facebook</label>
+                        <input type="url" name="facebook_url" class="form-control" value="{{ config.facebook_url }}">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Twitter</label>
+                        <input type="url" name="twitter_url" class="form-control" value="{{ config.twitter_url }}">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Instagram</label>
+                        <input type="url" name="instagram_url" class="form-control" value="{{ config.instagram_url }}">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">YouTube</label>
+                        <input type="url" name="youtube_url" class="form-control" value="{{ config.youtube_url }}">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Currency & Tax -->
+        <div class="col-lg-6">
+            <div class="table-card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-currency-dollar me-2"></i>Currency & Tax</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label">Select Currency</label>
+                        <select name="currency_short_form" class="form-select">
+                            {% for code, name in config.CURRENCY_CHOICES %}
+                            <option value="{{ code }}" {% if config.currency_short_form == code %}selected{% endif %}>
+                                {{ name }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                        <small class="text-muted">Currency will be shown in short form (e.g., USD, EUR, BDT)</small>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Currency Name</label>
+                        <input type="text" name="currency_name" class="form-control"
+                            value="{{ config.currency_name }}" placeholder="e.g., Bangladeshi Taka, US Dollar">
+                        <small class="text-muted">Full name of the currency</small>
+                    </div>
+                    <div class="form-check form-switch mb-3">
+                        <input type="checkbox" name="tax_enabled" class="form-check-input" id="tax_enabled" {% if
+                            config.tax_enabled %}checked{% endif %}>
+                        <label class="form-check-label" for="tax_enabled">
+                            <strong>Enable Tax</strong>
+                            <br><small class="text-muted">Turn off to disable tax on all orders</small>
+                        </label>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Tax Rate (%)</label>
+                        <input type="number" name="tax_rate" class="form-control" step="0.01"
+                            value="{{ config.tax_rate }}">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Order Settings -->
+        <div class="col-lg-6">
+            <div class="table-card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-box-seam me-2"></i>Order Settings</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label">Free Shipping Threshold</label>
+                        <input type="number" name="free_shipping_threshold" class="form-control" step="0.01"
+                            value="{{ config.free_shipping_threshold }}">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Default Shipping Cost</label>
+                        <input type="number" name="default_shipping_cost" class="form-control" step="0.01"
+                            value="{{ config.default_shipping_cost }}">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Low Stock Threshold</label>
+                        <input type="number" name="low_stock_threshold" class="form-control"
+                            value="{{ config.low_stock_threshold }}">
+                    </div>
+                    <div class="form-check">
+                        <input type="checkbox" name="enable_backorders" class="form-check-input" id="enable_backorders"
+                            {% if config.enable_backorders %}checked{% endif %}>
+                        <label class="form-check-label" for="enable_backorders">Enable Backorders</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Maintenance Mode -->
+        <div class="col-lg-6">
+            <div class="table-card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-tools me-2"></i>Maintenance Mode</h5>
+                </div>
+                <div class="card-body">
+                    <div class="form-check form-switch mb-3">
+                        <input type="checkbox" name="maintenance_mode" class="form-check-input" id="maintenance_mode" {%
+                            if config.maintenance_mode %}checked{% endif %}>
+                        <label class="form-check-label" for="maintenance_mode">
+                            <strong>Enable Maintenance Mode</strong>
+                            <br><small class="text-muted">This will show a maintenance page to all visitors</small>
+                        </label>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Maintenance Message</label>
+                        <textarea name="maintenance_message" class="form-control"
+                            rows="3">{{ config.maintenance_message }}</textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-4">
+        <button type="submit" class="btn btn-primary btn-lg">
+            <i class="bi bi-check-circle me-2"></i>Save Settings
+        </button>
+    </div>
+</form>
+{% endblock %}

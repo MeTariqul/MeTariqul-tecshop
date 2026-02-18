@@ -1,0 +1,85 @@
+{% extends 'admin/base.html' %}
+
+{% block admin_title %}Scan Item - Barcode Scanner Interface{% endblock %}
+
+{% block admin_content %}
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="mb-0"><i class="bi bi-upc-scan me-2"></i>Scan Item</h2>
+            <p class="text-muted mb-0">Scan barcode to verify product or confirm picking</p>
+        </div>
+        <a href="{% url 'admin_dashboard:fulfillment_dashboard' %}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left me-1"></i> Back to Fulfillment
+        </a>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0"><i class="bi bi-barcode me-2"></i>Barcode Scanner</h5>
+                </div>
+                <div class="card-body text-center">
+                    <div class="mb-4">
+                        <i class="bi bi-upc" style="font-size: 4rem; color: #6c757d;"></i>
+                    </div>
+                    
+                    <form id="scanForm" method="post">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <input type="text" 
+                                   id="barcodeInput" 
+                                   name="barcode" 
+                                   class="form-control form-control-lg text-center" 
+                                   placeholder="Scan or type barcode..."
+                                   autofocus
+                                   autocomplete="off">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Order ID (optional - for picking confirmation)</label>
+                            <input type="number" name="order_id" class="form-control" placeholder="Enter order ID">
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-lg w-100">
+                            <i class="bi bi-search me-1"></i> Look Up
+                        </button>
+                    </form>
+
+                    <div id="scanResult" class="mt-4" style="display: none;">
+                        <div class="alert" role="alert" id="resultAlert">
+                            <h5 id="resultTitle"></h5>
+                            <p id="resultMessage" class="mb-0"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card border-0 shadow-sm mt-4">
+                <div class="card-header bg-white py-3">
+                    <h6 class="mb-0">Instructions</h6>
+                </div>
+                <div class="card-body">
+                    <ol class="mb-0">
+                        <li>Connect your barcode scanner or use keyboard input</li>
+                        <li>Scan the product barcode or type SKU manually</li>
+                        <li>For picking confirmation, enter the Order ID</li>
+                        <li>System will verify product exists in the order</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('barcodeInput').focus();
+
+// Auto-submit on scan (when Enter is pressed)
+document.getElementById('barcodeInput').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+        e.preventDefault();
+        this.form.submit();
+    }
+});
+</script>
+{% endblock %}

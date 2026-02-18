@@ -1,0 +1,183 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Register - Tech Shop{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
+            <!-- Header -->
+            <div class="text-center mb-4">
+                <i class="bi bi-person-plus-fill display-3 text-secondary"></i>
+                <h3 class="fw-bold mt-2">Create Account</h3>
+                <p class="text-muted">Join Tech Shop for exclusive deals and offers</p>
+            </div>
+
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <form method="post">
+                        {% csrf_token %}
+
+                        {% if form.non_field_errors %}
+                        <div class="alert alert-danger py-2 small">
+                            {{ form.non_field_errors }}
+                        </div>
+                        {% endif %}
+
+                        <div class="mb-3">
+                            <label for="{{ form.username.id_for_label }}" class="form-label fw-bold">Username <span
+                                    class="text-danger">*</span></label>
+                            <input type="text" class="form-control {% if form.username.errors %}is-invalid{% endif %}"
+                                id="{{ form.username.id_for_label }}" name="{{ form.username.name }}"
+                                value="{{ form.username.value|default:'' }}" placeholder="Choose a username">
+                            {% if form.username.errors %}
+                            <div class="invalid-feedback">{{ form.username.errors }}</div>
+                            {% endif %}
+                            <div class="form-text small">Letters, digits and @/./+/-/_ only.</div>
+                        </div>
+
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                <label for="{{ form.password1.id_for_label }}" class="form-label fw-bold">Password <span
+                                        class="text-danger">*</span></label>
+                                <input type="password"
+                                    class="form-control {% if form.password1.errors %}is-invalid{% endif %}"
+                                    id="{{ form.password1.id_for_label }}" name="{{ form.password1.name }}"
+                                    placeholder="Create password">
+                                {% if form.password1.errors %}
+                                <div class="invalid-feedback">{{ form.password1.errors }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                <label for="{{ form.password2.id_for_label }}" class="form-label fw-bold">Confirm <span
+                                        class="text-danger">*</span></label>
+                                <input type="password"
+                                    class="form-control {% if form.password2.errors %}is-invalid{% endif %}"
+                                    id="{{ form.password2.id_for_label }}" name="{{ form.password2.name }}"
+                                    placeholder="Confirm password">
+                                {% if form.password2.errors %}
+                                <div class="invalid-feedback">{{ form.password2.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="small text-muted mb-4 bg-light p-3 rounded">
+                            <i class="bi bi-info-circle me-1"></i> Password must be at least 8 characters, not entirely
+                            numeric, and not too common.
+                        </div>
+
+                        <!-- Address Section -->
+                        <h6 class="fw-bold mb-3">Address Information (Optional)</h6>
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <label for="address" class="form-label">Address</label>
+                                <button type="button" class="btn btn-sm btn-outline-primary mb-2"
+                                    onclick="getLocation()">
+                                    <i class="bi bi-geo-alt me-1"></i> Use My Location
+                                </button>
+                            </div>
+                            <input type="text" class="form-control" id="address" name="address"
+                                placeholder="Enter your street address">
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="city" class="form-label">City</label>
+                                <input type="text" class="form-control" id="city" name="city" placeholder="Enter city">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="zip_code" class="form-label">ZIP Code</label>
+                                <input type="text" class="form-control" id="zip_code" name="zip_code"
+                                    placeholder="Enter ZIP code">
+                            </div>
+                        </div>
+
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-tech py-2 fw-bold">
+                                <i class="bi bi-person-plus me-2"></i> Create Account
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="text-center mt-4">
+                <p class="text-muted mb-0">Already have an account?
+                    <a href="{% url 'login' %}" class="text-primary fw-bold text-decoration-none">Sign in</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function getLocation() {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(showPosition, showError);
+        } else {
+            alert("Geolocation is not supported by this browser.");
+        }
+    }
+
+    function showPosition(position) {
+        var lat = position.coords.latitude;
+        var lon = position.coords.longitude;
+
+        // Show loading
+        var btn = event.target;
+        var originalText = btn.innerHTML;
+        btn.innerHTML = '<i class="bi bi-hourglass-split me-1"></i> Getting location...';
+        btn.disabled = true;
+
+        // Use Nominatim for reverse geocoding (free OpenStreetMap service)
+        fetch('https://nominatim.openstreetmap.org/reverse?format=json&lat=' + lat + '&lon=' + lon)
+            .then(response => response.json())
+            .then(data => {
+                if (data.address) {
+                    // Fill in address
+                    var addressParts = [];
+                    if (data.address.house_number) addressParts.push(data.address.house_number);
+                    if (data.address.road) addressParts.push(data.address.road);
+                    if (data.address.neighbourhood) addressParts.push(data.address.neighbourhood);
+                    if (data.address.suburb) addressParts.push(data.address.suburb);
+
+                    document.getElementById('address').value = addressParts.join(', ') || data.display_name.split(',').slice(0, 2).join(',');
+
+                    // Fill in city
+                    var city = data.address.city || data.address.town || data.address.village || data.address.county;
+                    document.getElementById('city').value = city || '';
+
+                    // Fill in zip
+                    document.getElementById('zip_code').value = data.address.postcode || '';
+                }
+
+                // Reset button
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Unable to get address from location. Please enter manually.');
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            });
+    }
+
+    function showError(error) {
+        switch (error.code) {
+            case error.PERMISSION_DENIED:
+                alert("User denied the request for Geolocation.");
+                break;
+            case error.POSITION_UNAVAILABLE:
+                alert("Location information is unavailable.");
+                break;
+            case error.TIMEOUT:
+                alert("The request to get user location timed out.");
+                break;
+            default:
+                alert("An unknown error occurred.");
+                break;
+        }
+    }
+</script>
+{% endblock %}

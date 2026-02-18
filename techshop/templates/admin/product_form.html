@@ -1,0 +1,99 @@
+{% extends 'admin/base.html' %}
+
+{% block admin_title %}Edit Product{% endblock %}
+
+{% block admin_content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h4 class="mb-0">Edit Product: {{ product.name }}</h4>
+    <a href="{% url 'admin_dashboard:products' %}" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left me-2"></i>Back to Products
+    </a>
+</div>
+
+<div class="table-card">
+    <div class="card-body">
+        <form method="post">
+            {% csrf_token %}
+
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <h5>Product Information</h5>
+                    <hr>
+                    <div class="mb-3">
+                        <label class="form-label">Product Name</label>
+                        <input type="text" name="name" class="form-control" value="{{ product.name }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Description</label>
+                        <textarea name="description" class="form-control" rows="4">{{ product.description }}</textarea>
+                    </div>
+                    <div class="form-check">
+                        <input type="checkbox" name="is_available_online" class="form-check-input" id="is_available" {% if product.is_available_online %}checked{% endif %}>
+                        <label class="form-check-label" for="is_available">Available for Online Purchase</label>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <h5>Pricing</h5>
+                    <hr>
+                    <div class="mb-3">
+                        <label class="form-label">Cost Price (৳)</label>
+                        <input type="number" name="cost_price" class="form-control" value="{{ product.cost_price }}"
+                            step="0.01" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Selling Price (৳)</label>
+                        <input type="number" name="selling_price" class="form-control"
+                            value="{{ product.selling_price }}" step="0.01" required>
+                    </div>
+
+                    <h5 class="mt-4"><i class="bi bi-tag me-1"></i>Offers & Discounts</h5>
+                    <hr>
+                    <div class="mb-3">
+                        <label class="form-label">Discount (%)</label>
+                        <input type="number" name="discount_percentage" class="form-control"
+                            value="{{ product.discount_percentage|default:'0' }}" step="0.01" min="0" max="100">
+                        <small class="text-muted">Set to 0 for no discount</small>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Offer Label</label>
+                        <input type="text" name="discount_label" class="form-control"
+                            value="{{ product.discount_label|default:'' }}" placeholder="e.g. Summer Sale, Flash Deal">
+                    </div>
+                    {% if product.has_offer %}
+                    <div class="alert alert-success py-2 mb-0">
+                        <small><i class="bi bi-check-circle me-1"></i>Active: <strong>{{ product.discount_percentage }}%
+                                off</strong> — ৳{{ product.selling_price }} → <strong>৳{{ product.discounted_price
+                                }}</strong></small>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <h5>Inventory</h5>
+                    <hr>
+                    <div class="mb-3">
+                        <label class="form-label">Quantity on Hand</label>
+                        <input type="number" name="quantity_on_hand" class="form-control"
+                            value="{{ inventory.quantity_on_hand|default:0 }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Reorder Level</label>
+                        <input type="number" name="reorder_level" class="form-control"
+                            value="{{ inventory.reorder_level|default:10 }}" required>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-4">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-check-circle me-2"></i>Save Changes
+                </button>
+                <a href="{% url 'admin_dashboard:products' %}" class="btn btn-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

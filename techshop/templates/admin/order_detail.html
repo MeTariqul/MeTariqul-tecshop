@@ -1,0 +1,123 @@
+{% extends 'admin/base.html' %}
+
+{% block admin_title %}Order Details{% endblock %}
+
+{% block admin_content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h4 class="mb-0">Order: {{ order.order_number }}</h4>
+    <a href="{% url 'admin_dashboard:orders' %}" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left me-2"></i>Back to Orders
+    </a>
+</div>
+
+<div class="row">
+    <!-- Order Info -->
+    <div class="col-lg-8">
+        <div class="table-card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Order Information</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Order Number:</strong> {{ order.order_number }}</p>
+                        <p><strong>Date:</strong> {{ order.created_at|date:"F d, Y H:i" }}</p>
+                        <p><strong>Status:</strong> <span class="status-badge {{ order.status }}">{{ order.status
+                                }}</span></p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Subtotal:</strong> {{ currency_short_form }}{{ order.subtotal }}</p>
+                        <p><strong>Tax:</strong> {{ currency_short_form }}{{ order.tax_amount }}</p>
+                        <p><strong>Shipping:</strong> {{ currency_short_form }}{{ order.shipping_cost }}</p>
+                        <p><strong>Total:</strong> <strong>{{ currency_short_form }}{{ order.total_amount }}</strong>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Update Status -->
+        <div class="table-card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Update Status</h5>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-md-8">
+                            <select name="status" class="form-select">
+                                <option value="pending" {% if order.status == 'pending' %}selected{% endif %}>Pending
+                                </option>
+                                <option value="confirmed" {% if order.status == 'confirmed' %}selected{% endif %}>
+                                    Confirmed</option>
+                                <option value="processing" {% if order.status == 'processing' %}selected{% endif %}>
+                                    Processing</option>
+                                <option value="shipped" {% if order.status == 'shipped' %}selected{% endif %}>Shipped
+                                </option>
+                                <option value="delivered" {% if order.status == 'delivered' %}selected{% endif %}>
+                                    Delivered</option>
+                                <option value="cancelled" {% if order.status == 'cancelled' %}selected{% endif %}>
+                                    Cancelled</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <button type="submit" class="btn btn-primary w-100">Update Status</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Order Items -->
+        <div class="table-card">
+            <div class="card-header">
+                <h5 class="mb-0">Order Items</h5>
+            </div>
+            <div class="card-body p-0">
+                <table class="table mb-0">
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>Quantity</th>
+                            <th>Unit Price</th>
+                            <th>Subtotal</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in items %}
+                        <tr>
+                            <td>
+                                <strong>{{ item.product.name }}</strong>
+                                <br><small class="text-muted">{{ item.product.SKU }}</small>
+                            </td>
+                            <td>{{ item.quantity }}</td>
+                            <td>{{ currency_short_form }}{{ item.unit_price }}</td>
+                            <td>{{ currency_short_form }}{{ item.subtotal }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Customer Info -->
+    <div class="col-lg-4">
+        <div class="table-card">
+            <div class="card-header">
+                <h5 class="mb-0">Customer Information</h5>
+            </div>
+            <div class="card-body">
+                <p><strong>Name:</strong> {{ order.customer.user.first_name }} {{ order.customer.user.last_name }}</p>
+                <p><strong>Email:</strong> {{ order.customer.user.email }}</p>
+                <p><strong>Phone:</strong> {{ order.customer.phone|default:"-" }}</p>
+                <hr>
+                <h6>Shipping Address</h6>
+                <p>{{ order.shipping_address }}</p>
+                <p>{{ order.shipping_city }}, {{ order.shipping_state }} {{ order.shipping_zip }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

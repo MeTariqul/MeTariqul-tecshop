@@ -1,0 +1,306 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<style>
+    /* Hide store navbar on admin pages */
+    .navbar.navbar-expand-lg.navbar-light.bg-white.border-top {
+        display: none !important;
+    }
+    
+    /* Admin Dashboard Styles */
+    .admin-sidebar {
+        min-height: 100vh;
+        background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
+        box-shadow: 4px 0 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .admin-sidebar .nav-link {
+        color: rgba(255, 255, 255, 0.7);
+        padding: 12px 20px;
+        border-radius: 8px;
+        margin: 4px 12px;
+        transition: all 0.3s ease;
+    }
+
+    .admin-sidebar .nav-link:hover,
+    .admin-sidebar .nav-link.active {
+        background: rgba(255, 255, 255, 0.1);
+        color: #fff;
+        transform: translateX(5px);
+    }
+
+    .admin-sidebar .nav-link i {
+        margin-right: 10px;
+        width: 20px;
+    }
+
+    .stat-card {
+        border: none;
+        border-radius: 15px;
+        transition: all 0.3s ease;
+        overflow: hidden;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    }
+
+    .stat-card .card-body {
+        padding: 1.5rem;
+    }
+
+    .stat-card .stat-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+    }
+
+    .stat-card.primary .stat-icon {
+        background: rgba(13, 110, 253, 0.1);
+        color: #0d6efd;
+    }
+
+    .stat-card.success .stat-icon {
+        background: rgba(25, 135, 84, 0.1);
+        color: #198754;
+    }
+
+    .stat-card.warning .stat-icon {
+        background: rgba(255, 193, 7, 0.1);
+        color: #ffc107;
+    }
+
+    .stat-card.danger .stat-icon {
+        background: rgba(220, 53, 69, 0.1);
+        color: #dc3545;
+    }
+
+    .stat-card.info .stat-icon {
+        background: rgba(13, 202, 240, 0.1);
+        color: #0dcaf0;
+    }
+
+    /* Table Styles */
+    .table-card {
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 2px 15px rgba(0, 0, 0, 0.05);
+    }
+
+    .table-card .card-header {
+        background: #fff;
+        border-bottom: 2px solid #f0f0f0;
+        padding: 1rem 1.5rem;
+        font-weight: 600;
+    }
+
+    /* Animations */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+
+        to {
+            opacity: 1;
+        }
+    }
+
+    @keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateX(-20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    .animate-fade-in-up {
+        animation: fadeInUp 0.5s ease forwards;
+    }
+
+    .animate-fade-in {
+        animation: fadeIn 0.5s ease forwards;
+    }
+
+    .animate-slide-in {
+        animation: slideIn 0.5s ease forwards;
+    }
+
+    .delay-1 {
+        animation-delay: 0.1s;
+    }
+
+    .delay-2 {
+        animation-delay: 0.2s;
+    }
+
+    .delay-3 {
+        animation-delay: 0.3s;
+    }
+
+    .delay-4 {
+        animation-delay: 0.4s;
+    }
+
+    .delay-5 {
+        animation-delay: 0.5s;
+    }
+
+    /* Stagger animations */
+    .stagger-item {
+        opacity: 0;
+        animation: fadeInUp 0.5s ease forwards;
+    }
+
+    /* Page transitions */
+    .page-content {
+        animation: fadeIn 0.3s ease;
+    }
+
+    /* Status badges */
+    .status-badge {
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 500;
+    }
+
+    .status-badge.pending {
+        background: #fff3cd;
+        color: #856404;
+    }
+
+    .status-badge.confirmed {
+        background: #cce5ff;
+        color: #004085;
+    }
+
+    .status-badge.processing {
+        background: #d1ecf1;
+        color: #0c5460;
+    }
+
+    .status-badge.shipped {
+        background: #d4edda;
+        color: #155724;
+    }
+
+    .status-badge.delivered {
+        background: #c3e6cb;
+        color: #155724;
+    }
+
+    .status-badge.cancelled {
+        background: #f8d7da;
+        color: #721c24;
+    }
+
+    /* Activity timeline */
+    .activity-item {
+        padding: 15px;
+        border-left: 3px solid #e9ecef;
+        transition: all 0.2s ease;
+    }
+
+    .activity-item:hover {
+        background: #f8f9fa;
+        border-left-color: #0d6efd;
+    }
+
+    /* Form styles */
+    .form-control,
+    .form-select {
+        border-radius: 10px;
+        padding: 12px 15px;
+        border: 2px solid #e9ecef;
+        transition: all 0.3s ease;
+    }
+
+    .form-control:focus,
+    .form-select:focus {
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 4px rgba(13, 110, 253, 0.1);
+    }
+
+    .btn {
+        border-radius: 10px;
+        padding: 10px 20px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+
+    .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .admin-header {
+        background: #fff;
+        border-bottom: 1px solid #e9ecef;
+        padding: 15px 0;
+    }
+
+    /* Quick stats row */
+    .quick-stat {
+        text-align: center;
+        padding: 20px;
+    }
+
+    .quick-stat .number {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #1a1a2e;
+    }
+
+    .quick-stat .label {
+        color: #6c757d;
+        font-size: 0.9rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="admin-wrapper">
+    <!-- Admin Header -->
+    <header class="admin-header mb-4">
+        <div class="container-fluid">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <h2 class="mb-0">{% block admin_title %}Admin Dashboard{% endblock %}</h2>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <span class="me-3"><i class="bi bi-person-circle me-1"></i>{{ user.username }}</span>
+                    <a href="{% url 'store:home' %}" class="btn btn-outline-secondary btn-sm">
+                        <i class="bi bi-arrow-left me-1"></i>Back to Site
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container-fluid page-content">
+        {% block admin_content %}{% endblock %}
+    </div>
+</div>
+{% endblock %}

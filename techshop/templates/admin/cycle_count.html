@@ -1,0 +1,124 @@
+{% extends 'admin/base.html' %}
+
+{% block admin_title %}Cycle Count - Inventory Auditing{% endblock %}
+
+{% block admin_content %}
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="mb-0"><i class="bi bi-clipboard-check me-2"></i>Cycle Counting</h2>
+            <p class="text-muted mb-0">Audit inventory - count physical stock vs system count</p>
+        </div>
+        <a href="{% url 'admin_dashboard:warehouse_dashboard' %}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left me-1"></i> Back to Warehouse
+        </a>
+    </div>
+
+    <div class="row">
+        <!-- Count Form -->
+        <div class="col-lg-5">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0"><i class="bi bi-calculator me-2"></i>Count Inventory</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label class="form-label">Select Product</label>
+                            <select name="product_id" class="form-select" id="productSelect" required onchange="updateSystemQty()">
+                                <option value="">Choose a product...</option>
+                                {% for product in products %}
+                                <option value="{{ product.id }}" data-qty="{{ product.inventory.quantity_on_hand|default:0 }}">
+                                    {{ product.name }} - {{ product.SKU }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">System Count</label>
+                            <div class="form-control-plaintext" id="systemQtyDisplay">
+                                <span class="text-muted">Select a product to see system count</span>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Physical Count</label>
+                            <input type="number" name="counted_qty" class="form-control" min="0" required placeholder="Enter actual physical count">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Notes</label>
+                            <textarea name="notes" class="form-control" rows="2" placeholder="Notes about this count"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="bi bi-check2 me-1"></i> Submit Count
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Counts -->
+        <div class="col-lg-7">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0"><i class="bi bi-clock-history me-2"></i>Recent Adjustments</h5>
+                </div>
+                <div class="card-body p-0">
+                    {% if recent_counts %}
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Product</th>
+                                    <th>Adjustment</th>
+                                    <th>Reference</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for count in recent_counts %}
+                                <tr>
+                                    <td>
+                                        <strong>{{ count.product.name }}</strong><br>
+                                        <small class="text-muted">{{ count.notes|truncatechars:50 }}</small>
+                                    </td>
+                                    <td>
+                                        {% if count.quantity > 0 %}
+                                        <span class="badge bg-success">+{{ count.quantity }}</span>
+                                        {% else %}
+                                        <span class="badge bg-danger">{{ count.quantity }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td><small>{{ count.reference_number }}</small></td>
+                                    <td><small>{{ count.created_at|date:"M j, g:i A" }}</small></td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-5 text-muted">
+                        No cycle counts yet
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function updateSystemQty() {
+    const select = document.getElementById('productSelect');
+    const option = select.options[select.selectedIndex];
+    const qty = option.getAttribute('data-qty');
+    const display = document.getElementById('systemQtyDisplay');
+    
+    if (qty !== null) {
+        display.innerHTML = '<strong class="text-primary">' + qty + ' units</strong>';
+    } else {
+        display.innerHTML = '<span class="text-muted">Select a product to see system count</span>';
+    }
+}
+</script>
+{% endblock %}

@@ -1,0 +1,221 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}FAQ - TechShop{% endblock %}
+
+{% block extra_css %}
+<style>
+    .faq-header {
+        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+        padding: 60px 0;
+    }
+
+    .faq-item {
+        border: none;
+        border-radius: 15px;
+        margin-bottom: 15px;
+        background: #fff;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+
+    .faq-item:hover {
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .faq-question {
+        padding: 20px 25px;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-weight: 600;
+        color: #1a1a2e;
+    }
+
+    .faq-question:hover {
+        color: #0d6efd;
+    }
+
+    .faq-icon {
+        transition: transform 0.3s ease;
+    }
+
+    .faq-item.active .faq-icon {
+        transform: rotate(180deg);
+    }
+
+    .faq-answer {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.3s ease, padding 0.3s ease;
+        padding: 0 25px;
+        color: #6c757d;
+    }
+
+    .faq-item.active .faq-answer {
+        max-height: 300px;
+        padding: 0 25px 20px;
+    }
+
+    .search-box {
+        border-radius: 50px;
+        padding: 15px 25px;
+        border: 2px solid #e9ecef;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    }
+
+    .search-box:focus {
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 4px rgba(13, 110, 253, 0.1);
+    }
+
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .faq-category {
+        display: inline-block;
+        padding: 5px 15px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        margin-bottom: 15px;
+    }
+
+    .category-order {
+        background: #e3f2fd;
+        color: #0d6efd;
+    }
+
+    .category-product {
+        background: #e8f5e9;
+        color: #2e7d32;
+    }
+
+    .category-payment {
+        background: #fff3e0;
+        color: #ef6c00;
+    }
+
+    .category-shipping {
+        background: #fce4ec;
+        color: #c2185b;
+    }
+
+    @keyframes slideIn {
+        0% {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        100% {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .faq-item {
+        animation: slideIn 0.4s ease forwards;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Header -->
+<section class="faq-header">
+    <div class="container">
+        <div class="row">
+            <div class="col-12 text-center text-white">
+                <h1 class="display-4 mb-3">Frequently Asked Questions</h1>
+                <p class="lead">Find answers to common questions about TechShop</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Search Section -->
+<section class="py-4 bg-light">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <input type="text" class="form-control search-box" placeholder="Search for questions..." id="faqSearch">
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- FAQ Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            < class="col-lg-10">
+                {% for faq in faqs %}
+                <div class="faq-item" data-question="{{ faq.question|lower }}">
+                    <div class="faq-question" onclick="toggleFaq(this)">
+                        <span>{{ faq.question }}</span>
+                        <i class="bi bi-chevron-down faq-icon"></i>
+                    </div>
+                    <div class="faq-answer">
+                        <p class="mb-0">{{ faq.answer }}</p>
+                    </div>
+                </div>
+                {% endfor %}
+        </div>
+    </div>
+    </div>
+</section>
+
+<!-- Still Have Questions -->
+<section class="py-5 bg-light">
+    <div class="container text-center">
+        <h3 class="mb-3">Still Have Questions?</h3>
+        <p class="text-muted mb-4">Can't find the answer you're looking for? Please contact our support team.</p>
+        <a href="{% url 'store:contact' %}" class="btn btn-primary btn-lg">
+            <i class="bi bi-chat-dots me-2"></i>Contact Support
+        </a>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // FAQ Toggle
+    function toggleFaq(element) {
+        const faqItem = element.parentElement;
+        const wasActive = faqItem.classList.contains('active');
+
+        // Close all other FAQs
+        document.querySelectorAll('.faq-item').forEach(item => {
+            item.classList.remove('active');
+        });
+
+        // Toggle current FAQ
+        if (!wasActive) {
+            faqItem.classList.add('active');
+        }
+    }
+
+    // Search functionality
+    document.getElementById('faqSearch').addEventListener('input', function (e) {
+        const searchTerm = e.target.value.toLowerCase();
+
+        document.querySelectorAll('.faq-item').forEach(item => {
+            const question = item.getAttribute('data-question');
+            if (question.includes(searchTerm) || searchTerm === '') {
+                item.style.display = 'block';
+            } else {
+                item.style.display = 'none';
+            }
+        });
+    });
+</script>
+{% endblock %}

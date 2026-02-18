@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Order History - Tech Shop{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Hide store navbar on order history page */
+    .navbar.navbar-expand-lg.navbar-light.bg-white.border-top {
+        display: none !important;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold mb-0"><i class="bi bi-clipboard-check me-2 text-primary"></i> Order History</h2>
+        <a href="{% url 'store:product_list' %}" class="btn btn-outline-primary btn-sm">
+            <i class="bi bi-shop me-1"></i> Continue Shopping
+        </a>
+    </div>
+
+    {% if orders %}
+    {% for order in orders %}
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-white border-bottom py-3">
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center">
+                <div>
+                    <h6 class="fw-bold mb-0">Order #{{ order.order_number }}</h6>
+                    <small class="text-muted">{{ order.created_at|date:"F d, Y g:i A" }}</small>
+                </div>
+                <div class="mt-2 mt-md-0">
+                    <span class="h5 text-primary fw-bold me-2">৳{{ order.total_amount }}</span>
+                    <span
+                        class="badge bg-{% if order.status == 'delivered' %}success{% elif order.status == 'shipped' %}info{% elif order.status == 'processing' %}warning{% else %}secondary{% endif %}">
+                        {{ order.get_status_display }}
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div class="card-body p-4">
+            <div class="row">
+                <div class="col-md-8">
+                    {% for item in order.items.all|slice:":3" %}
+                    <div class="d-flex align-items-center mb-2">
+                        <i class="bi bi-box-seam text-muted me-3"></i>
+                        <div class="flex-grow-1">
+                            <a href="{% url 'store:product_detail' item.product.SKU %}"
+                                class="text-decoration-none fw-bold text-dark">{{ item.product.name }}</a>
+                            <span class="text-muted small ms-2">x{{ item.quantity }}</span>
+                        </div>
+                        <span class="fw-bold">৳{{ item.subtotal }}</span>
+                    </div>
+                    {% endfor %}
+                    {% if order.items.count > 3 %}
+                    <p class="text-muted small mt-2 mb-0">+{{ order.items.count|add:"-3" }} more items</p>
+                    {% endif %}
+                </div>
+                <div class="col-md-4 border-start">
+                    <p class="mb-1 small"><strong>Subtotal:</strong> ৳{{ order.subtotal }}</p>
+                    <p class="mb-1 small"><strong>Shipping:</strong> ৳{{ order.shipping_cost }}</p>
+                    <p class="mb-1 small"><strong>Tax:</strong> ৳{{ order.tax_amount }}</p>
+                    {% if order.payment %}
+                    <p class="mb-0 small"><strong>Payment:</strong>
+                        <span
+                            class="badge bg-{% if order.payment.status == 'completed' %}success{% else %}warning{% endif %} small">
+                            {{ order.payment.get_status_display }}
+                        </span>
+                    </p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="card-footer bg-white border-top py-3">
+            <a href="{% url 'orders:order_confirmation' order.id %}" class="btn btn-sm btn-outline-primary">
+                <i class="bi bi-receipt me-1"></i> View Details
+            </a>
+        </div>
+    </div>
+    {% endfor %}
+
+    {% else %}
+    <div class="text-center py-5 bg-white rounded shadow-sm">
+        <i class="bi bi-clipboard-x display-1 text-muted mb-3"></i>
+        <h3>No Orders Yet</h3>
+        <p class="text-muted">You haven't placed any orders yet.</p>
+        <a href="{% url 'store:product_list' %}" class="btn btn-tech mt-2">
+            <i class="bi bi-shop me-2"></i> Start Shopping
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

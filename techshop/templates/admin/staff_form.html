@@ -1,0 +1,131 @@
+{% extends 'admin/base.html' %}
+
+{% block admin_title %}{{ action }} Staff Member{% endblock %}
+
+{% block admin_content %}
+<div class="row">
+    <div class="col-lg-8">
+        <div class="table-card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-person-plus me-2"></i>{{ action }} Staff Member</h5>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+
+                    {% if action == 'Create' %}
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Username *</label>
+                            <input type="text" name="username" class="form-control" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Email *</label>
+                            <input type="email" name="email" class="form-control" required>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Password *</label>
+                            <input type="password" name="password" class="form-control" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Phone</label>
+                            <input type="text" name="phone" class="form-control">
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">First Name</label>
+                            <input type="text" name="first_name" class="form-control">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Last Name</label>
+                            <input type="text" name="last_name" class="form-control">
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Role *</label>
+                            <select name="role" class="form-select" required>
+                                <option value="">Select Role</option>
+                                <option value="super_admin">Super Admin</option>
+                                <option value="manager">Manager</option>
+                                <option value="inventory_manager">Inventory Manager</option>
+                                <option value="order_manager">Order Manager</option>
+                                <option value="support">Customer Support</option>
+                                <option value="viewer">Viewer</option>
+                            </select>
+                            <small class="text-muted">
+                                <strong>Super Admin:</strong> Full access |
+                                <strong>Manager:</strong> All except staff mgmt |
+                                <strong>Viewer:</strong> Read only
+                            </small>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Department</label>
+                            <input type="text" name="department" class="form-control"
+                                placeholder="e.g., Sales, IT, Operations">
+                        </div>
+                    </div>
+
+                    {% if action == 'Edit' %}
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input type="checkbox" name="is_active" class="form-check-input" id="is_active" {% if staff.is_active %}checked{% endif %}>
+                            <label class="form-check-label" for="is_active">Active Account</label>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <div class="d-flex justify-content-end gap-2">
+                        <a href="{% url 'admin_dashboard:staff_list' %}" class="btn btn-secondary">Cancel</a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-circle me-2"></i>{{ action }} Staff Member
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="table-card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-info-circle me-2"></i>Role Permissions</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <h6>Super Admin</h6>
+                    <small class="text-muted">Full system access, can manage all staff</small>
+                </div>
+                <div class="mb-3">
+                    <h6>Manager</h6>
+                    <small class="text-muted">Manage products, orders, inventory, customers, settings</small>
+                </div>
+                <div class="mb-3">
+                    <h6>Inventory Manager</h6>
+                    <small class="text-muted">Manage products and inventory only</small>
+                </div>
+                <div class="mb-3">
+                    <h6>Order Manager</h6>
+                    <small class="text-muted">Manage orders and customers</small>
+                </div>
+                <div class="mb-3">
+                    <h6>Customer Support</h6>
+                    <small class="text-muted">View and manage orders, customer info</small>
+                </div>
+                <div>
+                    <h6>Viewer</h6>
+                    <small class="text-muted">View-only access to reports</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

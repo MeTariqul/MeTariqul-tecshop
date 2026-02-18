@@ -1,0 +1,211 @@
+{% extends 'base.html' %}
+
+{% block title %}Shopping Cart - Tech Shop{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Hide store navbar on cart page */
+    .navbar.navbar-expand-lg.navbar-light.bg-white.border-top {
+        display: none !important;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <h1><i class="bi bi-cart"></i> Shopping Cart</h1>
+
+    {% if cart_items %}
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-bottom py-3">
+                    <h5 class="mb-0 fw-bold">Your Items ({{ cart_item_count }} items)</h5>
+                </div>
+                <div class="card-body">
+                    {% for item in cart_items %}
+                    <div class="row mb-3 pb-3 border-bottom">
+                        <div class="col-md-2">
+                            {% if item.product.featured_image %}
+                            <img src="{{ item.product.featured_image.url }}" class="img-fluid rounded"
+                                alt="{{ item.product.name }}" style="height: 80px; object-fit: cover;">
+                            {% else %}
+                            <div class="bg-light d-flex align-items-center justify-content-center rounded"
+                                style="height: 80px;">
+                                <i class="bi bi-laptop text-muted"></i>
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-5">
+                            <h6><a href="{% url 'store:product_detail' item.product.SKU %}"
+                                    class="text-decoration-none">{{ item.product.name }}</a></h6>
+                            <p class="text-muted small mb-1">SKU: {{ item.product.SKU }}</p>
+                            {% if item.product.has_offer %}
+                            <p class="text-muted small">
+                                Price: <span class="text-danger">{{ currency_short_form }} {{ item.product.discounted_price }}</span>
+                                <span class="text-decoration-line-through">{{ currency_short_form }} {{ item.product.selling_price }}</span>
+                                <span class="badge bg-danger ms-1">{{ item.product.discount_percentage|floatformat:0 }}%
+                                    OFF</span>
+                            </p>
+                            {% else %}
+                            <p class="text-muted small">Price: {{ currency_short_form }} {{ item.product.selling_price }}</p>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-3">
+                            <form method="post" action="{% url 'cart:update_cart_item' item.product.SKU %}"
+                                class="update-form">
+                                {% csrf_token %}
+                                <div class="input-group input-group-sm">
+                                    <input type="number" class="form-control quantity-input" name="quantity"
+                                        value="{{ item.quantity }}" min="1" max="{{ item.inventory.quantity_on_hand }}"
+                                        data-sku="{{ item.product.SKU }}">
+                                    <span class="input-group-text">of {{ item.inventory.quantity_on_hand }}
+                                        available</span>
+                                    <button class="btn btn-tech update-btn" type="submit">Update</button>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="col-md-2 text-end">
+                            <p class="fw-bold item-subtotal">{{ currency_short_form }} {{ item.item_total|floatformat:2 }}</p>
+                            <form method="post" action="{% url 'cart:remove_from_cart' item.product.SKU %}"
+                                class="d-inline">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-tech btn-sm">
+                                    <i class="bi bi-trash"></i> Remove
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-bottom py-3">
+                    <h5 class="mb-0 fw-bold">Order Summary</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Subtotal ({{ cart_item_count }} items):</span>
+                        <span class="fw-bold cart-subtotal">{{ currency_short_form }} {{ cart_total|floatformat:2 }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Shipping:</span>
+                        <span>
+                            {% if shipping_cost == 0 %}
+                            <span class="text-success">FREE</span>
+                            {% else %}
+                            <span>{{ currency_short_form }} {{ shipping_cost }}</span>
+                            {% endif %}
+                        </span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Tax (8%):</span>
+                        <span class="tax-amount">{{ currency_short_form }} {{ tax_amount|floatformat:2 }}</span>
+                    </div>
+                    <hr>
+                    <div class="d-flex justify-content-between mb-3">
+                        <span class="h5">Total:</span>
+                        <span class="h5 text-primary cart-total">
+                            {{ currency_short_form }} {{ total_amount|floatformat:2 }}
+                        </span>
+                    </div>
+                    <div class="d-grid">
+                        <a href="{% url 'orders:checkout' %}" class="btn btn-tech btn-lg">
+                            <i class="bi bi-credit-card"></i> Proceed to Checkout
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mt-3">
+                <div class="card-body text-center">
+                    <i class="bi bi-shield-check display-4 text-success mb-3"></i>
+                    <h6>Secure Checkout</h6>
+                    <p class="small text-muted mb-0">Your payment information is encrypted and secure</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="text-center py-5">
+        <i class="bi bi-cart-x display-1 text-muted mb-3"></i>
+        <h3>Your cart is empty</h3>
+        <p class="text-muted">Add some products to your cart to get started</p>
+        <a href="{% url 'store:product_list' %}" class="btn btn-tech btn-lg">
+            <i class="bi bi-shop"></i> Continue Shopping
+        </a>
+    </div>
+    {% endif %}
+</div>
+
+<style>
+    .quantity-input:focus {
+        box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+    }
+
+    .update-btn {
+        border-left: none;
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Handle quantity updates
+        document.querySelectorAll('.update-form').forEach(form => {
+            form.addEventListener('submit', function (e) {
+                e.preventDefault();
+
+                const sku = this.querySelector('.quantity-input').dataset.sku;
+                const quantity = this.querySelector('.quantity-input').value;
+
+                fetch(`/cart/update/${sku}/`, {  // Using URL directly since template tag won't work here
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: `quantity=${quantity}`
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Update the UI
+                            document.querySelector(`[data-sku="${sku}"]`).closest('.row')
+                                .querySelector('.item-subtotal').textContent = `{{ currency_short_form }}${data.item_subtotal}`;
+                            document.querySelector('.cart-subtotal').textContent = `{{ currency_short_form }}${data.cart_total}`;
+                            document.querySelector('.tax-amount').textContent = `{{ currency_short_form }}${data.tax_amount}`;
+
+                            const shippingEl = document.querySelector('.shipping-cost');
+                            if (parseFloat(data.shipping_cost) === 0) {
+                                if (shippingEl) shippingEl.innerHTML = '<span class="text-success">FREE</span>';
+                            } else {
+                                if (shippingEl) shippingEl.textContent = `{{ currency_short_form }}${data.shipping_cost}`;
+                            }
+
+                            document.querySelector('.cart-total').textContent = `{{ currency_short_form }}${data.total_amount}`;
+
+                            // Show success message
+                            const alertDiv = document.createElement('div');
+                            alertDiv.className = 'alert alert-success alert-dismissible fade show';
+                            alertDiv.innerHTML = `
+                        Item quantity updated successfully
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    `;
+                            document.querySelector('.container').insertBefore(alertDiv, document.querySelector('.row'));
+
+                            setTimeout(() => {
+                                if (alertDiv.parentNode) {
+                                    alertDiv.remove();
+                                }
+                            }, 3000);
+                        }
+                    });
+            });
+        });
+    });
+</script>
+{% endblock %}

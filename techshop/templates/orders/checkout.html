@@ -1,0 +1,330 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Checkout - Tech Shop{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Hide store navbar on checkout page */
+    .navbar.navbar-expand-lg.navbar-light.bg-white.border-top {
+        display: none !important;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <!-- Checkout Progress Bar -->
+    <div class="checkout-progress mb-4">
+        <div class="progress-step active">
+            <div class="step-circle"><i class="bi bi-cart-check"></i></div>
+            <span>Cart</span>
+        </div>
+        <div class="progress-step active">
+            <div class="step-circle"><i class="bi bi-truck"></i></div>
+            <span>Shipping</span>
+        </div>
+        <div class="progress-step">
+            <div class="step-circle"><i class="bi bi-credit-card"></i></div>
+            <span>Payment</span>
+        </div>
+        <div class="progress-step">
+            <div class="step-circle"><i class="bi bi-check-circle"></i></div>
+            <span>Confirm</span>
+        </div>
+    </div>
+
+    <style>
+        .checkout-progress {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0;
+            max-width: 600px;
+            margin: 0 auto 30px;
+        }
+        
+        .progress-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            flex: 1;
+        }
+        
+        .progress-step:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            width: 100%;
+            height: 3px;
+            background: #dee2e6;
+            z-index: 0;
+        }
+        
+        .progress-step.active:not(:last-child)::after {
+            background: #0d6efd;
+        }
+        
+        .step-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #dee2e6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1;
+            transition: all 0.3s ease;
+        }
+        
+        .progress-step.active .step-circle {
+            background: #0d6efd;
+            color: white;
+        }
+        
+        .progress-step span {
+            margin-top: 8px;
+            font-size: 0.85rem;
+            color: #6c757d;
+            font-weight: 500;
+        }
+        
+        .progress-step.active span {
+            color: #0d6efd;
+        }
+        
+        @media (max-width: 576px) {
+            .progress-step span {
+                font-size: 0.7rem;
+            }
+            
+            .step-circle {
+                width: 32px;
+                height: 32px;
+            }
+        }
+    </style>
+
+    <h2 class="mb-4 fw-bold"><i class="bi bi-shield-lock me-2 text-primary"></i> Secure Checkout</h2>
+
+    {% if cart_items %}
+    <div class="row g-4">
+        <!-- Left Column: Shipping & Order Details -->
+        <div class="col-lg-8">
+            <!-- Shipping Information -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white border-bottom py-3">
+                    <h5 class="mb-0 fw-bold">Shipping Information</h5>
+                </div>
+                <div class="card-body p-4">
+                    <form method="post" id="checkout-form">
+                        {% csrf_token %}
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <label for="shipping_address" class="form-label fw-bold">Address</label>
+                                    <button type="button" class="btn btn-sm btn-outline-primary mb-2"
+                                        onclick="getLocation()">
+                                        <i class="bi bi-geo-alt me-1"></i> Use My Location
+                                    </button>
+                                </div>
+                                <input type="text" class="form-control" id="shipping_address" name="shipping_address"
+                                    placeholder="123 Main St" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="shipping_city" class="form-label fw-bold">City</label>
+                                <input type="text" class="form-control" id="shipping_city" name="shipping_city"
+                                    required>
+                            </div>
+                            <div class="col-md-3">
+                                <label for="shipping_state" class="form-label fw-bold">State</label>
+                                <input type="text" class="form-control" id="shipping_state" name="shipping_state"
+                                    required>
+                            </div>
+                            <div class="col-md-3">
+                                <label for="shipping_zip" class="form-label fw-bold">ZIP Code</label>
+                                <input type="text" class="form-control" id="shipping_zip" name="shipping_zip" required>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Order Items -->
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-bottom py-3">
+                    <h5 class="mb-0 fw-bold">Review Items</h5>
+                </div>
+                <div class="card-body p-4">
+                    {% for item in cart_items %}
+                    <div class="d-flex align-items-center mb-3 pb-3 {{ forloop.last|yesno:',border-bottom' }}">
+                        <div class="flex-shrink-0">
+                            {% if item.product.featured_image %}
+                            <img src="{{ item.product.featured_image.url }}" class="img-fluid rounded border"
+                                alt="{{ item.product.name }}" style="width: 80px; height: 80px; object-fit: cover;">
+                            {% else %}
+                            <div class="bg-light d-flex align-items-center justify-content-center rounded border"
+                                style="width: 80px; height: 80px;">
+                                <i class="bi bi-laptop text-muted"></i>
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h6 class="mb-1 text-dark fw-bold">{{ item.product.name }}</h6>
+                            <p class="text-muted small mb-0">SKU: {{ item.product.SKU }}</p>
+                            <p class="text-muted small mb-0">Qty: {{ item.quantity }} x {{ currency_short_form }} {{ item.product.selling_price }}</p>
+                        </div>
+                        <div class="text-end">
+                            <span class="fw-bold text-primary">{{ currency_short_form }} {{ item.item_total }}</span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column: Order Summary -->
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white border-bottom py-3">
+                    <h5 class="mb-0 fw-bold">Order Summary</h5>
+                </div>
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Subtotal:</span>
+                        <span class="fw-bold">{{ currency_short_form }} {{ subtotal }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Shipping:</span>
+                        <span>
+                            {% if shipping_cost == 0 %}
+                            <span class="text-success fw-bold">FREE</span>
+                            {% else %}
+                            <span>{{ currency_short_form }} {{ shipping_cost }}</span>
+                            {% endif %}
+                        </span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-3">
+                        <span>Tax (8%):</span>
+                        <span>{{ currency_short_form }} {{ tax_amount|floatformat:2 }}</span>
+                    </div>
+                    <hr>
+                    <div class="d-flex justify-content-between mb-4">
+                        <span class="h5 fw-bold">Total:</span>
+                        <span class="h5 fw-bold text-primary">{{ currency_short_form }} {{ total_amount|floatformat:2 }}</span>
+                    </div>
+
+                    <div class="d-grid">
+                        <button type="submit" form="checkout-form" class="btn btn-tech py-3 text-uppercase fw-bold">
+                            <i class="bi bi-check-lg me-2"></i> Place Order
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Security Badge -->
+            <div class="card border-0 shadow-sm bg-light">
+                <div class="card-body p-4 text-center">
+                    <i class="bi bi-lock-fill display-4 text-secondary mb-2"></i>
+                    <h6 class="fw-bold">100% Secure Payment</h6>
+                    <p class="small text-muted mb-0">
+                        Your data is protected with 256-bit SSL encryption.
+                    </p>
+                    <div class="mt-3 text-muted fs-4">
+                        <i class="bi bi-credit-card mx-1"></i>
+                        <i class="bi bi-paypal mx-1"></i>
+                        <i class="bi bi-bank mx-1"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="text-center py-5 bg-white rounded shadow-sm border">
+        <i class="bi bi-cart-x display-1 text-muted mb-3"></i>
+        <h3>Your cart is empty</h3>
+        <p class="text-muted">Add items to your cart before checking out.</p>
+        <a href="{% url 'store:product_list' %}" class="btn btn-primary mt-3">
+            <i class="bi bi-shop me-2"></i> Continue Shopping
+        </a>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+    function getLocation() {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(showPosition, showError);
+        } else {
+            alert("Geolocation is not supported by this browser.");
+        }
+    }
+
+    function showPosition(position) {
+        var lat = position.coords.latitude;
+        var lon = position.coords.longitude;
+
+        // Show loading
+        var btn = event.target;
+        var originalText = btn.innerHTML;
+        btn.innerHTML = '<i class="bi bi-hourglass-split me-1"></i> Getting location...';
+        btn.disabled = true;
+
+        // Use Nominatim for reverse geocoding (free OpenStreetMap service)
+        fetch('https://nominatim.openstreetmap.org/reverse?format=json&lat=' + lat + '&lon=' + lon)
+            .then(response => response.json())
+            .then(data => {
+                if (data.address) {
+                    // Fill in address
+                    var addressParts = [];
+                    if (data.address.house_number) addressParts.push(data.address.house_number);
+                    if (data.address.road) addressParts.push(data.address.road);
+                    if (data.address.neighbourhood) addressParts.push(data.address.neighbourhood);
+                    if (data.address.suburb) addressParts.push(data.address.suburb);
+
+                    document.getElementById('shipping_address').value = addressParts.join(', ') || data.display_name.split(',').slice(0, 2).join(',');
+
+                    // Fill in city
+                    var city = data.address.city || data.address.town || data.address.village || data.address.county;
+                    document.getElementById('shipping_city').value = city || '';
+
+                    // Fill in state (for Bangladesh, this would be the division)
+                    var state = data.address.state || data.address.division;
+                    document.getElementById('shipping_state').value = state || '';
+
+                    // Fill in zip
+                    document.getElementById('shipping_zip').value = data.address.postcode || '';
+                }
+
+                // Reset button
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Unable to get address from location. Please enter manually.');
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            });
+    }
+
+    function showError(error) {
+        switch (error.code) {
+            case error.PERMISSION_DENIED:
+                alert("User denied the request for Geolocation.");
+                break;
+            case error.POSITION_UNAVAILABLE:
+                alert("Location information is unavailable.");
+                break;
+            case error.TIMEOUT:
+                alert("The request to get user location timed out.");
+                break;
+            default:
+                alert("An unknown error occurred.");
+                break;
+        }
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,230 @@
+/* Code White & Black Admin Theme */
+/* Terminal/Hacker aesthetic */
+
+:root {
+    --bg-primary: #ffffff;
+    --fg-primary: #000000;
+    --font-mono: 'Courier New', Courier, monospace;
+}
+
+/* GLOBAL RESET */
+body {
+    font-family: var(--font-mono) !important;
+    background-color: var(--bg-primary);
+    color: var(--fg-primary);
+}
+
+/* HEADER */
+#header {
+    background: var(--fg-primary) !important;
+    color: var(--bg-primary) !important;
+    border-bottom: 5px solid var(--fg-primary) !important;
+    text-transform: uppercase;
+    padding: 15px;
+}
+
+#header a:link,
+#header a:visited {
+    color: var(--bg-primary) !important;
+}
+
+#header .brand一小 {
+    color: var(--bg-primary) !important;
+}
+
+/* BREADCRUMBS */
+div.breadcrumbs {
+    background: var(--bg-primary) !important;
+    border-bottom: 1px solid var(--fg-primary) !important;
+    color: var(--fg-primary) !important;
+    padding: 10px;
+    font-family: var(--font-mono);
+}
+
+/* TABLES & MODULES */
+.module {
+    border: 2px solid var(--fg-primary) !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+}
+
+table {
+    border: 2px solid var(--fg-primary) !important;
+    border-collapse: collapse !important;
+}
+
+thead th {
+    background: var(--fg-primary) !important;
+    color: var(--bg-primary) !important;
+    text-transform: uppercase;
+    border: none !important;
+    font-family: var(--font-mono);
+}
+
+tbody tr {
+    background: var(--bg-primary) !important;
+}
+
+tbody tr:hover {
+    background: #f0f0f0 !important;
+}
+
+tr.row1 {
+    background: #ffffff !important;
+}
+
+tr.row2 {
+    background: #f8f8f8 !important;
+}
+
+/* FORMS */
+.form-row {
+    border-bottom: 1px solid #cccccc !important;
+}
+
+input[type=text],
+input[type=password],
+input[type=email],
+input[type=number],
+select,
+textarea {
+    font-family: var(--font-mono) !important;
+    border: 2px solid var(--fg-primary) !important;
+    border-radius: 0 !important;
+    padding: 8px !important;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+    border-color: var(--fg-primary) !important;
+    box-shadow: none !important;
+}
+
+/* BUTTONS */
+.button,
+input[type=submit],
+.submit-row input,
+.button-default,
+.object-tools a {
+    background: var(--bg-primary) !important;
+    color: var(--fg-primary) !important;
+    border: 2px solid var(--fg-primary) !important;
+    border-radius: 0 !important;
+    text-transform: uppercase;
+    font-weight: bold !important;
+    font-family: var(--font-mono) !important;
+    box-shadow: none !important;
+    padding: 8px 15px !important;
+    transition: 0.2s;
+}
+
+.button:hover,
+input[type=submit]:hover,
+.button-default:hover,
+.object-tools a:hover {
+    background: var(--fg-primary) !important;
+    color: var(--bg-primary) !important;
+}
+
+.deletelink-box .deletelink {
+    background: #ffffff !important;
+    color: #000000 !important;
+    border: 2px solid #000000 !important;
+    border-radius: 0 !important;
+    text-decoration: none;
+}
+
+.deletelink-box .deletelink:hover {
+    background: #000000 !important;
+    color: #ffffff !important;
+}
+
+/* OBJECT TOOLS */
+.object-tools {
+    background: transparent !important;
+}
+
+.object-tools a {
+    font-size: 12px !important;
+    padding: 5px 10px !important;
+}
+
+/* CHANGE FORM */
+.change-form .submit-row {
+    background: #f8f8f8 !important;
+    border-top: 2px solid #000000 !important;
+    padding: 15px !important;
+}
+
+/* MESSAGES */
+.messagelist li {
+    font-family: var(--font-mono);
+    border-left: 5px solid #000000;
+}
+
+/* PAGINATOR */
+.paginator {
+    font-family: var(--font-mono);
+}
+
+.paginator a {
+    border: 1px solid #000000 !important;
+    color: #000000 !important;
+}
+
+.paginator a:hover {
+    background: #000000 !important;
+    color: #ffffff !important;
+}
+
+/* DATE & TIME */
+.datetime span {
+    font-family: var(--font-mono);
+}
+
+/* ACTIONS */
+.actions {
+    background: #f8f8f8 !important;
+    border-bottom: 2px solid #000000 !important;
+}
+
+.actions select {
+    border: 2px solid #000000 !important;
+    border-radius: 0 !important;
+}
+
+/* FILTER SIDEBAR */
+#changelist-filter {
+    border-left: 2px solid #000000 !important;
+}
+
+#changelist-filter h2 {
+    font-family: var(--font-mono);
+    text-transform: uppercase;
+    border-bottom: 2px solid #000000;
+}
+
+/* APP LIST */
+.app-attr {
+    font-family: var(--font-mono);
+}
+
+.model-attr {
+    font-family: var(--font-mono);
+}
+
+/* ADD/CHANGE TITLES */
+h1,
+h2,
+h3 {
+    font-family: var(--font-mono) !important;
+    text-transform: uppercase;
+}
+
+/* LOCKED MESSAGE */
+.locked-message {
+    font-family: var(--font-mono);
+    background: #f8f8f8;
+    border: 2px solid #000000;
+}
