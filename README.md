@@ -60,10 +60,24 @@ Visit `http://127.0.0.1:8000/` to view the site.
 - Product browsing with categories
 - Product variants (size, color, storage)
 - Shopping cart with persistence
+- **Coupon codes** (SAVE10, SAVE20, WELCOME, FLAT50, FLAT100)
+- **Save for Later** functionality
 - Wishlist
 - Checkout process
 - Order history and tracking
+- **Order tracking page**
 - PDF invoice download with QR code
+- **Product reviews and ratings**
+- **Contact/Support form** for customer inquiries
+- **Customer Support dashboard** for admin responses
+
+### New Pages
+- About Us
+- FAQ
+- Terms & Conditions
+- Privacy Policy
+- Return & Refund Policy
+- Shipping Information
 
 ### Admin Features
 - Multi-level dashboard system
@@ -71,6 +85,7 @@ Visit `http://127.0.0.1:8000/` to view the site.
 - Inventory tracking
 - Order management
 - Staff management with roles
+- **Customer Support management** - respond to customer inquiries
 - Reports and analytics
 
 ## 🖥️ Admin Dashboards
@@ -97,9 +112,11 @@ MeTariqul-tecshop/
 │   ├── cart/               # Shopping cart
 │   ├── orders/             # Order management
 │   ├── store/              # Store front
+│   ├── invoices/           # Invoice generation
 │   ├── wishlist/           # Wishlist
 │   ├── templates/          # HTML templates
 │   └── techshop_proj/      # Settings
+├── run_server.bat          # Windows startup script
 ├── requirements.txt
 └── README.md
 ```
@@ -178,17 +195,42 @@ DB_PASSWORD=your_password
 - `/store/` - Products list
 - `/store/product/<id>/` - Product details
 - `/store/search/` - Search products
+- `/store/about/` - About page
+- `/store/contact/` - Contact form
+- `/store/faq/` - FAQ page
+- `/store/track-order/` - Track order
+- `/store/privacy/` - Privacy policy
+- `/store/terms/` - Terms & conditions
+- `/store/return-refund/` - Return & refund
+- `/store/shipping/` - Shipping info
 
 ### Cart
 - `/cart/` - View cart
 - `/cart/add/<id>/` - Add product
 - `/cart/remove/<id>/` - Remove item
+- `/cart/update/<id>/` - Update quantity
+- `/cart/apply-coupon/` - Apply coupon code
+- `/cart/save-later/<id>/` - Save for later
 
 ### Orders
 - `/orders/checkout/` - Checkout
 - `/orders/confirmation/<id>/` - Confirmation
 - `/orders/invoice/<id>/` - PDF Invoice
 - `/orders/history/` - Order history
+- `/orders/track/<id>/` - Track order
+
+### Invoices
+- `/invoices/` - Invoice list
+- `/invoices/create/` - Create invoice
+- `/invoices/<id>/` - Invoice detail
+- `/invoices/<id>/pdf/` - Download PDF
+
+### Admin Dashboard
+- `/admin-dashboard/` - Main dashboard
+- `/admin-dashboard/customer-support/` - Customer support
+- `/admin-dashboard/director/` - Director dashboard
+- `/admin-dashboard/warehouse/` - Warehouse dashboard
+- `/admin-dashboard/fulfillment/` - Fulfillment dashboard
 
 ### Accounts
 - `/accounts/login/` - Login
@@ -200,10 +242,16 @@ DB_PASSWORD=your_password
 ### Core Models
 - **Product**: Name, price, SKU, stock, category
 - **ProductVariant**: Size, color, storage variants
+- **ProductImage**: Product images
+- **Category**: Product categories
+- **Brand**: Product brands
 - **WebCustomer**: User profile, addresses
 - **WebOrder**: Order details, status, totals
 - **OrderItem**: Products in order
 - **StaffProfile**: Staff role, permissions
+- **ContactMessage**: Customer inquiries
+- **Invoice**: Invoice records
+- **Review**: Product reviews and ratings
 
 ## 🔒 Security Features
 
