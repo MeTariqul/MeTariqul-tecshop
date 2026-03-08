@@ -359,3 +359,56 @@ def move_to_cart(request, sku):
         request.session['saved_items'] = saved  
         request.session.modified = True  
     return redirect('cart:cart_view') 
+
+
+def compare_view(request):
+    """View compare page"""
+    compare_list = request.session.get('compare_list', [])
+    products = []
+    from store.models import Product
+    for sku in compare_list:
+        try:
+            product = Product.objects.get(SKU=sku)
+            products.append(product)
+        except Product.DoesNotExist:
+            pass
+    
+    context = {
+        'compare_products': products,
+        'compare_count': len(products),
+    }
+    return render(request, 'cart/compare.html', context)
+
+
+def add_to_compare(request, sku):
+    """Add product to compare list"""
+    compare_list = request.session.get('compare_list', [])
+    
+    if sku not in compare_list:
+        if len(compare_list) < 4:
+            compare_list.append(sku)
+            request.session['compare_list'] = compare_list
+            messages.success(request, f'Product added to compare list!')
+        else:
+            messages.warning(request, 'You can compare maximum 4 products at a time.')
+    else:
+        messages.info(request, 'Product is already in compare list.')
+    
+    return redirect(request.META.get('HTTP_REFERER', 'store:product_list'))
+
+
+def remove_from_compare(request, sku):
+    """Remove product from compare list"""
+    compare_list = request.session.get('compare_list', [])
+    if sku in compare_list:
+        compare_list.remove(sku)
+        request.session['compare_list'] = compare_list
+        messages.success(request, 'Product removed from compare list.')
+    return redirect('cart:compare_view')
+
+
+def clear_compare(request):
+    """Clear all products from compare list"""
+    request.session['compare_list'] = []
+    messages.success(request, 'Compare list cleared.')
+    return redirect('cart:compare_view')

@@ -403,8 +403,8 @@
                     {% if in_wishlist %}Remove from Wishlist{% else %}Add to Wishlist{% endif %}
                 </a>
                 {% else %}
-                <a href="{% url 'login' %}" class="btn btn-outline-danger">
-                    <i class="bi bi-heart me-2"></i>Add to Wishlist
+                <a href="{% url 'cart:add_to_compare' product.SKU %}" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-repeat me-2"></i>Add to Compare
                 </a>
                 {% endif %}
             </div>

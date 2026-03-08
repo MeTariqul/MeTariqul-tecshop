@@ -112,9 +112,9 @@
                             <button class="product-action-btn" title="Add to Wishlist">
                                 <i class="bi bi-heart"></i>
                             </button>
-                            <button class="product-action-btn" title="Add to Compare">
+                            <a href="{% url 'cart:add_to_compare' product.SKU %}" class="product-action-btn" title="Add to Compare">
                                 <i class="bi bi-arrow-repeat"></i>
-                            </button>
+                            </a>
                         </div>
                     </div>
 

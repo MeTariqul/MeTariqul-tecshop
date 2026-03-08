@@ -122,6 +122,8 @@
                             </span>
                             {% endif %}
                         </a>
+                        <a href="{% url 'cart:compare_view' %}" class="text-decoration-none position-relative ms-3">
+                            <i class="bi bi-arrow-left-right fs-5 text-dark"></i>
                         <div class="dropdown">
                             <a href="#" class="text-decoration-none" data-bs-toggle="dropdown">
                                 <i class="bi bi-person-circle fs-5 text-dark"></i>
@@ -283,6 +285,7 @@
                         <li><a href="{% url 'orders:order_history' %}">Order History</a></li>
                         <li><a href="{% url 'wishlist:wishlist_view' %}">Wishlist</a></li>
                         <li><a href="{% url 'cart:cart_view' %}">Cart</a></li>
+                        <li><a href="{% url 'cart:compare_view' %}">Compare</a></li>
                         {% else %}
                         <li><a href="{% url 'login' %}">Login</a></li>
                         <li><a href="{% url 'orders:register' %}">Register</a></li>
