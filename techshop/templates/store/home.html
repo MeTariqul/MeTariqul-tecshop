@@ -76,83 +76,6 @@
     </div>
 </section>
 
-<!-- Category Section -->
-<section class="category-section">
-    <div class="container">
-        <div class="section-header">
-            <h2 class="section-title">Shop by Category</h2>
-        </div>
-        <div class="row g-3 g-md-4">
-            {% for category in categories %}
-            <div class="col-6 col-md-4 col-lg-2">
-                <a href="{% url 'store:product_list' %}?category={{ category.id }}" class="category-card">
-                    <div class="category-icon">
-                        <i class="bi bi-{% cycle 'laptop' 'display' 'cpu' 'gpu-card' 'keyboard' 'headset' %}"></i>
-                    </div>
-                    <h4>{{ category.name }}</h4>
-                    <p>Shop Now <i class="bi bi-arrow-right small"></i></p>
-                </a>
-            </div>
-            {% empty %}
-            <div class="col-6 col-md-4 col-lg-2">
-                <a href="{% url 'store:product_list' %}?category=1" class="category-card">
-                    <div class="category-icon">
-                        <i class="bi bi-laptop"></i>
-                    </div>
-                    <h4>Laptops</h4>
-                    <p>500+ Products</p>
-                </a>
-            </div>
-            <div class="col-6 col-md-4 col-lg-2">
-                <a href="{% url 'store:product_list' %}?category=2" class="category-card">
-                    <div class="category-icon">
-                        <i class="bi bi-display"></i>
-                    </div>
-                    <h4>Monitors</h4>
-                    <p>200+ Products</p>
-                </a>
-            </div>
-            <div class="col-6 col-md-4 col-lg-2">
-                <a href="{% url 'store:product_list' %}?category=3" class="category-card">
-                    <div class="category-icon">
-                        <i class="bi bi-cpu"></i>
-                    </div>
-                    <h4>Processors</h4>
-                    <p>100+ Products</p>
-                </a>
-            </div>
-            <div class="col-6 col-md-4 col-lg-2">
-                <a href="{% url 'store:product_list' %}?category=4" class="category-card">
-                    <div class="category-icon">
-                        <i class="bi bi-gpu-card"></i>
-                    </div>
-                    <h4>Graphics Card</h4>
-                    <p>80+ Products</p>
-                </a>
-            </div>
-            <div class="col-6 col-md-4 col-lg-2">
-                <a href="{% url 'store:product_list' %}?category=5" class="category-card">
-                    <div class="category-icon">
-                        <i class="bi bi-keyboard"></i>
-                    </div>
-                    <h4>Accessories</h4>
-                    <p>300+ Products</p>
-                </a>
-            </div>
-            <div class="col-6 col-md-4 col-lg-2">
-                <a href="{% url 'store:product_list' %}?category=6" class="category-card">
-                    <div class="category-icon">
-                        <i class="bi bi-headset"></i>
-                    </div>
-                    <h4>Audio</h4>
-                    <p>150+ Products</p>
-                </a>
-            </div>
-            {% endfor %}
-        </div>
-    </div>
-</section>
-
 <!-- Featured Products -->
 <section class="featured-section">
     <div class="container">
@@ -251,6 +174,63 @@
     </div>
 </section>
 
+<!-- Quick View Modal Template -->
+{% for product in featured_products %}
+<div class="modal fade" id="quickView{{ product.SKU }}" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">{{ product.name }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        {% if product.featured_image %}
+                        <img src="{{ product.featured_image.url }}" class="img-fluid rounded" alt="{{ product.name }}">
+                        {% else %}
+                        <div class="bg-light d-flex align-items-center justify-content-center" style="height: 300px;">
+                            <i class="bi bi-image text-muted" style="font-size: 3rem;"></i>
+                        </div>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6">
+                        <h4 class="text-primary">{{ currency_short_form }} {{ product.selling_price }}</h4>
+                        {% if product.cost_price > product.selling_price %}
+                        <p class="text-muted"><del>{{ currency_short_form }} {{ product.cost_price }}</del></p>
+                        {% endif %}
+                        
+                        <p class="mt-3">{{ product.description|truncatewords:30 }}</p>
+                        
+                        {% if product.stock_quantity > 0 %}
+                        <span class="badge bg-success">In Stock</span>
+                        {% else %}
+                        <span class="badge bg-danger">Out of Stock</span>
+                        {% endif %}
+                        
+                        <div class="mt-4">
+                            <form method="post" action="{% url 'cart:add_to_cart' product.SKU %}">
+                                {% csrf_token %}
+                                <div class="d-flex gap-2">
+                                    <input type="number" name="quantity" value="1" min="1" max="{{ product.stock_quantity }}" class="form-control" style="width: 80px;">
+                                    <button type="submit" class="btn btn-warning">
+                                        <i class="bi bi-cart-plus"></i> Add to Cart
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                        
+                        <div class="mt-3">
+                            <a href="{% url 'store:product_detail' product.SKU %}" class="btn btn-outline-primary">View Full Details</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+
 <!-- Banner Section -->
 <section class="banner-section">
     <div class="container">
@@ -290,7 +270,7 @@
         <div class="row g-4">
             <div class="col-md-3">
                 <div class="category-card">
-                    <div class="category-icon" style="background: #28a745;">
+                    <div class="category-icon" style="background: #16a34a;">
                         <i class="bi bi-shield-check"></i>
                     </div>
                     <h4>100% Authentic</h4>
@@ -299,7 +279,7 @@
             </div>
             <div class="col-md-3">
                 <div class="category-card">
-                    <div class="category-icon" style="background: #17a2b8;">
+                    <div class="category-icon" style="background: #16a34a;">
                         <i class="bi bi-truck"></i>
                     </div>
                     <h4>Fast Delivery</h4>
@@ -308,7 +288,7 @@
             </div>
             <div class="col-md-3">
                 <div class="category-card">
-                    <div class="category-icon" style="background: #ffc107;">
+                    <div class="category-icon" style="background: #22c55e;">
                         <i class="bi bi-arrow-repeat"></i>
                     </div>
                     <h4>Easy Returns</h4>
@@ -317,7 +297,7 @@
             </div>
             <div class="col-md-3">
                 <div class="category-card">
-                    <div class="category-icon" style="background: #dc3545;">
+                    <div class="category-icon" style="background: #16a34a;">
                         <i class="bi bi-headset"></i>
                     </div>
                     <h4>24/7 Support</h4>

@@ -67,6 +67,19 @@
                                 }}</strong></small>
                     </div>
                     {% endif %}
+                    
+                    <h5 class="mt-4"><i class="bi bi-percent me-1"></i>Tax Settings</h5>
+                    <hr>
+                    <div class="mb-3">
+                        <label class="form-label">Product Tax Rate (%)</label>
+                        <input type="number" name="tax_rate" class="form-control"
+                            value="{{ product.tax_rate|default:'' }}" step="0.01" min="0" max="100">
+                        <small class="text-muted">Leave empty to use global tax rate</small>
+                    </div>
+                    <div class="form-check">
+                        <input type="checkbox" name="tax_exempt" class="form-check-input" id="tax_exempt" {% if product.tax_exempt %}checked{% endif %}>
+                        <label class="form-check-label" for="tax_exempt">Tax Exempt (No tax on this product)</label>
+                    </div>
                 </div>
             </div>
 

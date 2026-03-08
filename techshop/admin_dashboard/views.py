@@ -13,7 +13,7 @@ import os
 import json
 
 from .models import StaffProfile, ActivityLog, SystemSettings, SiteConfiguration, UserPermission, Supplier, PurchaseOrder, PurchaseOrderItem, InventoryMovement
-from store.models import Product, Category, Inventory
+from store.models import Product, Category, Inventory, Review
 from orders.models import WebOrder, OrderItem, WebCustomer
 from cart.models import ShoppingCart
 
@@ -202,7 +202,7 @@ def get_role_permissions(role):
 @login_required
 @admin_required
 def dashboard(request):
-    """Main admin dashboard"""
+    """Main admin dashboard - Unified dashboard with all features"""
     # Get date ranges
     today = timezone.now().date()
     week_ago = today - timedelta(days=7)
@@ -215,25 +215,49 @@ def dashboard(request):
     except StaffProfile.DoesNotExist:
         permissions = get_role_permissions('super_admin')
     
-    # Orders statistics
+    # ==================== ORDERS ====================
     total_orders = WebOrder.objects.count()
     orders_today = WebOrder.objects.filter(created_at__date=today).count()
     orders_this_week = WebOrder.objects.filter(created_at__date__gte=week_ago).count()
     orders_this_month = WebOrder.objects.filter(created_at__date__gte=month_ago).count()
+    
+    # Today's orders for director
+    today_orders = WebOrder.objects.filter(created_at__date=today, status__in=['confirmed', 'processing', 'shipped', 'delivered'])
+    today_sales = sum(order.total_amount for order in today_orders)
+    today_order_count = today_orders.count()
+    
+    # This month's sales
+    month_start = today.replace(day=1)
+    month_orders = WebOrder.objects.filter(created_at__date__gte=month_start, status__in=['confirmed', 'processing', 'shipped', 'delivered'])
+    month_sales = sum(order.total_amount for order in month_orders)
     
     # Revenue
     revenue_today = WebOrder.objects.filter(created_at__date=today, status__in=['delivered', 'confirmed', 'processing', 'shipped']).aggregate(Sum('total_amount'))['total_amount__sum'] or 0
     revenue_week = WebOrder.objects.filter(created_at__date__gte=week_ago, status__in=['delivered', 'confirmed', 'processing', 'shipped']).aggregate(Sum('total_amount'))['total_amount__sum'] or 0
     revenue_month = WebOrder.objects.filter(created_at__date__gte=month_ago, status__in=['delivered', 'confirmed', 'processing', 'shipped']).aggregate(Sum('total_amount'))['total_amount__sum'] or 0
     
-    # Products
+    # ==================== PRODUCTS ====================
     total_products = Product.objects.count()
     low_stock_products = Inventory.objects.filter(quantity_on_hand__lte=10).count()
     out_of_stock = Inventory.objects.filter(quantity_on_hand=0).count()
     
-    # Customers
+    # Inventory Value (Director feature)
+    total_inventory_value = 0
+    total_stock = 0
+    for product in Product.objects.select_related('inventory').all():
+        if product.inventory:
+            total_inventory_value += product.selling_price * product.inventory.quantity_on_hand
+            total_stock += product.inventory.quantity_on_hand
+    
+    # ==================== CUSTOMERS ====================
     total_customers = WebCustomer.objects.count()
     new_customers_this_month = WebCustomer.objects.filter(created_at__date__gte=month_ago).count()
+    
+    # ==================== STAFF ====================
+    total_staff = StaffProfile.objects.filter(is_active=True).count()
+    
+    # ==================== PURCHASE ORDERS ====================
+    pending_pos = PurchaseOrder.objects.filter(status__in=['draft', 'sent', 'confirmed', 'ordered', 'in_transit']).count()
     
     # Recent orders
     recent_orders = WebOrder.objects.select_related('customer__user').order_by('-created_at')[:10]
@@ -247,24 +271,58 @@ def dashboard(request):
     # Low stock alerts
     low_stock_items = Inventory.objects.select_related('product').filter(quantity_on_hand__lte=10)[:10]
     
+    # Reviews for director dashboard
+    recent_reviews = Review.objects.select_related('product', 'user__user').order_by('-created_at')[:10]
+    pending_reviews = Review.objects.filter(admin_response__isnull=True).count()
+    
     context = {
+        # Permissions
         'permissions': permissions,
+        
+        # Orders
         'total_orders': total_orders,
         'orders_today': orders_today,
         'orders_this_week': orders_this_week,
         'orders_this_month': orders_this_month,
+        
+        # Sales (Director)
+        'today_sales': today_sales,
+        'today_order_count': today_order_count,
+        'month_sales': month_sales,
+        
+        # Revenue
         'revenue_today': revenue_today,
         'revenue_week': revenue_week,
         'revenue_month': revenue_month,
+        
+        # Products
         'total_products': total_products,
         'low_stock_products': low_stock_products,
         'out_of_stock': out_of_stock,
+        
+        # Inventory Value (Director)
+        'total_inventory_value': total_inventory_value,
+        'total_stock': total_stock,
+        
+        # Customers
         'total_customers': total_customers,
         'new_customers_this_month': new_customers_this_month,
+        
+        # Staff (Director)
+        'total_staff': total_staff,
+        
+        # Purchase Orders (Director)
+        'pending_pos': pending_pos,
+        
+        # Common
         'recent_orders': recent_orders,
         'recent_activities': recent_activities,
         'order_status_counts': order_status_counts,
         'low_stock_items': low_stock_items,
+        
+        # Reviews
+        'recent_reviews': recent_reviews,
+        'pending_reviews': pending_reviews,
     }
     
     return render(request, 'admin/dashboard.html', context)
@@ -519,8 +577,8 @@ def settings_view(request):
         config.meta_keywords = request.POST.get('meta_keywords', config.meta_keywords)
         config.maintenance_mode = request.POST.get('maintenance_mode') == 'on'
         config.maintenance_message = request.POST.get('maintenance_message', config.maintenance_message)
-        config.currency_symbol = request.POST.get('currency_symbol', config.currency_symbol)
-        config.currency_code = request.POST.get('currency_code', config.currency_code)
+        config.currency_short_form = request.POST.get('currency_short_form', config.currency_short_form)
+        config.currency_name = request.POST.get('currency_name', config.currency_name)
         config.tax_enabled = request.POST.get('tax_enabled') == 'on'
         config.tax_rate = Decimal(request.POST.get('tax_rate', config.tax_rate))
         config.free_shipping_threshold = Decimal(request.POST.get('free_shipping_threshold', config.free_shipping_threshold))
@@ -663,6 +721,11 @@ def product_edit(request, product_id):
         discount_pct = request.POST.get('discount_percentage', '0')
         product.discount_percentage = Decimal(discount_pct) if discount_pct else Decimal('0')
         product.discount_label = request.POST.get('discount_label', '')
+        
+        # Tax Settings
+        tax_rate = request.POST.get('tax_rate', '')
+        product.tax_rate = Decimal(tax_rate) if tax_rate else None
+        product.tax_exempt = request.POST.get('tax_exempt') == 'on'
         
         product.save()
         
@@ -1132,34 +1195,90 @@ def database_backup(request):
         return redirect('admin_dashboard:website_settings')
     
     try:
-        import subprocess
         from datetime import datetime
+        import shutil
         
-        db_name = settings.DATABASES['default']['NAME']
-        db_user = settings.DATABASES['default']['USER']
-        db_password = settings.DATABASES['default']['PASSWORD']
-        db_host = settings.DATABASES['default']['HOST']
-        db_port = settings.DATABASES['default']['PORT']
+        db_engine = settings.DATABASES['default']['ENGINE']
         
         # Create backup filename
         timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-        backup_file = f'backup_{db_name}_{timestamp}.sql'
+        backup_file = f'backup_techshop_db_{timestamp}.sql'
         backup_path = os.path.join(settings.MEDIA_ROOT, 'backups')
         os.makedirs(backup_path, exist_ok=True)
         full_path = os.path.join(backup_path, backup_file)
         
-        # Run mysqldump (for MySQL)
-        cmd = [
-            'mysqldump',
-            f'-u{db_user}',
-            f'-p{db_password}',
-            f'-h{db_host}',
-            f'-P{db_port}',
-            db_name,
-        ]
-        
-        with open(full_path, 'w') as f:
-            subprocess.run(cmd, stdout=f, check=True)
+        if 'sqlite' in db_engine:
+            # For SQLite, simply copy the database file
+            db_path = settings.DATABASES['default']['NAME']
+            if not os.path.isabs(db_path):
+                db_path = os.path.join(settings.BASE_DIR, db_path)
+            shutil.copy2(db_path, full_path)
+            messages.success(request, 'Database backup created successfully!')
+        elif 'mysql' in db_engine:
+            # For MySQL/MariaDB
+            db_name = settings.DATABASES['default']['NAME']
+            db_user = settings.DATABASES['default']['USER']
+            db_password = settings.DATABASES['default']['PASSWORD']
+            db_host = settings.DATABASES['default']['HOST']
+            db_port = settings.DATABASES['default']['PORT']
+            
+            # Try to find mysqldump in common Windows locations
+            mysqldump_path = 'mysqldump'
+            possible_paths = [
+                r'C:\xampp\mysql\bin\mysqldump.exe',
+                r'C:\wamp\bin\mysql\mysql5.7.31\bin\mysqldump.exe',
+                r'C:\Program Files\MySQL\MySQL Server 8.0\bin\mysqldump.exe',
+                r'C:\Program Files (x86)\MySQL\MySQL Server 5.7\bin\mysqldump.exe',
+            ]
+            
+            # Check if mysqldump is available in PATH
+            import subprocess
+            try:
+                subprocess.run(['mysqldump', '--version'], capture_output=True, check=True)
+                mysqldump_path = 'mysqldump'
+            except (FileNotFoundError, subprocess.CalledProcessError):
+                # Try common installation paths
+                mysqldump_path = None
+                for path in possible_paths:
+                    if os.path.exists(path):
+                        mysqldump_path = path
+                        break
+            
+            if mysqldump_path:
+                # Run mysqldump
+                cmd = [
+                    mysqldump_path,
+                    f'-u{db_user}',
+                    f'-p{db_password}',
+                    f'-h{db_host}',
+                    f'-P{db_port}',
+                    '--single-transaction',
+                    '--quick',
+                    '--lock-tables=false',
+                    db_name,
+                ]
+                
+                with open(full_path, 'w', encoding='utf-8') as f:
+                    result = subprocess.run(cmd, stdout=f, stderr=subprocess.PIPE)
+                    
+                if os.path.getsize(full_path) > 0:
+                    messages.success(request, 'Database backup created successfully!')
+                else:
+                    raise Exception('mysqldump produced empty output')
+            else:
+                # Fallback: Create a text file with database info
+                with open(full_path, 'w') as f:
+                    f.write(f'-- Database Backup Information\n')
+                    f.write(f'-- Date: {timestamp}\n')
+                    f.write(f'-- Database: {db_name}\n')
+                    f.write(f'-- User: {db_user}\n\n')
+                    f.write('-- NOTE: mysqldump not found. Please backup manually.\n')
+                    f.write('-- Install MySQL client tools or use phpMyAdmin/XAMPP/MySQL Workbench.\n')
+                messages.warning(request, 'mysqldump not found. Created informational file instead.')
+        else:
+            # For other databases
+            with open(full_path, 'w') as f:
+                f.write(f'-- Backup not supported for this database engine: {db_engine}\n')
         
         # Read and return the backup file
         with open(full_path, 'rb') as f:
@@ -1175,63 +1294,6 @@ def database_backup(request):
 # =====================
 # Director/Owner Dashboard
 # =====================
-
-@login_required
-@admin_required
-def director_dashboard(request):
-    """Director Dashboard - Executive Summary with P&L, Inventory Value, Staff Management"""
-    
-    today = timezone.now().date()
-    
-    # Today's sales
-    today_orders = WebOrder.objects.filter(created_at__date=today, status__in=['confirmed', 'processing', 'shipped', 'delivered'])
-    today_sales = sum(order.total_amount for order in today_orders)
-    today_order_count = today_orders.count()
-    
-    # This month's sales
-    month_start = today.replace(day=1)
-    month_orders = WebOrder.objects.filter(created_at__date__gte=month_start, status__in=['confirmed', 'processing', 'shipped', 'delivered'])
-    month_sales = sum(order.total_amount for order in month_orders)
-    
-    # Inventory Value
-    total_inventory_value = 0
-    for product in Product.objects.select_related('inventory').all():
-        if product.inventory:
-            total_inventory_value += product.selling_price * product.inventory.quantity_on_hand
-    
-    # Total products count
-    total_products = Product.objects.count()
-    total_stock = sum(p.inventory.quantity_on_hand if p.inventory else 0 for p in Product.objects.select_related('inventory').all())
-    
-    # Low stock items
-    low_stock_items = Product.objects.filter(
-        inventory__quantity_on_hand__lt=10
-    ).select_related('inventory')[:10]
-    
-    # Recent orders
-    recent_orders = WebOrder.objects.order_by('-created_at')[:10]
-    
-    # Staff count
-    total_staff = StaffProfile.objects.filter(is_active=True).count()
-    
-    # Pending POs
-    pending_pos = PurchaseOrder.objects.filter(status__in=['draft', 'sent', 'confirmed', 'ordered', 'in_transit']).count()
-    
-    # Quick stats
-    context = {
-        'today_sales': today_sales,
-        'today_order_count': today_order_count,
-        'month_sales': month_sales,
-        'total_inventory_value': total_inventory_value,
-        'total_products': total_products,
-        'total_stock': total_stock,
-        'low_stock_items': low_stock_items,
-        'recent_orders': recent_orders,
-        'total_staff': total_staff,
-        'pending_pos': pending_pos,
-    }
-    return render(request, 'admin/director_dashboard.html', context)
-
 
 # =====================
 # Warehouse/Inventory Dashboard
@@ -1659,3 +1721,131 @@ def packing_slip(request, order_id):
         'items': items,
     }
     return render(request, 'admin/packing_slip.html', context)
+
+
+# ====================
+# REVIEW MANAGEMENT
+# ====================
+
+@login_required
+@admin_required
+def respond_review(request, review_id):
+    """Respond to a customer review - Chat/Reply functionality"""
+    review = get_object_or_404(Review, id=review_id)
+    
+    if request.method == 'POST':
+        response_text = request.POST.get('response_text', '').strip()
+        
+        if response_text:
+            review.admin_response = response_text
+            review.admin_response_by = request.user
+            review.admin_response_at = timezone.now()
+            review.save()
+            
+            # Log the activity
+            ActivityLog.objects.create(
+                user=request.user,
+                action='respond',
+                model_name='Review',
+                object_id=review.id,
+                object_repr=f'Review for {review.product.name}',
+                description=f'Responded to review: {response_text[:50]}...'
+            )
+            
+            messages.success(request, 'Your response has been added to the review!')
+        else:
+            messages.error(request, 'Please enter a response.')
+    
+    return redirect('admin_dashboard:dashboard')
+
+
+# ====================
+# CUSTOMER SUPPORT
+# ====================
+
+@login_required
+@admin_required
+def customer_support(request):
+    """Customer Support - View and respond to contact messages"""
+    # Check permission - only director and super_admin can access
+    try:
+        staff = request.user.staff_profile
+        if staff.role not in ['director', 'super_admin']:
+            messages.error(request, 'You do not have permission to access this page.')
+            return redirect('admin_dashboard:dashboard')
+    except StaffProfile.DoesNotExist:
+        # Superuser can access
+        pass
+    
+    from store.models import ContactMessage
+    
+    # Get filter parameters
+    status_filter = request.GET.get('status', '')
+    
+    # Query messages
+    messages_list = ContactMessage.objects.select_related('customer__user').order_by('-created_at')
+    
+    if status_filter:
+        messages_list = messages_list.filter(status=status_filter)
+    
+    # Counts
+    total_messages = ContactMessage.objects.count()
+    new_messages = ContactMessage.objects.filter(status='new').count()
+    pending_messages = ContactMessage.objects.filter(status='in_progress').count()
+    resolved_messages = ContactMessage.objects.filter(status='resolved').count()
+    
+    context = {
+        'messages': messages_list,
+        'total_messages': total_messages,
+        'new_messages': new_messages,
+        'pending_messages': pending_messages,
+        'resolved_messages': resolved_messages,
+        'status_filter': status_filter,
+    }
+    return render(request, 'admin/customer_support.html', context)
+
+
+@login_required
+@admin_required
+def respond_contact(request, message_id):
+    """Respond to a contact message"""
+    # Check permission - only director and super_admin can respond
+    try:
+        staff = request.user.staff_profile
+        if staff.role not in ['director', 'super_admin']:
+            messages.error(request, 'You do not have permission to respond to messages.')
+            return redirect('admin_dashboard:dashboard')
+    except StaffProfile.DoesNotExist:
+        # Superuser can access
+        pass
+    
+    from store.models import ContactMessage
+    
+    message = get_object_or_404(ContactMessage, id=message_id)
+    
+    if request.method == 'POST':
+        response_text = request.POST.get('response_text', '').strip()
+        new_status = request.POST.get('status', 'in_progress')
+        
+        if response_text:
+            message.admin_response = response_text
+            message.admin_response_by = request.user
+            message.admin_response_at = timezone.now()
+            message.status = new_status
+            message.save()
+            
+            # Log the activity
+            ActivityLog.objects.create(
+                user=request.user,
+                action='respond',
+                model_name='ContactMessage',
+                object_id=message.id,
+                object_repr=f'Message from {message.name}',
+                description=f'Responded to contact message: {response_text[:50]}...'
+            )
+            
+            messages.success(request, 'Your response has been sent!')
+        else:
+            messages.error(request, 'Please enter a response.')
+    
+    return redirect('admin_dashboard:customer_support')

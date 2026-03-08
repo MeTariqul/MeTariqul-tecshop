@@ -1,0 +1,209 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Track Order - TechShop{% endblock %}
+
+{% block extra_css %}
+<style>
+    .track-order-card {
+        max-width: 600px;
+        margin: 0 auto;
+    }
+    .order-status {
+        padding: 20px;
+        border-radius: 10px;
+        background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+        color: white;
+    }
+    .tracking-timeline {
+        position: relative;
+        padding-left: 30px;
+    }
+    .tracking-timeline::before {
+        content: '';
+        position: absolute;
+        left: 8px;
+        top: 0;
+        bottom: 0;
+        width: 2px;
+        background: #e2e8f0;
+    }
+    .timeline-item {
+        position: relative;
+        padding-bottom: 25px;
+    }
+    .timeline-item:last-child {
+        padding-bottom: 0;
+    }
+    .timeline-dot {
+        position: absolute;
+        left: -26px;
+        top: 0;
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        background: #e2e8f0;
+        border: 3px solid white;
+        box-shadow: 0 0 0 2px #e2e8f0;
+    }
+    .timeline-item.active .timeline-dot {
+        background: #16a34a;
+        box-shadow: 0 0 0 2px #16a34a;
+    }
+    .timeline-item.active .timeline-content {
+        color: #16a34a;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <h1 class="mb-4 text-center">Track Your Order</h1>
+            
+            <!-- Order Lookup Form -->
+            <div class="card track-order-card mb-4">
+                <div class="card-body">
+                    <form method="get" action="{% url 'store:track_order' %}">
+                        <div class="mb-3">
+                            <label for="order_number" class="form-label">Order Number</label>
+                            <input type="text" class="form-control" id="order_number" name="order_number" 
+                                   placeholder="e.g., ORD-ABC12345" value="{{ order_number|default:'' }}" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email Address</label>
+                            <input type="email" class="form-control" id="email" name="email" 
+                                   placeholder="Enter your email" value="{{ email|default:'' }}" required>
+                        </div>
+                        <button type="submit" class="btn btn-success w-100">
+                            <i class="bi bi-search me-2"></i>Track Order
+                        </button>
+                    </form>
+                </div>
+            </div>
+            
+            {% if order %}
+            <!-- Order Found -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <div class="order-status mb-4">
+                        <h5 class="mb-1">Order Status</h5>
+                        <h3 class="mb-0">{{ order.get_status_display }}</h3>
+                    </div>
+                    
+                    <div class="row mb-4">
+                        <div class="col-6">
+                            <p class="text-muted mb-1">Order Number</p>
+                            <strong>{{ order.order_number }}</strong>
+                        </div>
+                        <div class="col-6">
+                            <p class="text-muted mb-1">Order Date</p>
+                            <strong>{{ order.created_at|date:"F d, Y" }}</strong>
+                        </div>
+                    </div>
+                    
+                    <!-- Order Items -->
+                    <h5 class="mb-3">Order Items</h5>
+                    <div class="table-responsive mb-4">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Product</th>
+                                    <th>Qty</th>
+                                    <th class="text-end">Price</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in order.items.all %}
+                                <tr>
+                                    <td>{{ item.product.name }}</td>
+                                    <td>{{ item.quantity }}</td>
+                                    <td class="text-end">${{ item.subtotal }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <td colspan="2"><strong>Total</strong></td>
+                                    <td class="text-end"><strong>${{ order.total_amount }}</strong></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                    
+                    <!-- Shipping Address -->
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h5 class="mb-2">Shipping Address</h5>
+                            <p class="text-muted mb-0">{{ order.customer.user.get_full_name }}</p>
+                            <p class="text-muted mb-0">{{ order.shipping_address }}</p>
+                            <p class="text-muted mb-0">{{ order.shipping_city }}, {{ order.shipping_state }} {{ order.shipping_zip }}</p>
+                        </div>
+                    </div>
+                    
+                    <h5 class="mb-3">Tracking Timeline</h5>
+                    <div class="tracking-timeline">
+                        <div class="timeline-item {% if order.status == 'pending' or order.status == 'confirmed' or order.status == 'processing' or order.status == 'shipped' or order.status == 'delivered' %}active{% endif %}">
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-content">
+                                <strong>Order Placed</strong>
+                                <p class="text-muted mb-0 small">{{ order.created_at|date:"F d, Y, g:i A" }}</p>
+                            </div>
+                        </div>
+                        
+                        <div class="timeline-item {% if order.status == 'confirmed' or order.status == 'processing' or order.status == 'shipped' or order.status == 'delivered' %}active{% endif %}">
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-content">
+                                <strong>Order Confirmed</strong>
+                                <p class="text-muted mb-0 small">Your order has been confirmed</p>
+                            </div>
+                        </div>
+                        
+                        <div class="timeline-item {% if order.status == 'processing' or order.status == 'shipped' or order.status == 'delivered' %}active{% endif %}">
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-content">
+                                <strong>Processing</strong>
+                                <p class="text-muted mb-0 small">Your order is being prepared</p>
+                            </div>
+                        </div>
+                        
+                        <div class="timeline-item {% if order.status == 'shipped' or order.status == 'delivered' %}active{% endif %}">
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-content">
+                                <strong>Shipped</strong>
+                                <p class="text-muted mb-0 small">{% if order.shipped_at %}{{ order.shipped_at|date:"F d, Y" }}{% else %}Your order has been shipped{% endif %}</p>
+                            </div>
+                        </div>
+                        
+                        <div class="timeline-item {% if order.status == 'delivered' %}active{% endif %}">
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-content">
+                                <strong>Delivered</strong>
+                                <p class="text-muted mb-0 small">{% if order.delivered_at %}{{ order.delivered_at|date:"F d, Y" }}{% else %}Your order has been delivered{% endif %}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            {% elif searched %}
+            <!-- Order Not Found -->
+            <div class="alert alert-warning">
+                <i class="bi bi-exclamation-triangle me-2"></i>
+                No order found with this order number and email. Please check and try again.
+            </div>
+            {% endif %}
+            
+            <!-- Help Section -->
+            <div class="card mt-4">
+                <div class="card-body">
+                    <h5>Need Help?</h5>
+                    <p class="text-muted">If you're having trouble tracking your order, please contact our customer support.</p>
+                    <a href="{% url 'store:contact' %}" class="btn btn-outline-success">Contact Us</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

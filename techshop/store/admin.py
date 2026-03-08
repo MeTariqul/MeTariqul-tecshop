@@ -1,11 +1,6 @@
 from django.contrib import admin
-from .models import Product, Category, Supplier, Inventory, ProductImage
-
-
-# Global Admin Site Header
-admin.site.site_header = "TECH SHOP // SYSTEM TERMINAL"
-admin.site.site_title = "Admin Access"
-admin.site.index_title = "Database Management"
+from django.utils import timezone
+from .models import Product, Category, Supplier, Inventory, ProductImage, Review
 
 
 @admin.register(Product)
@@ -63,4 +58,35 @@ class InventoryAdmin(admin.ModelAdmin):
 class ProductImageAdmin(admin.ModelAdmin):
     list_display = ('product', 'alt_text', 'sort_order')
     list_filter = ('product',)
+
+
+@admin.register(Review)
+class ReviewAdmin(admin.ModelAdmin):
+    list_display = ('product', 'user', 'rating', 'title', 'is_verified_purchase', 'created_at', 'has_admin_response')
+    list_filter = ('rating', 'is_verified_purchase', 'created_at')
+    search_fields = ('product__name', 'user__user__username', 'title', 'comment')
+    readonly_fields = ('created_at', 'updated_at', 'is_verified_purchase', 'product', 'user', 'rating', 'title', 'comment', 'admin_response_by')
+    fieldsets = (
+        ('Review Information', {
+            'fields': ('product', 'user', 'rating', 'title', 'comment', 'is_verified_purchase')
+        }),
+        ('Admin Response', {
+            'fields': ('admin_response', 'admin_response_by', 'admin_response_at')
+        }),
+        ('Timestamps', {
+            'fields': ('created_at', 'updated_at'),
+            'classes': ('collapse',)
+        }),
+    )
+    
+    def has_admin_response(self, obj):
+        return bool(obj.admin_response)
+    has_admin_response.short_description = 'Replied'
+    has_admin_response.boolean = True
+    
+    def save_model(self, request, obj, form, change):
+        if obj.admin_response:
+            obj.admin_response_by = request.user
+            obj.admin_response_at = timezone.now()
+        super().save_model(request, obj, form, change)
 

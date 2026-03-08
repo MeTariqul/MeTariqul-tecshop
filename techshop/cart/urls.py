@@ -9,4 +9,7 @@ urlpatterns = [
     path('add/<str:sku>/', views.add_to_cart, name='add_to_cart'),
     path('remove/<str:sku>/', views.remove_from_cart, name='remove_from_cart'),
     path('update/<str:sku>/', views.update_cart_item, name='update_cart_item'),
+    path('save-later/<str:sku>/', views.save_for_later, name='save_for_later'),
+    path('move-to-cart/<str:sku>/', views.move_to_cart, name='move_to_cart'),
+    path('apply-coupon/', views.apply_coupon, name='apply_coupon'),
 ]

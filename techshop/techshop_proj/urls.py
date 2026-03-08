@@ -25,6 +25,7 @@ from orders.views import custom_login
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('dashboard/', include('admin_dashboard.urls')),  # Admin Dashboard
+    path('invoices/', include('invoices.urls')),  # Invoice System
     path('', include('store.urls')),  # Main store URLs
     path('cart/', include('cart.urls')),  # Cart functionality
     path('orders/', include('orders.urls')),  # Order processing

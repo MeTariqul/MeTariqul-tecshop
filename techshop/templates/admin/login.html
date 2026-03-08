@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% trans 'Log in' %} - TechShop Admin</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .login-container {
+            background: #ffffff;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            width: 100%;
+            max-width: 400px;
+        }
+        .login-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .login-header h1 {
+            color: #16a34a;
+            font-size: 1.8rem;
+            margin-bottom: 8px;
+        }
+        .login-header p {
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #495057;
+            font-weight: 500;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+            background: #ffffff;
+        }
+        .form-group input:focus {
+            outline: none;
+            border-color: #16a34a;
+        }
+        .submit-row {
+            margin-top: 30px;
+        }
+        .submit-row button {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .submit-row button:hover {
+            transform: translateY(-2px);
+        }
+        .errornote {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            border: 1px solid #f5c6cb;
+        }
+        ul.errorlist {
+            list-style: none;
+            padding: 0;
+            margin: 5px 0 0 0;
+            color: #dc3545;
+            font-size: 0.875rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-header">
+            <h1>TechShop Admin</h1>
+            <p>Please sign in to continue</p>
+        </div>
+        
+        {% if form.errors %}
+            <div class="errornote">
+                {% if form.errors.items|length == 1 %}
+                    {% trans "Please correct the error below." %}
+                {% else %}
+                    {% trans "Please correct the errors below." %}
+                {% endif %}
+            </div>
+        {% endif %}
+
+        <form action="{{ app_path }}" method="post" id="login-form">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label for="id_username">{{ form.username.label }}</label>
+                {{ form.username }}
+                {% if form.username.errors %}
+                    <ul class="errorlist">
+                    {% for error in form.username.errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+            
+            <div class="form-group">
+                <label for="id_password">{{ form.password.label }}</label>
+                {{ form.password }}
+                {% if form.password.errors %}
+                    <ul class="errorlist">
+                    {% for error in form.password.errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+            
+            {% url 'admin_password_reset' as password_reset_url %}
+            {% if password_reset_url %}
+            <div class="password-reset-link">
+                <a href="{{ password_reset_url }}">{% trans 'Forgotten your password or username?' %}</a>
+            </div>
+            {% endif %}
+            
+            <div class="submit-row">
+                <button type="submit">{% trans 'Log in' %}</button>
+            </div>
+        </form>
+    </div>
+</body>
+</html>

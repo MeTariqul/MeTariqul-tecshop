@@ -1,0 +1,222 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Invoice {{ invoice.invoice_number }} - TechShop{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1>Invoice {{ invoice.invoice_number }}</h1>
+                <div>
+                    <a href="{% url 'invoices:view_invoice' invoice.id %}" class="btn btn-info">Web View</a>
+                    <a href="{% url 'invoices:download_pdf' invoice.id %}" class="btn btn-primary">Download PDF</a>
+                    <a href="{% url 'invoices:print_invoice' invoice.id %}" class="btn btn-secondary" target="_blank">Print</a>
+                    <a href="{% url 'invoices:invoice_list' %}" class="btn btn-outline-secondary">Back to List</a>
+                </div>
+            </div>
+            
+            <div class="row">
+                <!-- Invoice Info -->
+                <div class="col-md-8">
+                    <div class="card mb-4">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">Invoice Details</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p><strong>Invoice Number:</strong> {{ invoice.invoice_number }}</p>
+                                    <p><strong>Date:</strong> {{ invoice.invoice_date|date:"d M Y" }}</p>
+                                    <p><strong>Order:</strong> {% if invoice.order %}{{ invoice.order.order_number }}{% else %}N/A{% endif %}</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p><strong>Payment Method:</strong> {{ invoice.get_payment_method_display }}</p>
+                                    <p><strong>Status:</strong> 
+                                        {% if invoice.payment_status == 'paid' %}
+                                        <span class="badge bg-success">Paid</span>
+                                        {% elif invoice.payment_status == 'partial' %}
+                                        <span class="badge bg-warning">Partial</span>
+                                        {% else %}
+                                        <span class="badge bg-danger">Pending</span>
+                                        {% endif %}
+                                    </p>
+                                    <p><strong>Salesperson:</strong> {{ invoice.salesperson|default:"N/A" }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Customer Info -->
+                    <div class="card mb-4">
+                        <div class="card-header bg-info text-white">
+                            <h5 class="mb-0">Customer Information</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p><strong>Name:</strong> {{ invoice.customer_name }}</p>
+                                    <p><strong>Phone:</strong> {{ invoice.customer_phone }}</p>
+                                    <p><strong>Email:</strong> {{ invoice.customer_email|default:"N/A" }}</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p><strong>Billing Address:</strong><br>{{ invoice.billing_address|linebreaks }}</p>
+                                    {% if invoice.shipping_address %}
+                                    <p><strong>Shipping Address:</strong><br>{{ invoice.shipping_address|linebreaks }}</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Items -->
+                    <div class="card mb-4">
+                        <div class="card-header bg-dark text-white">
+                            <h5 class="mb-0">Order Items</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>Product</th>
+                                            <th>SKU</th>
+                                            <th class="text-center">Qty</th>
+                                            <th class="text-end">Unit Price</th>
+                                            <th class="text-end">Tax</th>
+                                            <th class="text-end">Total</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for item in invoice.items.all %}
+                                        <tr>
+                                            <td>{{ item.product_name }}</td>
+                                            <td>{{ item.product_sku }}</td>
+                                            <td class="text-center">{{ item.quantity }}</td>
+                                            <td class="text-end">৳{{ item.unit_price|floatformat:2 }}</td>
+                                            <td class="text-end">৳{{ item.tax_amount|floatformat:2 }}</td>
+                                            <td class="text-end">৳{{ item.total|floatformat:2 }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                    <tfoot>
+                                        <tr>
+                                            <td colspan="5" class="text-end"><strong>Subtotal:</strong></td>
+                                            <td class="text-end">৳{{ invoice.subtotal|floatformat:2 }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="5" class="text-end"><strong>Discount:</strong></td>
+                                            <td class="text-end">-৳{{ invoice.total_discount|floatformat:2 }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="5" class="text-end"><strong>Tax:</strong></td>
+                                            <td class="text-end">৳{{ invoice.tax_amount|floatformat:2 }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="5" class="text-end"><strong>Shipping:</strong></td>
+                                            <td class="text-end">৳{{ invoice.shipping_cost|floatformat:2 }}</td>
+                                        </tr>
+                                        <tr class="table-primary">
+                                            <td colspan="5" class="text-end"><strong>Grand Total:</strong></td>
+                                            <td class="text-end"><strong>৳{{ invoice.grand_total|floatformat:2 }}</strong></td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Sidebar -->
+                <div class="col-md-4">
+                    <!-- Payment Summary -->
+                    <div class="card mb-4">
+                        <div class="card-header bg-success text-white">
+                            <h5 class="mb-0">Payment Summary</h5>
+                        </div>
+                        <div class="card-body">
+                            <p><strong>Total Amount:</strong> ৳{{ invoice.grand_total|floatformat:2 }}</p>
+                            <p><strong>Amount Paid:</strong> ৳{{ invoice.amount_paid|floatformat:2 }}</p>
+                            <p><strong>Amount Due:</strong> ৳{{ invoice.amount_due|floatformat:2 }}</p>
+                            
+                            {% if invoice.amount_due > 0 %}
+                            <button type="button" class="btn btn-primary w-100" data-bs-toggle="modal" data-bs-target="#paymentModal">
+                                Add Payment
+                            </button>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <!-- Payment History -->
+                    {% if invoice.payments.all %}
+                    <div class="card mb-4">
+                        <div class="card-header bg-secondary text-white">
+                            <h5 class="mb-0">Payment History</h5>
+                        </div>
+                        <div class="card-body">
+                            {% for payment in invoice.payments.all %}
+                            <div class="border-bottom mb-2 pb-2">
+                                <p class="mb-0"><strong>৳{{ payment.amount|floatformat:2 }}</strong> - {{ payment.get_payment_method_display }}</p>
+                                <small class="text-muted">{{ payment.payment_date|date:"d M Y, g:i A" }}</small>
+                                {% if payment.transaction_id %}<br><small>TXN: {{ payment.transaction_id }}{% endif %}
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Notes -->
+                    {% if invoice.notes %}
+                    <div class="card mb-4">
+                        <div class="card-header bg-warning">
+                            <h5 class="mb-0">Notes</h5>
+                        </div>
+                        <div class="card-body">
+                            {{ invoice.notes|linebreaks }}
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Payment Modal -->
+<div class="modal fade" id="paymentModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add Payment</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="post" action="{% url 'invoices:add_payment' invoice.id %}">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Amount</label>
+                        <input type="number" name="amount" class="form-control" step="0.01" max="{{ invoice.amount_due }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Payment Method</label>
+                        <select name="payment_method" class="form-select" required>
+                            <option value="cash">Cash</option>
+                            <option value="card">Card</option>
+                            <option value="online">Online</option>
+                            <option value="mobile_banking">Mobile Banking</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Transaction ID</label>
+                        <input type="text" name="transaction_id" class="form-control">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Add Payment</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

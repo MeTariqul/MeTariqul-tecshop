@@ -1,0 +1,119 @@
+{% extends "admin/base.html" %}
+{% load i18n static %}
+
+{% block extrastyle %}
+{{ block.super }}
+<style>
+    .app-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 20px;
+        margin-top: 20px;
+    }
+    .app-card {
+        background: white;
+        border-radius: 8px;
+        padding: 20px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        transition: transform 0.2s;
+    }
+    .app-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    }
+    .app-card h3 {
+        margin: 0 0 10px 0;
+        color: #16a34a;
+    }
+    .app-card ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    .app-card li {
+        padding: 5px 0;
+    }
+    .app-card a {
+        color: #495057;
+        text-decoration: none;
+    }
+    .app-card a:hover {
+        color: #16a34a;
+    }
+    .welcome-message {
+        background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+        color: white;
+        padding: 30px;
+        border-radius: 8px;
+        margin-bottom: 30px;
+    }
+    .welcome-message h1 {
+        margin: 0 0 10px 0;
+        font-size: 1.8rem;
+    }
+    .welcome-message p {
+        margin: 0;
+        opacity: 0.9;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div id="content-main">
+    {% if app_list %}
+        <div class="welcome-message">
+            <h1>{% trans 'Welcome to TechShop Admin' %}</h1>
+            <p>{% trans 'Manage your store from this dashboard' %}</p>
+        </div>
+        
+        <div class="app-list">
+        {% for app in app_list %}
+            <div class="app-card">
+                <h3>{{ app.name }}</h3>
+                <ul>
+                {% for model in app.models %}
+                    <li>
+                        {% if model.add_url %}
+                            <a href="{{ model.add_url }}">{{ model.name }}</a>
+                        {% else %}
+                            {{ model.name }}
+                        {% endif %}
+                    </li>
+                {% endfor %}
+                </ul>
+            </div>
+        {% endfor %}
+        </div>
+    {% else %}
+        <p>No models available.</p>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block sidebar %}
+<div id="content-related">
+    <div class="module" id="recent-actions-module">
+        <h2>{% trans 'Recent actions' %}</h2>
+        <h3>{% trans 'My actions' %}</h3>
+        {% load log %}
+        {% get_admin_log 10 as log %}
+        {% if log %}
+            <ul>
+            {% for entry in log %}
+                <li>
+                    {% if entry.is_addition %}{% trans 'Added' %}{% endif %}
+                    {% if entry.is_change %}{% trans 'Changed' %}{% endif %}
+                    {% if entry.is_deletion %}{% trans 'Deleted' %}{% endif %}
+                    {{ entry.object_repr }}
+                    {% if entry.content_type %}
+                        <span class="mini quiet">({{ entry.content_type }})</span>
+                    {% endif %}
+                </li>
+            {% endfor %}
+            </ul>
+        {% else %}
+            <p>{% trans 'None available' %}</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

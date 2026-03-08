@@ -11,6 +11,9 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 from pathlib import Path
+import pymysql
+pymysql.version_info = (2, 2, 1, 'final', 0)
+pymysql.install_as_MySQLdb()
 
 from decouple import config, Csv
 
@@ -32,7 +35,12 @@ SECRET_KEY = config('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', default=False, cast=bool)
 
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='127.0.0.1', cast=Csv())
+# For development, allow all common hosts including Cloudflare tunnel
+import os
+if os.environ.get('DEBUG', '').lower() == 'true':
+    ALLOWED_HOSTS = ['*']
+else:
+    ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '.trycloudflare.com', 'localhost:8000', '127.0.0.1:8000', 'commerce-origin-advertisement-both.trycloudflare.com']
 
 
 # Application definition
@@ -50,6 +58,7 @@ INSTALLED_APPS = [
     'wishlist',
     'admin_dashboard',
     'templatetags',
+    'invoices',
 ]
 
 MIDDLEWARE = [

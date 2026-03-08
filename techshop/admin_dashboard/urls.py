@@ -47,8 +47,8 @@ urlpatterns = [
     # Reports
     path('reports/', views.reports, name='reports'),
     
-    # Director Dashboard
-    path('director/', views.director_dashboard, name='director_dashboard'),
+    # Director Dashboard (merged with main dashboard)
+    path('director/', views.dashboard, name='director_dashboard'),
     
     # Warehouse/Inventory Dashboard
     path('warehouse/', views.warehouse_dashboard, name='warehouse_dashboard'),
@@ -75,4 +75,11 @@ urlpatterns = [
     # Scanning & Packing
     path('scan/', views.scan_item, name='scan_item'),
     path('packing-slip/<int:order_id>/', views.packing_slip, name='packing_slip'),
+    
+    # Review Management
+    path('respond-review/<int:review_id>/', views.respond_review, name='respond_review'),
+    
+    # Customer Support
+    path('customer-support/', views.customer_support, name='customer_support'),
+    path('respond-contact/<int:message_id>/', views.respond_contact, name='respond_contact'),
 ]

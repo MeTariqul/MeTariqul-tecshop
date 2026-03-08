@@ -26,6 +26,7 @@ urlpatterns = [
     path('orders/', include('orders.urls')),  # Order processing
     path('accounts/', include('django.contrib.auth.urls')),
     path('dashboard/', include('admin_dashboard.urls', namespace='admin_dashboard')),  # Admin Dashboard
+    path('invoices/', include('invoices.urls', namespace='invoices')),  # Invoice Management
 ]
 
 # Serve media files during development

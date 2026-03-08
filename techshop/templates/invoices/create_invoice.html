@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Create Invoice - TechShop{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <h1 class="mb-4">Create New Invoice</h1>
+            
+            <div class="card">
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <h5 class="mb-3">Select Order (Optional)</h5>
+                        <div class="mb-3">
+                            <select name="order" class="form-select">
+                                <option value="">-- Select Order --</option>
+                                {% for order in orders %}
+                                <option value="{{ order.id }}">{{ order.order_number }} - {{ order.customer.user.username }} - ৳{{ order.total_amount }}</option>
+                                {% endfor %}
+                            </select>
+                            <small class="text-muted">If you select an order, customer info and items will be auto-filled.</small>
+                        </div>
+                        
+                        <hr>
+                        
+                        <h5 class="mb-3">Customer Information</h5>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Customer Name *</label>
+                                <input type="text" name="customer_name" class="form-control" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Phone *</label>
+                                <input type="text" name="customer_phone" class="form-control" required>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Email</label>
+                            <input type="email" name="customer_email" class="form-control">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Billing Address *</label>
+                            <textarea name="billing_address" class="form-control" rows="2" required></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Shipping Address</label>
+                            <textarea name="shipping_address" class="form-control" rows="2"></textarea>
+                        </div>
+                        
+                        <hr>
+                        
+                        <h5 class="mb-3">Payment Information</h5>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Payment Method *</label>
+                                <select name="payment_method" class="form-select" required>
+                                    <option value="cash">Cash</option>
+                                    <option value="card">Card</option>
+                                    <option value="online">Online</option>
+                                    <option value="mobile_banking">Mobile Banking</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Payment Status *</label>
+                                <select name="payment_status" class="form-select" required>
+                                    <option value="paid">Paid</option>
+                                    <option value="pending">Pending</option>
+                                    <option value="partial">Partial</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Amount Paid</label>
+                                <input type="number" name="amount_paid" class="form-control" step="0.01" value="0">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Shipping Cost</label>
+                                <input type="number" name="shipping_cost" class="form-control" step="0.01" value="0">
+                            </div>
+                        </div>
+                        
+                        <hr>
+                        
+                        <h5 class="mb-3">Additional Information</h5>
+                        <div class="mb-3">
+                            <label class="form-label">Salesperson</label>
+                            <input type="text" name="salesperson" class="form-control">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Notes</label>
+                            <textarea name="notes" class="form-control" rows="2"></textarea>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-success btn-lg">Create Invoice</button>
+                            <a href="{% url 'invoices:invoice_list' %}" class="btn btn-secondary">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

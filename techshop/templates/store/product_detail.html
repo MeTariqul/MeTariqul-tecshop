@@ -39,7 +39,7 @@
 
     .thumbnail:hover,
     .thumbnail.active {
-        border-color: #0d6efd;
+        border-color: #16a34a;
         transform: scale(1.05);
     }
 
@@ -127,7 +127,7 @@
     }
 
     .add-to-cart-btn {
-        background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
+        background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
         border: none;
         padding: 12px 32px;
         font-weight: 600;
@@ -190,7 +190,7 @@
     }
 
     .product-tab.active {
-        color: #0d6efd;
+        color: #16a34a;
     }
 
     .product-tab.active::after {
@@ -200,7 +200,7 @@
         left: 0;
         right: 0;
         height: 2px;
-        background: #0d6efd;
+        background: #16a34a;
     }
     
     /* Variant Selection Styles */
@@ -222,13 +222,13 @@
     }
     
     .variant-option input:checked + .variant-btn {
-        border-color: #0d6efd;
-        background-color: #0d6efd;
+        border-color: #16a34a;
+        background-color: #16a34a;
         color: white;
     }
     
     .variant-option:hover .variant-btn {
-        border-color: #0d6efd;
+        border-color: #16a34a;
     }
 </style>
 {% endblock %}
@@ -442,6 +442,311 @@
         if (mobileInput) mobileInput.value = newVal;
     }
 </script>
+
+<!-- Product Reviews Section -->
+<div class="container my-5">
+    <hr class="my-4">
+    <h3 class="mb-4 fw-bold">Customer Reviews</h3>
+    
+    {% with product.reviews.all as reviews %}
+    {% if reviews %}
+    {% with avg_rating=product.get_average_rating|default:0 %}
+    <!-- Amazon-Style Rating Summary -->
+    <div class="rating-summary-amazon mb-4">
+        <div class="row">
+            <div class="col-lg-4 col-md-5 mb-3">
+                <div class="text-center">
+                    <div class="display-4 fw-bold text-dark">{{ avg_rating|floatformat:1 }}</div>
+                    <div class="rating-stars mb-2">
+                        {% for i in "12345" %}
+                        <i class="bi bi-star{% if forloop.counter <= avg_rating|floatformat:"0" %}-fill{% endif %}" style="color: #FFA41C; font-size: 1.2rem;"></i>
+                        {% endfor %}
+                    </div>
+                    <div class="text-muted small">{{ reviews_count }} ratings</div>
+                </div>
+            </div>
+            <div class="col-lg-8 col-md-7">
+                <div class="rating-bars">
+                    {% for star in "54321" %}
+                    <div class="d-flex align-items-center mb-2">
+                        <span class="me-2 text-muted small" style="min-width: 50px;">{{ star }} star</span>
+                        <div class="progress flex-grow-1 mx-2" style="height: 12px; background: #ddd; border-radius: 2px;">
+                            <div class="progress-bar bg-warning" role="progressbar" style="width: {{ star|add:"0" }}%; background: #FFA41C !important; border-radius: 2px;"></div>
+                        </div>
+                        <span class="text-muted small ms-2" style="min-width: 40px;">{{ star|add:"0" }}%</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endwith %}
+    
+    <!-- Filter Tabs -->
+    <div class="review-filters mb-4">
+        <ul class="nav nav-pills">
+            <li class="nav-item">
+                <a class="nav-link active bg-dark" href="#">Top Reviews</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-dark" href="#">Most Recent</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-dark" href="#">With Photos</a>
+            </li>
+        </ul>
+    </div>
+    
+    <!-- Reviews List - Amazon Style -->
+    <div class="reviews-container">
+        {% for review in reviews %}
+        <div class="review-item-amazon py-4 border-bottom">
+            <div class="d-flex mb-2">
+                <!-- Reviewer Avatar -->
+                <div class="flex-shrink-0 me-3">
+                    <div class="reviewer-avatar-amazon" style="width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #FFA41C, #FF8C00); color: white; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 14px; text-transform: uppercase;">
+                        {{ review.user.user.username|make_list|first }}
+                    </div>
+                </div>
+                <div class="flex-grow-1">
+                    <div class="d-flex align-items-center mb-1">
+                        <strong class="me-2">{{ review.user.user.get_full_name|default:review.user.user.username }}</strong>
+                        {% if review.is_verified_purchase %}
+                        <span class="verified-badge" style="background: #c8f7c5; color: #007600; font-size: 11px; padding: 2px 6px; border-radius: 2px; font-weight: 500;">
+                            <i class="bi bi-check-circle-fill me-1"></i>Verified Purchase
+                        </span>
+                        {% endif %}
+                    </div>
+                    <div class="d-flex align-items-center small text-muted mb-2">
+                        <span class="text-warning me-1">
+                            {% for i in "12345" %}
+                            <i class="bi bi-star{% if forloop.counter <= review.rating %}-fill{% endif %}" style="font-size: 12px;"></i>
+                            {% endfor %}
+                        </span>
+                        <span class="mx-1">|</span>
+                        <span>{{ review.created_at|date:"F d, Y" }}</span>
+                    </div>
+                </div>
+            </div>
+            
+            {% if review.title %}
+            <h6 class="fw-bold mb-2" style="font-size: 15px;">{{ review.title }}</h6>
+            {% endif %}
+            
+            <p class="mb-3" style="font-size: 14px; line-height: 1.6; color: #1a1a1a;">{{ review.comment|default:"No comment provided" }}</p>
+            
+            <!-- Review Images Placeholder -->
+            <!-- Admin Response -->
+            {% if review.admin_response %}
+            <div class="admin-response-amazon mt-3 p-3" style="background: #f0fdf4; border: 1px solid #86efac; border-radius: 4px;">
+                <div class="d-flex align-items-center mb-2">
+                    <span class="text-success fw-bold" style="font-size: 12px;">TechShop Response</span>
+                    {% if review.admin_response_at %}
+                    <span class="text-muted mx-2" style="font-size: 11px;">|</span>
+                    <span class="text-muted" style="font-size: 11px;">{{ review.admin_response_at|date:"F d, Y" }}</span>
+                    {% endif %}
+                </div>
+                <p class="mb-0" style="font-size: 13px;">{{ review.admin_response }}</p>
+            </div>
+            {% endif %}
+            
+            <!-- Helpful Buttons -->
+            <div class="helpful-section mt-3">
+                <span class="text-muted small">Was this review helpful?</span>
+                <div class="btn-group btn-group-sm ms-2" role="group">
+                    <button type="button" class="btn btn-outline-secondary" style="font-size: 12px; border-radius: 2px 0 0 2px;">
+                        <i class="bi bi-hand-thumbs-up me-1"></i> Helpful
+                    </button>
+                    <button type="button" class="btn btn-outline-secondary" style="font-size: 12px; border-radius: 0 2px 2px 0;">
+                        <i class="bi bi-flag me-1"></i> Report
+                    </button>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    
+    {% else %}
+    <!-- No Reviews -->
+    <div class="no-reviews-amazon text-center py-5">
+        <div class="mb-4">
+            <i class="bi bi-chat-square-text" style="font-size: 4rem; color: #ddd;"></i>
+        </div>
+        <h5 class="text-dark mb-2">No reviews yet</h5>
+        <p class="text-muted mb-4">Share your thoughts with other customers</p>
+        <button class="btn btn-warning btn-lg" style="background: #FFA41C; border-color: #FFA41C; color: #111;">
+            <i class="bi bi-pencil me-2"></i>Write a Review
+        </button>
+    </div>
+    {% endif %}
+    {% endwith %}
+    
+    <!-- Write/Edit Review Section -->
+    {% if user.is_authenticated %}
+    {% if can_review %}
+    <div class="write-review-amazon mt-5">
+        <h5 class="fw-bold mb-3">Write a Review</h5>
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-4">
+                <form method="POST" action="{% url 'store:add_review' product.SKU %}">
+                    {% csrf_token %}
+                    
+                    <!-- Star Rating -->
+                    <div class="mb-4">
+                        <label class="form-label fw-bold d-block">Select your rating</label>
+                        <div class="star-rating-amazon">
+                            {% for i in "12345" %}
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="rating" id="rating{{ forloop.counter }}" value="{{ forloop.counter }}" required>
+                                <label class="form-check-label" for="rating{{ forloop.counter }}">
+                                    <span style="font-size: 24px; color: #FFA41C;">
+                                        <i class="bi bi-star"></i>
+                                    </span>
+                                </label>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        <div class="rating-labels mt-2 small text-muted">
+                            <span>1 = Poor</span>
+                            <span class="mx-2">|</span>
+                            <span>2 = Fair</span>
+                            <span class="mx-2">|</span>
+                            <span>3 = Good</span>
+                            <span class="mx-2">|</span>
+                            <span>4 = Very Good</span>
+                            <span class="mx-2">|</span>
+                            <span>5 = Excellent</span>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="title" class="form-label fw-bold">Review Title</label>
+                        <input type="text" class="form-control" id="title" name="title" placeholder="What's most important to know?" maxlength="200" style="border-radius: 4px;">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="comment" class="form-label fw-bold">Your Review</label>
+                        <textarea class="form-control" id="comment" name="comment" rows="6" placeholder="What did you like or dislike? Who would you recommend this to?" style="border-radius: 4px;"></textarea>
+                        <small class="text-muted">Minimum 50 characters. {{ 50|add:"0" }} characters minimum.</small>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-warning" style="background: #FFA41C; border-color: #FFA41C; color: #111; font-weight: 600;">
+                        <i class="bi bi-send me-2"></i>Submit Review
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+    {% elif user_review %}
+    <!-- User has already reviewed - Show Edit Section -->
+    <div class="edit-review-amazon mt-5">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="fw-bold mb-0">Your Review</h5>
+            <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editReviewModal">
+                <i class="bi bi-pencil me-1"></i>Edit Review
+            </button>
+        </div>
+        
+        <!-- Current Review Display -->
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-4">
+                <div class="d-flex align-items-center mb-2">
+                    <span class="text-warning me-2">
+                        {% for i in "12345" %}
+                        <i class="bi bi-star{% if forloop.counter <= user_review.rating %}-fill{% endif %}" style="font-size: 14px;"></i>
+                        {% endfor %}
+                    </span>
+                    <span class="text-muted small">{{ user_review.created_at|date:"F d, Y" }}</span>
+                </div>
+                {% if user_review.title %}
+                <h6 class="fw-bold mb-2">{{ user_review.title }}</h6>
+                {% endif %}
+                <p class="mb-0 text-dark">{{ user_review.comment }}</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Edit Review Modal -->
+    <div class="modal fade" id="editReviewModal" tabindex="-1" aria-labelledby="editReviewModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header" style="background: #FFA41C; color: #111;">
+                    <h5 class="modal-title fw-bold" id="editReviewModalLabel">Edit Your Review</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form method="POST" action="{% url 'store:edit_review' product.SKU user_review.id %}">
+                    {% csrf_token %}
+                    <div class="modal-body">
+                        <!-- Star Rating -->
+                        <div class="mb-4">
+                            <label class="form-label fw-bold d-block">Select your rating</label>
+                            <div class="star-rating-amazon">
+                                {% for i in "12345" %}
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" name="rating" id="edit_rating{{ forloop.counter }}" value="{{ forloop.counter }}" {% if user_review.rating == forloop.counter %}checked{% endif %} required>
+                                    <label class="form-check-label" for="edit_rating{{ forloop.counter }}">
+                                        <span style="font-size: 24px; color: #FFA41C;">
+                                            <i class="bi bi-star"></i>
+                                        </span>
+                                    </label>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="edit_title" class="form-label fw-bold">Review Title</label>
+                            <input type="text" class="form-control" id="edit_title" name="title" value="{{ user_review.title|default:"" }}" placeholder="What's most important to know?" maxlength="200" style="border-radius: 4px;">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="edit_comment" class="form-label fw-bold">Your Review</label>
+                            <textarea class="form-control" id="edit_comment" name="comment" rows="6" placeholder="What did you like or dislike? Who would you recommend this to?" style="border-radius: 4px;">{{ user_review.comment }}</textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-warning" style="background: #FFA41C; border-color: #FFA41C; color: #111; font-weight: 600;">
+                            <i class="bi bi-check-lg me-2"></i>Save Changes
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="alert alert-warning mt-4" style="background: #fff; border: 1px solid #ffd700; border-radius: 4px;">
+        <div class="d-flex align-items-center">
+            <i class="bi bi-exclamation-triangle text-warning me-3" style="font-size: 1.5rem;"></i>
+            <div>
+                <strong>Purchase Required</strong>
+                <p class="mb-0 text-muted">You can only review products you have purchased and received.</p>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    {% else %}
+    <div class="login-prompt-amazon card mt-4 border-0 shadow-sm">
+        <div class="card-body text-center py-4" style="background: #f8f8f8; border-radius: 8px;">
+            <h5 class="mb-3">Have you used this product?</h5>
+            <p class="text-muted mb-3">Share your thoughts to help other customers</p>
+            <a href="{% url 'login' %}" class="btn btn-warning" style="background: #FFA41C; border-color: #FFA41C; color: #111; font-weight: 600;">
+                <i class="bi bi-box-arrow-in-right me-2"></i>Login to Write a Review
+            </a>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<style>
+.rating-summary-amazon .progress-bar {
+    background-color: #FFA41C !important;
+}
+.star-rating-amazon .form-check-input:checked + label i,
+.star-rating-amazon .form-check-input:hover + label i {
+    color: #FFA41C;
+}
+</style>
 {% endblock %}
 
 {% block extra_js %}

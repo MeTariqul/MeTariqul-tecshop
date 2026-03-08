@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Invoice {{ invoice.invoice_number }}</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 0;
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 11px;
+            line-height: 1.5;
+            color: #2c3e50;
+            background: #fff;
+        }
+        
+        /* Main Container */
+        .invoice-container {
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 30px 40px;
+            background: #fff;
+        }
+        
+        /* Header Section */
+        .invoice-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            padding-bottom: 20px;
+            border-bottom: 3px solid #3498db;
+            margin-bottom: 25px;
+        }
+        
+        .shop-info {
+            flex: 1;
+        }
+        
+        .shop-logo {
+            font-size: 28px;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 8px;
+            letter-spacing: 1px;
+        }
+        
+        .shop-logo span {
+            color: #3498db;
+        }
+        
+        .shop-details {
+            font-size: 11px;
+            color: #7f8c8d;
+            line-height: 1.6;
+        }
+        
+        .shop-details strong {
+            color: #2c3e50;
+        }
+        
+        .invoice-info {
+            text-align: right;
+        }
+        
+        .invoice-number {
+            font-size: 22px;
+            font-weight: bold;
+            color: #3498db;
+            margin-bottom: 8px;
+        }
+        
+        .invoice-meta {
+            font-size: 11px;
+            color: #7f8c8d;
+        }
+        
+        .invoice-meta strong {
+            color: #2c3e50;
+        }
+        
+        /* Status Badge */
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin-top: 8px;
+        }
+        
+        .status-paid {
+            background: #27ae60;
+            color: white;
+        }
+        
+        .status-pending {
+            background: #e74c3c;
+            color: white;
+        }
+        
+        .status-partial {
+            background: #f39c12;
+            color: white;
+        }
+        
+        /* Address Section */
+        .address-section {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 25px;
+        }
+        
+        .address-box {
+            flex: 1;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin-right: 15px;
+        }
+        
+        .address-box:last-child {
+            margin-right: 0;
+        }
+        
+        .address-box h4 {
+            font-size: 12px;
+            color: #3498db;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-bottom: 1px solid #e0e0e0;
+            padding-bottom: 8px;
+        }
+        
+        .address-box p {
+            font-size: 11px;
+            color: #2c3e50;
+            margin-bottom: 4px;
+        }
+        
+        .address-box .name {
+            font-weight: bold;
+            font-size: 13px;
+        }
+        
+        /* Items Table */
+        .items-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 25px;
+        }
+        
+        .items-table thead {
+            background: #2c3e50;
+        }
+        
+        .items-table th {
+            padding: 12px 8px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: white;
+        }
+        
+        .items-table th.text-right {
+            text-align: right;
+        }
+        
+        .items-table th.text-center {
+            text-align: center;
+        }
+        
+        .items-table tbody tr {
+            border-bottom: 1px solid #ecf0f1;
+        }
+        
+        .items-table tbody tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+        
+        .items-table td {
+            padding: 10px 8px;
+            font-size: 11px;
+            color: #2c3e50;
+        }
+        
+        .items-table td.text-right {
+            text-align: right;
+        }
+        
+        .items-table td.text-center {
+            text-align: center;
+        }
+        
+        .items-table .sku {
+            font-family: 'Courier New', monospace;
+            font-size: 10px;
+            color: #7f8c8d;
+        }
+        
+        /* Totals Section */
+        .totals-section {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 25px;
+        }
+        
+        .totals-table {
+            width: 280px;
+        }
+        
+        .totals-table tr {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #ecf0f1;
+        }
+        
+        .totals-table tr:last-child {
+            border-bottom: none;
+        }
+        
+        .totals-table .label {
+            color: #7f8c8d;
+            font-size: 11px;
+        }
+        
+        .totals-table .value {
+            font-weight: 600;
+            color: #2c3e50;
+            font-size: 12px;
+        }
+        
+        .totals-table .grand-total {
+            background: #3498db;
+            color: white;
+            padding: 12px 15px;
+            margin-top: 5px;
+            border-radius: 5px;
+        }
+        
+        .totals-table .grand-total .label {
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+        .totals-table .grand-total .value {
+            color: white;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        
+        /* Payment Section */
+        .payment-section {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+        }
+        
+        .payment-section h4 {
+            font-size: 12px;
+            color: #2c3e50;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .payment-grid {
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .payment-item {
+            text-align: center;
+            flex: 1;
+        }
+        
+        .payment-item .label {
+            font-size: 10px;
+            color: #7f8c8d;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+        
+        .payment-item .value {
+            font-size: 14px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        
+        .payment-item.paid .value {
+            color: #27ae60;
+        }
+        
+        .payment-item.due .value {
+            color: #e74c3c;
+        }
+        
+        /* Footer Section */
+        .invoice-footer {
+            border-top: 2px solid #ecf0f1;
+            padding-top: 20px;
+            margin-top: 20px;
+        }
+        
+        .footer-grid {
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .footer-info {
+            flex: 1;
+        }
+        
+        .footer-info p {
+            font-size: 10px;
+            color: #7f8c8d;
+            margin-bottom: 4px;
+        }
+        
+        .footer-info strong {
+            color: #2c3e50;
+        }
+        
+        .signature-box {
+            width: 200px;
+            text-align: center;
+        }
+        
+        .signature-line {
+            border-top: 1px solid #2c3e50;
+            padding-top: 8px;
+            margin-bottom: 5px;
+        }
+        
+        .signature-box p {
+            font-size: 10px;
+            color: #7f8c8d;
+        }
+        
+        .thank-you {
+            text-align: center;
+            margin-top: 25px;
+            padding-top: 15px;
+            border-top: 1px solid #ecf0f1;
+        }
+        
+        .thank-you p {
+            font-size: 14px;
+            color: #3498db;
+            font-weight: 600;
+        }
+        
+        /* Print Styles */
+        @media print {
+            body {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            
+            .invoice-container {
+                padding: 20px;
+            }
+            
+            .items-table th {
+                background: #2c3e50 !important;
+                color: white !important;
+            }
+            
+            .status-paid {
+                background: #27ae60 !important;
+            }
+            
+            .status-pending {
+                background: #e74c3c !important;
+            }
+            
+            .status-partial {
+                background: #f39c12 !important;
+            }
+            
+            .totals-table .grand-total {
+                background: #3498db !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="invoice-container">
+        <!-- Header -->
+        <div class="invoice-header">
+            <div class="shop-info">
+                <div class="shop-logo">TECH<span>SHOP</span></div>
+                <div class="shop-details">
+                    <p><strong>{{ invoice.shop_name|default:"TechShop Bangladesh" }}</strong></p>
+                    <p>{{ invoice.shop_address|default:"123 Electronics Market, Dhaka-1000" }}</p>
+                    <p>Phone: {{ invoice.shop_phone|default:"+880 1234 567890" }} | Email: {{ invoice.shop_email|default:"info@techshop.com" }}</p>
+                    {% if invoice.tax_number %}<p>Tax ID: {{ invoice.tax_number }}</p>{% endif %}
+                </div>
+            </div>
+            <div class="invoice-info">
+                <div class="invoice-number">{{ invoice.invoice_number }}</div>
+                <div class="invoice-meta">
+                    <p><strong>Date:</strong> {{ invoice.invoice_date|date:"d M Y" }}</p>
+                    <p><strong>Due Date:</strong> {{ invoice.due_date|date:"d M Y"|default:"-" }}</p>
+                    {% if invoice.order %}<p><strong>Order:</strong> #{{ invoice.order.id }}</p>{% endif %}
+                </div>
+                {% if invoice.payment_status == 'paid' %}
+                    <span class="status-badge status-paid">PAID</span>
+                {% elif invoice.payment_status == 'partial' %}
+                    <span class="status-badge status-partial">PARTIAL</span>
+                {% else %}
+                    <span class="status-badge status-pending">PENDING</span>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Customer Info -->
+        <div class="address-section">
+            <div class="address-box">
+                <h4>Bill To</h4>
+                <p class="name">{{ invoice.customer_name }}</p>
+                <p>{{ invoice.customer_phone }}</p>
+                {% if invoice.customer_email %}<p>{{ invoice.customer_email }}</p>{% endif %}
+                <p>{{ invoice.billing_address|linebreaks|default:"-" }}</p>
+            </div>
+            {% if invoice.shipping_address %}
+            <div class="address-box">
+                <h4>Ship To</h4>
+                <p>{{ invoice.shipping_address|linebreaks }}</p>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Items Table -->
+        <table class="items-table">
+            <thead>
+                <tr>
+                    <th style="width: 40px;">#</th>
+                    <th>Product Description</th>
+                    <th style="width: 100px;">SKU</th>
+                    <th class="text-center" style="width: 60px;">Qty</th>
+                    <th class="text-right" style="width: 100px;">Unit Price</th>
+                    <th class="text-right" style="width: 80px;">Tax (15%)</th>
+                    <th class="text-right" style="width: 100px;">Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in invoice.items.all %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>
+                        <strong>{{ item.product_name }}</strong>
+                        {% if item.product_description %}
+                        <br><small style="color: #7f8c8d;">{{ item.product_description|truncatewords:10 }}</small>
+                        {% endif %}
+                    </td>
+                    <td class="sku">{{ item.product_sku|default:"-" }}</td>
+                    <td class="text-center">{{ item.quantity }}</td>
+                    <td class="text-right">{{ currency|default:"BDT" }} {{ item.unit_price|floatformat:2 }}</td>
+                    <td class="text-right">{{ currency|default:"BDT" }} {{ item.tax_amount|floatformat:2 }}</td>
+                    <td class="text-right"><strong>{{ currency|default:"BDT" }} {{ item.total|floatformat:2 }}</strong></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <!-- Totals -->
+        <div class="totals-section">
+            <div class="totals-table">
+                <tr>
+                    <td class="label">Subtotal:</td>
+                    <td class="value">{{ currency|default:"BDT" }} {{ invoice.subtotal|floatformat:2 }}</td>
+                </tr>
+                {% if invoice.total_discount > 0 %}
+                <tr>
+                    <td class="label">Discount:</td>
+                    <td class="value" style="color: #27ae60;">-{{ currency|default:"BDT" }} {{ invoice.total_discount|floatformat:2 }}</td>
+                </tr>
+                {% endif %}
+                <tr>
+                    <td class="label">VAT (15%):</td>
+                    <td class="value">{{ currency|default:"BDT" }} {{ invoice.tax_amount|floatformat:2 }}</td>
+                </tr>
+                {% if invoice.shipping_cost > 0 %}
+                <tr>
+                    <td class="label">Shipping:</td>
+                    <td class="value">{{ currency|default:"BDT" }} {{ invoice.shipping_cost|floatformat:2 }}</td>
+                </tr>
+                {% endif %}
+                <tr class="grand-total">
+                    <td class="label">Grand Total:</td>
+                    <td class="value">{{ currency|default:"BDT" }} {{ invoice.grand_total|floatformat:2 }}</td>
+                </tr>
+            </div>
+        </div>
+
+        <!-- Payment Info -->
+        <div class="payment-section">
+            <h4>Payment Information</h4>
+            <div class="payment-grid">
+                <div class="payment-item">
+                    <div class="label">Payment Method</div>
+                    <div class="value">{{ invoice.get_payment_method_display|upper|default:"CASH" }}</div>
+                </div>
+                <div class="payment-item paid">
+                    <div class="label">Amount Paid</div>
+                    <div class="value">{{ currency|default:"BDT" }} {{ invoice.amount_paid|floatformat:2 }}</div>
+                </div>
+                <div class="payment-item due">
+                    <div class="label">Amount Due</div>
+                    <div class="value">{{ currency|default:"BDT" }} {{ invoice.amount_due|floatformat:2 }}</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="invoice-footer">
+            <div class="footer-grid">
+                <div class="footer-info">
+                    <p><strong>Return Policy:</strong> {{ invoice.return_policy|default:"7 days return policy with original packaging. Terms and conditions apply." }}</p>
+                    <p><strong>Warranty:</strong> {{ invoice.warranty_info|default:"All electronics come with manufacturer warranty. Extended warranty available on request." }}</p>
+                    {% if invoice.notes %}<p><strong>Notes:</strong> {{ invoice.notes }}</p>{% endif %}
+                </div>
+                <div class="signature-box">
+                    <div class="signature-line"></div>
+                    <p>Authorized Signature</p>
+                </div>
+            </div>
+            <div class="thank-you">
+                <p>Thank You for Shopping with TechShop!</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

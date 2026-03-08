@@ -64,7 +64,7 @@
         }
         
         .progress-step.active:not(:last-child)::after {
-            background: #0d6efd;
+            background: #16a34a;
         }
         
         .step-circle {
@@ -80,7 +80,7 @@
         }
         
         .progress-step.active .step-circle {
-            background: #0d6efd;
+            background: #16a34a;
             color: white;
         }
         
@@ -92,7 +92,7 @@
         }
         
         .progress-step.active span {
-            color: #0d6efd;
+            color: #16a34a;
         }
         
         @media (max-width: 576px) {
@@ -207,7 +207,7 @@
                         </span>
                     </div>
                     <div class="d-flex justify-content-between mb-3">
-                        <span>Tax (8%):</span>
+                        <span>Tax ({{ tax_rate }}%):</span>
                         <span>{{ currency_short_form }} {{ tax_amount|floatformat:2 }}</span>
                     </div>
                     <hr>

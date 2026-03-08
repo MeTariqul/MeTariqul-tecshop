@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
+from django.http import JsonResponse
 from decimal import Decimal
 from store.models import Product, Inventory
 
@@ -44,6 +45,7 @@ def cart_view(request):
                 'product': product,
                 'quantity': quantity,
                 'item_total': item_total,
+                'price': product.discounted_price,
                 'sku': sku,
                 'available_stock': available_stock
             })
@@ -59,10 +61,31 @@ def cart_view(request):
     from admin_dashboard.models import SiteConfiguration
     config = SiteConfiguration.objects.first()
     
+    # Get currency
+    currency_short_form = config.currency_short_form if config else 'BDT'
+    
+    # Calculate cart item count
+    cart_item_count = sum(item['quantity'] for item in cart_items)
+    
+    # Calculate product-wise tax
+    tax_amount = Decimal('0.00')
     if config and config.tax_enabled:
-        tax_amount = subtotal * (config.tax_rate / Decimal('100'))
-    else:
-        tax_amount = Decimal('0.00')
+        global_tax_rate = config.tax_rate
+        for item in cart_items:
+            product = item['product']
+            price = item['price']
+            quantity = item['quantity']
+            item_subtotal = price * quantity
+            
+            # Use product-specific tax rate if set, otherwise use global rate
+            if product.tax_exempt:
+                item_tax = Decimal('0.00')
+            elif product.tax_rate is not None:
+                item_tax = item_subtotal * (product.tax_rate / Decimal('100'))
+            else:
+                item_tax = item_subtotal * (global_tax_rate / Decimal('100'))
+            
+            tax_amount += item_tax
     
     if config:
         shipping_threshold = config.free_shipping_threshold
@@ -72,14 +95,31 @@ def cart_view(request):
         default_shipping = Decimal('5.99')
         
     shipping_cost = default_shipping if subtotal > 0 and subtotal < shipping_threshold else Decimal('0')
-    total_amount = subtotal + tax_amount + shipping_cost
+    
+    # Calculate discount
+    discount_amount = Decimal('0')
+    coupon_discount = request.session.get('coupon_discount')
+    coupon_code = request.session.get('coupon_code')
+    if coupon_discount and subtotal > 0:
+        discount_amount = subtotal * (Decimal(str(coupon_discount)) / Decimal('100'))
+    
+    total_amount = subtotal - discount_amount + tax_amount + shipping_cost
+    
+    # Get saved items
+    saved_items_dict = request.session.get('saved_items', {})
+    saved_count = len(saved_items_dict)
     
     context = {
         'cart_items': cart_items,
+        'cart_item_count': cart_item_count,
+        'currency_short_form': currency_short_form,
         'subtotal': subtotal,
+        'discount_amount': discount_amount,
+        'coupon_code': coupon_code,
         'tax_amount': tax_amount,
         'shipping_cost': shipping_cost,
         'total_amount': total_amount,
+        'saved_count': saved_count,
     }
     return render(request, 'cart/cart.html', context)
 
@@ -222,10 +262,27 @@ def update_cart_item(request, sku):
             from admin_dashboard.models import SiteConfiguration
             config = SiteConfiguration.objects.first()
             
+            # Calculate product-wise tax
+            tax_amount = Decimal('0.00')
             if config and config.tax_enabled:
-                tax_amount = subtotal * (config.tax_rate / Decimal('100'))
-            else:
-                tax_amount = Decimal('0.00')
+                global_tax_rate = config.tax_rate
+                for s, item in cart.items():
+                    try:
+                        p = Product.objects.get(SKU=s)
+                        q = item.get('quantity', 1)
+                        item_total = p.discounted_price * Decimal(str(q))
+                        
+                        # Use product-specific tax rate if set, otherwise use global rate
+                        if p.tax_exempt:
+                            item_tax = Decimal('0.00')
+                        elif p.tax_rate is not None:
+                            item_tax = item_total * (p.tax_rate / Decimal('100'))
+                        else:
+                            item_tax = item_total * (global_tax_rate / Decimal('100'))
+                        
+                        tax_amount += item_tax
+                    except Product.DoesNotExist:
+                        continue
             
             if config:
                 shipping_threshold = config.free_shipping_threshold
@@ -250,3 +307,55 @@ def update_cart_item(request, sku):
         messages.error(request, 'Item not found in cart')
     
     return redirect('cart:cart_view')
+  
+  
+"def save_for_later(request, sku):"  
+'    """Save item for later - move from cart to saved items"""'  
+"    cart = request.session.get('cart', {})"  
+"    saved_items = request.session.get('saved_items', {})"  
+"    "  
+"    if sku in cart:"  
+"        saved_items[sku] = cart[sku]"  
+"        del cart[sku]"  
+"        "  
+"        request.session['cart'] = cart"  
+"        request.session['saved_items'] = saved_items"  
+"        request.session.modified = True"  
+"        "  
+"    return redirect('cart:cart_view')" 
+  
+def save_for_later(request, sku):  
+    """Save item for later"""  
+    cart = request.session.get('cart', {})  
+    saved = request.session.get('saved_items', {})  
+    if sku in cart:  
+        saved[sku] = cart[sku]  
+        del cart[sku]  
+        request.session['cart'] = cart  
+        request.session['saved_items'] = saved  
+        request.session.modified = True  
+    return redirect('cart:cart_view') 
+  
+def apply_coupon(request):  
+    """Apply coupon code to cart"""  
+    if request.method == 'POST':  
+        code = request.POST.get('code', '').strip().upper()  
+        coupons = {'SAVE10': 10, 'SAVE20': 20, 'WELCOME': 15, 'FLAT50': 50, 'FLAT100': 100}  
+        if code in coupons:  
+            request.session['coupon_code'] = code  
+            request.session['coupon_discount'] = coupons[code]  
+            return JsonResponse({'success': True, 'message': f'Coupon {code} applied!'})  
+        return JsonResponse({'success': False, 'message': 'Invalid coupon'})  
+    return JsonResponse({'success': False}) 
+  
+def move_to_cart(request, sku):  
+    """Move item from saved for later back to cart"""  
+    saved = request.session.get('saved_items', {})  
+    cart = request.session.get('cart', {})  
+    if sku in saved:  
+        cart[sku] = saved[sku]  
+        del saved[sku]  
+        request.session['cart'] = cart  
+        request.session['saved_items'] = saved  
+        request.session.modified = True  
+    return redirect('cart:cart_view') 

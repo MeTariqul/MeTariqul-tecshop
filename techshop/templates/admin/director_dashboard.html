@@ -11,6 +11,9 @@
             <p class="text-muted mb-0">Business Overview & Performance</p>
         </div>
         <div class="d-flex gap-2">
+            <a href="{% url 'admin_dashboard:customer_support' %}" class="btn btn-outline-success btn-sm">
+                <i class="bi bi-headset me-1"></i> Support
+            </a>
             <a href="{% url 'admin_dashboard:staff_list' %}" class="btn btn-outline-primary btn-sm">
                 <i class="bi bi-people me-1"></i> Staff
             </a>
@@ -233,6 +236,112 @@
                             </tbody>
                         </table>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Customer Reviews Section -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-0 py-3 d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="bi bi-chat-square-text me-2 text-success"></i>Customer Reviews</h5>
+                    {% if pending_reviews > 0 %}
+                    <span class="badge bg-warning">{{ pending_reviews }} Pending Responses</span>
+                    {% endif %}
+                </div>
+                <div class="card-body p-0">
+                    {% if recent_reviews %}
+                    <div class="reviews-list" style="max-height: 500px; overflow-y: auto;">
+                        {% for review in recent_reviews %}
+                        <div class="review-item p-4 border-bottom">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <div class="d-flex align-items-center">
+                                    <div class="reviewer-avatar me-3" style="width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #16a34a, #15803d); color: white; display: flex; align-items: center; justify-content: center; font-weight: 600;">
+                                        {{ review.user.user.username|make_list|first|upper }}
+                                    </div>
+                                    <div>
+                                        <strong>{{ review.user.user.get_full_name|default:review.user.user.username }}</strong>
+                                        <div class="text-muted small">{{ review.product.name }}</div>
+                                    </div>
+                                </div>
+                                <div class="text-end">
+                                    <div class="rating-stars text-warning mb-1">
+                                        {% for i in "12345" %}
+                                        <i class="bi bi-star{% if forloop.counter <= review.rating %}-fill{% endif %}"></i>
+                                        {% endfor %}
+                                    </div>
+                                    <small class="text-muted">{{ review.created_at|date:"M j, Y" }}</small>
+                                </div>
+                            </div>
+                            
+                            {% if review.title %}
+                            <h6 class="fw-bold mb-1">{{ review.title }}</h6>
+                            {% endif %}
+                            
+                            <p class="mb-2">{{ review.comment|truncatechars:200 }}</p>
+                            
+                            <!-- Admin Response (if exists) -->
+                            {% if review.admin_response %}
+                            <div class="admin-response p-3 ms-4" style="background: #f0fdf4; border-left: 3px solid #16a34a; border-radius: 0 8px 8px 0;">
+                                <div class="d-flex align-items-center mb-1">
+                                    <i class="bi bi-shop text-success me-2"></i>
+                                    <strong class="text-success small">TechShop Response</strong>
+                                    {% if review.admin_response_at %}
+                                    <small class="text-muted ms-2">{{ review.admin_response_at|date:"M j, Y" }}</small>
+                                    {% endif %}
+                                </div>
+                                <p class="mb-0 small">{{ review.admin_response }}</p>
+                            </div>
+                            {% else %}
+                            <!-- Reply Button -->
+                            <button class="btn btn-sm btn-outline-success" data-bs-toggle="modal" data-bs-target="#replyModal{{ review.id }}">
+                                <i class="bi bi-reply me-1"></i>Reply
+                            </button>
+                            
+                            <!-- Reply Modal -->
+                            <div class="modal fade" id="replyModal{{ review.id }}" tabindex="-1" aria-labelledby="replyModalLabel{{ review.id }}" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header bg-success text-white">
+                                            <h5 class="modal-title" id="replyModalLabel{{ review.id }}">Reply to Review</h5>
+                                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <form method="POST" action="{% url 'admin_dashboard:respond_review' review.id %}">
+                                            {% csrf_token %}
+                                            <div class="modal-body">
+                                                <div class="mb-3">
+                                                    <label class="form-label fw-bold">Your Response</label>
+                                                    <textarea class="form-control" name="response_text" rows="4" placeholder="Write your response to this customer review..." required></textarea>
+                                                </div>
+                                                <div class="p-3 bg-light rounded">
+                                                    <small class="text-muted">
+                                                        <strong>Original Review:</strong><br>
+                                                        "{{ review.comment|truncatechars:150 }}"
+                                                    </small>
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                <button type="submit" class="btn btn-success">
+                                                    <i class="bi bi-send me-1"></i>Send Response
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="text-center py-5 text-muted">
+                        <i class="bi bi-chat-square-text fs-1 d-block mb-2"></i>
+                        No reviews yet
+                    </div>
+                    {% endif %}
                 </div>
             </div>
         </div>

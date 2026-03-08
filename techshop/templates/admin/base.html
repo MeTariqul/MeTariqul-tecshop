@@ -8,10 +8,10 @@
         display: none !important;
     }
     
-    /* Admin Dashboard Styles */
+    /* Admin Dashboard Styles - White & Green Theme */
     .admin-sidebar {
         min-height: 100vh;
-        background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
+        background: linear-gradient(180deg, #16a34a 0%, #15803d 100%);
         box-shadow: 4px 0 15px rgba(0, 0, 0, 0.1);
     }
 
@@ -62,8 +62,8 @@
     }
 
     .stat-card.primary .stat-icon {
-        background: rgba(13, 110, 253, 0.1);
-        color: #0d6efd;
+        background: rgba(22, 163, 74, 0.1);
+        color: #16a34a;
     }
 
     .stat-card.success .stat-icon {
@@ -94,8 +94,8 @@
     }
 
     .table-card .card-header {
-        background: #fff;
-        border-bottom: 2px solid #f0f0f0;
+        background: #ffffff;
+        border-bottom: 2px solid #16a34a;
         padding: 1rem 1.5rem;
         font-weight: 600;
     }
@@ -219,13 +219,14 @@
     /* Activity timeline */
     .activity-item {
         padding: 15px;
-        border-left: 3px solid #e9ecef;
+        border-left: 3px solid #e2e8f0;
         transition: all 0.2s ease;
+        background: #ffffff;
     }
 
     .activity-item:hover {
-        background: #f8f9fa;
-        border-left-color: #0d6efd;
+        background: #f8fafc;
+        border-left-color: #16a34a;
     }
 
     /* Form styles */
@@ -233,14 +234,15 @@
     .form-select {
         border-radius: 10px;
         padding: 12px 15px;
-        border: 2px solid #e9ecef;
+        border: 2px solid #e2e8f0;
+        background: #ffffff;
         transition: all 0.3s ease;
     }
 
     .form-control:focus,
     .form-select:focus {
-        border-color: #0d6efd;
-        box-shadow: 0 0 0 4px rgba(13, 110, 253, 0.1);
+        border-color: #16a34a;
+        box-shadow: 0 0 0 4px rgba(22, 163, 74, 0.1);
     }
 
     .btn {
@@ -250,14 +252,24 @@
         transition: all 0.3s ease;
     }
 
+    .btn-primary {
+        background-color: #16a34a;
+        border-color: #16a34a;
+    }
+
+    .btn-primary:hover {
+        background-color: #15803d;
+        border-color: #15803d;
+    }
+
     .btn:hover {
         transform: translateY(-2px);
         box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
     }
 
     .admin-header {
-        background: #fff;
-        border-bottom: 1px solid #e9ecef;
+        background: #ffffff;
+        border-bottom: 3px solid #16a34a;
         padding: 15px 0;
     }
 
@@ -270,7 +282,7 @@
     .quick-stat .number {
         font-size: 2rem;
         font-weight: 700;
-        color: #1a1a2e;
+        color: #16a34a;
     }
 
     .quick-stat .label {
@@ -287,7 +299,7 @@
         <div class="container-fluid">
             <div class="row align-items-center">
                 <div class="col-md-6">
-                    <h2 class="mb-0">{% block admin_title %}Admin Dashboard{% endblock %}</h2>
+                    <h2 class="mb-0">{% block admin_title %}Director Dashboard{% endblock %}</h2>
                 </div>
                 <div class="col-md-6 text-md-end">
                     <span class="me-3"><i class="bi bi-person-circle me-1"></i>{{ user.username }}</span>

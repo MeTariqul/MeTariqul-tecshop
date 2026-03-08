@@ -113,8 +113,7 @@
                         <small class="text-muted">Full name of the currency</small>
                     </div>
                     <div class="form-check form-switch mb-3">
-                        <input type="checkbox" name="tax_enabled" class="form-check-input" id="tax_enabled" {% if
-                            config.tax_enabled %}checked{% endif %}>
+                        <input type="checkbox" name="tax_enabled" class="form-check-input" id="tax_enabled" {% if config.tax_enabled %}checked{% endif %}>
                         <label class="form-check-label" for="tax_enabled">
                             <strong>Enable Tax</strong>
                             <br><small class="text-muted">Turn off to disable tax on all orders</small>
@@ -168,8 +167,7 @@
                 </div>
                 <div class="card-body">
                     <div class="form-check form-switch mb-3">
-                        <input type="checkbox" name="maintenance_mode" class="form-check-input" id="maintenance_mode" {%
-                            if config.maintenance_mode %}checked{% endif %}>
+                        <input type="checkbox" name="maintenance_mode" class="form-check-input" id="maintenance_mode" {% if config.maintenance_mode %}checked{% endif %}>
                         <label class="form-check-label" for="maintenance_mode">
                             <strong>Enable Maintenance Mode</strong>
                             <br><small class="text-muted">This will show a maintenance page to all visitors</small>

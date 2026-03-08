@@ -1,233 +1,409 @@
 {% extends 'admin/base.html' %}
 
-{% block admin_title %}Admin Dashboard - Complete Management{% endblock %}
+{% block admin_title %}Director Dashboard{% endblock %}
 
 {% block admin_content %}
 <div class="container-fluid py-4">
     <!-- Header -->
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <h2 class="mb-0"><i class="bi bi-speedometer2 me-2"></i>Admin Dashboard</h2>
-            <p class="text-muted mb-0">Complete Business Management</p>
+            <h2 class="mb-0 fw-bold"><i class="bi bi-speedometer2 me-2 text-success"></i>Director Dashboard</h2>
+            <p class="text-muted mb-0">Complete Business Control Center</p>
         </div>
         <div class="text-end">
-            <span class="text-muted">Today: {% now "F j, Y" %}</span>
+            <span class="text-muted"><i class="bi bi-calendar3 me-1"></i>{% now "F j, Y" %}</span>
         </div>
     </div>
 
-    <!-- Stats Row - Executive Summary -->
-    <div class="row g-4 mb-4">
-        <div class="col-md-3">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-body">
-                    <p class="text-muted mb-1">Today's Sales</p>
-                    <h3 class="mb-0">৳{{ today_sales|floatformat:0 }}</h3>
-                    <small class="text-success">{{ today_order_count }} orders</small>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-body">
-                    <p class="text-muted mb-1">This Month</p>
-                    <h3 class="mb-0">৳{{ revenue_month|floatformat:0 }}</h3>
-                    <small class="text-muted">{{ orders_this_month }} orders</small>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-body">
-                    <p class="text-muted mb-1">Total Products</p>
-                    <h3 class="mb-0">{{ total_products }}</h3>
-                    <small class="text-warning">{{ low_stock_products }} low stock</small>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-body">
-                    <p class="text-muted mb-1">Total Customers</p>
-                    <h3 class="mb-0">{{ total_customers }}</h3>
-                    <small class="text-success">+{{ new_customers_this_month }} new</small>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Quick Actions -->
+    <!-- Executive Stats Row -->
     <div class="row g-3 mb-4">
-        <div class="col-12">
-            <h5 class="mb-3"><i class="bi bi-lightning me-2"></i>Quick Actions</h5>
+        <div class="col-md-2 col-6">
+            <div class="card border-0 shadow-sm h-100" style="background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);">
+                <div class="card-body text-white p-3">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <p class="mb-1 opacity-75 small">Today's Sales</p>
+                            <h4 class="mb-0 fw-bold">৳{{ today_sales|floatformat:0 }}</h4>
+                            <small class="opacity-75">{{ today_order_count }} orders</small>
+                        </div>
+                        <i class="bi bi-currency-dollar fs-2 opacity-50"></i>
+                    </div>
+                </div>
+            </div>
         </div>
         <div class="col-md-2 col-6">
-            <a href="{% url 'admin_dashboard:orders' %}" class="btn btn-outline-success w-100 py-2">
-                <i class="bi bi-bag d-block mb-1" style="font-size: 1.2rem;"></i>
-                Orders
-            </a>
+            <div class="card border-0 shadow-sm h-100" style="background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);">
+                <div class="card-body text-white p-3">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <p class="mb-1 opacity-75 small">This Month</p>
+                            <h4 class="mb-0 fw-bold">৳{{ month_sales|floatformat:0 }}</h4>
+                            <small class="opacity-75">{{ orders_this_month }} orders</small>
+                        </div>
+                        <i class="bi bi-graph-up-arrow fs-2 opacity-50"></i>
+                    </div>
+                </div>
+            </div>
         </div>
         <div class="col-md-2 col-6">
-            <a href="{% url 'admin_dashboard:products' %}" class="btn btn-outline-primary w-100 py-2">
-                <i class="bi bi-box-seam d-block mb-1" style="font-size: 1.2rem;"></i>
-                Products
-            </a>
+            <div class="card border-0 shadow-sm h-100" style="background: linear-gradient(135deg, #16a34a 0%, #0d9488 100%);">
+                <div class="card-body text-white p-3">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <p class="mb-1 opacity-75 small">Inventory Value</p>
+                            <h4 class="mb-0 fw-bold">৳{{ total_inventory_value|floatformat:0 }}</h4>
+                            <small class="opacity-75">{{ total_stock }} units</small>
+                        </div>
+                        <i class="bi bi-boxes fs-2 opacity-50"></i>
+                    </div>
+                </div>
+            </div>
         </div>
         <div class="col-md-2 col-6">
-            <a href="{% url 'admin_dashboard:customers' %}" class="btn btn-outline-info w-100 py-2">
-                <i class="bi bi-people d-block mb-1" style="font-size: 1.2rem;"></i>
-                Customers
-            </a>
+            <div class="card border-0 shadow-sm h-100" style="background: linear-gradient(135deg, #15803d 0%, #16a34a 100%);">
+                <div class="card-body text-white p-3">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <p class="mb-1 opacity-75 small">Products</p>
+                            <h4 class="mb-0 fw-bold">{{ total_products }}</h4>
+                            <small class="opacity-75">{{ low_stock_products }} low stock</small>
+                        </div>
+                        <i class="bi bi-box-seam fs-2 opacity-50"></i>
+                    </div>
+                </div>
+            </div>
         </div>
         <div class="col-md-2 col-6">
-            <a href="{% url 'admin_dashboard:staff_list' %}" class="btn btn-outline-warning w-100 py-2">
-                <i class="bi bi-person-badge d-block mb-1" style="font-size: 1.2rem;"></i>
-                Staff
-            </a>
+            <div class="card border-0 shadow-sm h-100" style="background: linear-gradient(135deg, #16a34a 0%, #22c55e 100%);">
+                <div class="card-body text-white p-3">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <p class="mb-1 opacity-75 small">Customers</p>
+                            <h4 class="mb-0 fw-bold">{{ total_customers }}</h4>
+                            <small class="opacity-75">+{{ new_customers_this_month }} new</small>
+                        </div>
+                        <i class="bi bi-people fs-2 opacity-50"></i>
+                    </div>
+                </div>
+            </div>
         </div>
         <div class="col-md-2 col-6">
-            <a href="{% url 'admin_dashboard:suppliers' %}" class="btn btn-outline-secondary w-100 py-2">
-                <i class="bi bi-building d-block mb-1" style="font-size: 1.2rem;"></i>
-                Suppliers
-            </a>
-        </div>
-        <div class="col-md-2 col-6">
-            <a href="{% url 'admin_dashboard:purchase_orders' %}" class="btn btn-outline-dark w-100 py-2">
-                <i class="bi bi-cart d-block mb-1" style="font-size: 1.2rem;"></i>
-                Purchase Orders
-            </a>
+            <div class="card border-0 shadow-sm h-100" style="background: linear-gradient(135deg, #15803d 0%, #166534 100%);">
+                <div class="card-body text-white p-3">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <p class="mb-1 opacity-75 small">Staff</p>
+                            <h4 class="mb-0 fw-bold">{{ total_staff }}</h4>
+                            <small class="opacity-75">{{ pending_pos }} pending POs</small>
+                        </div>
+                        <i class="bi bi-person-badge fs-2 opacity-50"></i>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
-    <!-- Three Column Layout: Warehouse, Fulfillment, Staff -->
-    <div class="row g-4">
-        <!-- Warehouse Section -->
-        <div class="col-lg-4">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0"><i class="bi bi-boxes me-2 text-success"></i>Warehouse</h5>
+    <!-- Management Sections Grid -->
+    <div class="row g-4 mb-4">
+        <!-- Orders Management -->
+        <div class="col-lg-3 col-md-6">
+            <div class="card border-0 shadow-sm h-100" style="border-radius: 16px; overflow: hidden;">
+                <div class="card-header py-3" style="background: linear-gradient(135deg, #16a34a 0%, #15803d 100%); color: white;">
+                    <h6 class="mb-0 fw-bold"><i class="bi bi-bag-check me-2"></i>Orders Management</h6>
                 </div>
-                <div class="card-body">
-                    <div class="mb-3">
-                        <a href="{% url 'admin_dashboard:stock_transfer' %}" class="btn btn-outline-success w-100 mb-2">
+                <div class="card-body p-3">
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'admin_dashboard:orders' %}" class="btn btn-outline-success btn-sm">
+                            <i class="bi bi-list-ul me-1"></i> All Orders
+                        </a>
+                        <a href="{% url 'admin_dashboard:orders' %}?status=pending" class="btn btn-outline-warning btn-sm">
+                            <i class="bi bi-clock me-1"></i> Pending Orders
+                        </a>
+                        <a href="{% url 'admin_dashboard:orders' %}?status=processing" class="btn btn-outline-info btn-sm">
+                            <i class="bi bi-gear me-1"></i> Processing
+                        </a>
+                        <a href="{% url 'admin_dashboard:orders' %}?status=shipped" class="btn btn-outline-success btn-sm">
+                            <i class="bi bi-truck me-1"></i> Shipped
+                        </a>
+                        <a href="{% url 'admin_dashboard:fulfillment_dashboard' %}" class="btn btn-success btn-sm">
+                            <i class="bi bi-arrow-right me-1"></i> Fulfillment Center
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Products Management -->
+        <div class="col-lg-3 col-md-6">
+            <div class="card border-0 shadow-sm h-100" style="border-radius: 16px; overflow: hidden;">
+                <div class="card-header py-3" style="background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%); color: white;">
+                    <h6 class="mb-0 fw-bold"><i class="bi bi-box-seam me-2"></i>Products Management</h6>
+                </div>
+                <div class="card-body p-3">
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'admin_dashboard:products' %}" class="btn btn-outline-success btn-sm">
+                            <i class="bi bi-list-ul me-1"></i> All Products
+                        </a>
+                        <a href="{% url 'admin_dashboard:products' %}" class="btn btn-outline-info btn-sm">
+                            <i class="bi bi-plus-lg me-1"></i> Add Product
+                        </a>
+                        <a href="{% url 'admin_dashboard:warehouse_dashboard' %}" class="btn btn-outline-success btn-sm">
+                            <i class="bi bi-boxes me-1"></i> Inventory
+                        </a>
+                        <a href="{% url 'admin_dashboard:stock_transfer' %}" class="btn btn-outline-warning btn-sm">
                             <i class="bi bi-arrow-left-right me-1"></i> Stock Transfer
                         </a>
-                        <a href="{% url 'admin_dashboard:cycle_count' %}" class="btn btn-outline-success w-100 mb-2">
+                        <a href="{% url 'admin_dashboard:cycle_count' %}" class="btn btn-success btn-sm">
                             <i class="bi bi-clipboard-check me-1"></i> Cycle Count
                         </a>
-                        <a href="{% url 'admin_dashboard:warehouse_dashboard' %}" class="btn btn-success w-100">
-                            <i class="bi bi-arrow-right me-1"></i> Full Inventory
-                        </a>
-                    </div>
-                    <hr>
-                    <h6 class="mb-2">Stock Overview</h6>
-                    <div class="d-flex justify-content-between mb-1">
-                        <span class="text-muted">In Stock</span>
-                        <span class="badge bg-success">{{ total_products|add:low_stock_products }}</span>
-                    </div>
-                    <div class="d-flex justify-content-between mb-1">
-                        <span class="text-muted">Low Stock</span>
-                        <span class="badge bg-warning">{{ low_stock_products }}</span>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Fulfillment Section -->
-        <div class="col-lg-4">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0"><i class="bi bi-scroll me-2 text-warning"></i>Fulfillment</h5>
+        <!-- Customers Management -->
+        <div class="col-lg-3 col-md-6">
+            <div class="card border-0 shadow-sm h-100" style="border-radius: 16px; overflow: hidden;">
+                <div class="card-header py-3" style="background: linear-gradient(135deg, #16a34a 0%, #0d9488 100%); color: white;">
+                    <h6 class="mb-0 fw-bold"><i class="bi bi-people me-2"></i>Customers Management</h6>
                 </div>
-                <div class="card-body">
-                    <div class="mb-3">
-                        <a href="{% url 'admin_dashboard:scan_item' %}" class="btn btn-outline-warning w-100 mb-2">
-                            <i class="bi bi-upc-scan me-1"></i> Scan Item
+                <div class="card-body p-3">
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'admin_dashboard:customers' %}" class="btn btn-outline-success btn-sm">
+                            <i class="bi bi-list-ul me-1"></i> All Customers
                         </a>
-                        <a href="{% url 'admin_dashboard:fulfillment_dashboard' %}" class="btn btn-warning w-100">
-                            <i class="bi bi-arrow-right me-1"></i> Full Fulfillment
+                        <a href="{% url 'admin_dashboard:reports' %}" class="btn btn-outline-info btn-sm">
+                            <i class="bi bi-bar-chart me-1"></i> Customer Reports
+                        </a>
+                        <a href="{% url 'admin_dashboard:activity_logs' %}" class="btn btn-outline-secondary btn-sm">
+                            <i class="bi bi-activity me-1"></i> Activity Logs
                         </a>
                     </div>
-                    <hr>
-                    <h6 class="mb-2">Order Status</h6>
-                    <div class="d-flex justify-content-between mb-1">
-                        <span class="text-muted">Pending</span>
-                        <span class="badge bg-warning">0</span>
+                    <hr class="my-3">
+                    <div class="d-flex justify-content-between small text-muted">
+                        <span>Total Customers</span>
+                        <strong>{{ total_customers }}</strong>
                     </div>
-                    <div class="d-flex justify-content-between mb-1">
-                        <span class="text-muted">Processing</span>
-                        <span class="badge bg-info">0</span>
-                    </div>
-                    <div class="d-flex justify-content-between mb-1">
-                        <span class="text-muted">Ready to Ship</span>
-                        <span class="badge bg-success">0</span>
+                    <div class="d-flex justify-content-between small text-muted">
+                        <span>New This Month</span>
+                        <strong class="text-success">+{{ new_customers_this_month }}</strong>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Staff & Suppliers Section -->
-        <div class="col-lg-4">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0"><i class="bi bi-people me-2 text-info"></i>Staff & Suppliers</h5>
+        <!-- Staff Management -->
+        <div class="col-lg-3 col-md-6">
+            <div class="card border-0 shadow-sm h-100" style="border-radius: 16px; overflow: hidden;">
+                <div class="card-header py-3" style="background: linear-gradient(135deg, #15803d 0%, #16a34a 100%); color: white;">
+                    <h6 class="mb-0 fw-bold"><i class="bi bi-person-badge me-2"></i>Staff Management</h6>
                 </div>
-                <div class="card-body">
-                    <div class="mb-3">
-                        <a href="{% url 'admin_dashboard:staff_list' %}" class="btn btn-outline-info w-100 mb-2">
-                            <i class="bi bi-people me-1"></i> Manage Staff
+                <div class="card-body p-3">
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'admin_dashboard:staff_list' %}" class="btn btn-outline-success btn-sm">
+                            <i class="bi bi-list-ul me-1"></i> All Staff
                         </a>
-                        <a href="{% url 'admin_dashboard:suppliers' %}" class="btn btn-outline-info w-100 mb-2">
-                            <i class="bi bi-building me-1"></i> Suppliers
+                        <a href="{% url 'admin_dashboard:staff_create' %}" class="btn btn-outline-info btn-sm">
+                            <i class="bi bi-person-plus me-1"></i> Add Staff
+                        </a>
+                        <a href="{% url 'admin_dashboard:user_profile' %}" class="btn btn-outline-success btn-sm">
+                            <i class="bi bi-person-circle me-1"></i> My Profile
                         </a>
                     </div>
-                    <hr>
-                    <h6 class="mb-2">Purchase Orders</h6>
-                    <a href="{% url 'admin_dashboard:create_purchase_order' %}" class="btn btn-primary btn-sm w-100 mb-2">
-                        <i class="bi bi-plus-lg me-1"></i> New PO
-                    </a>
-                    <a href="{% url 'admin_dashboard:purchase_orders' %}" class="btn btn-outline-secondary btn-sm w-100">
-                        View All POs
-                    </a>
+                    <hr class="my-3">
+                    <div class="d-flex justify-content-between small text-muted">
+                        <span>Active Staff</span>
+                        <strong>{{ total_staff }}</strong>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Recent Orders -->
-    <div class="row g-4 mt-2">
-        <div class="col-12">
-            <div class="card border-0 shadow-sm">
-                <div class="card-header bg-white py-3">
-                    <h5 class="mb-0"><i class="bi bi-clock-history me-2"></i>Recent Orders</h5>
+    <!-- Second Row: Suppliers, Reports, Settings, Scanning -->
+    <div class="row g-4 mb-4">
+        <!-- Suppliers & Purchase Orders -->
+        <div class="col-lg-3 col-md-6">
+            <div class="card border-0 shadow-sm h-100" style="border-radius: 16px; overflow: hidden;">
+                <div class="card-header py-3" style="background: linear-gradient(135deg, #16a34a 0%, #22c55e 100%); color: white;">
+                    <h6 class="mb-0 fw-bold"><i class="bi bi-building me-2"></i>Suppliers & Procurement</h6>
+                </div>
+                <div class="card-body p-3">
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'admin_dashboard:suppliers' %}" class="btn btn-outline-success btn-sm">
+                            <i class="bi bi-building me-1"></i> All Suppliers
+                        </a>
+                        <a href="{% url 'admin_dashboard:create_supplier' %}" class="btn btn-outline-info btn-sm">
+                            <i class="bi bi-plus-lg me-1"></i> Add Supplier
+                        </a>
+                        <a href="{% url 'admin_dashboard:purchase_orders' %}" class="btn btn-outline-success btn-sm">
+                            <i class="bi bi-cart me-1"></i> Purchase Orders
+                        </a>
+                        <a href="{% url 'admin_dashboard:create_purchase_order' %}" class="btn btn-success btn-sm">
+                            <i class="bi bi-plus-lg me-1"></i> New PO
+                        </a>
+                    </div>
+                    <hr class="my-3">
+                    <div class="d-flex justify-content-between small text-muted">
+                        <span>Pending POs</span>
+                        <strong class="text-warning">{{ pending_pos }}</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Reports & Analytics -->
+        <div class="col-lg-3 col-md-6">
+            <div class="card border-0 shadow-sm h-100" style="border-radius: 16px; overflow: hidden;">
+                <div class="card-header py-3" style="background: linear-gradient(135deg, #22c55e 0%, #15803d 100%); color: white;">
+                    <h6 class="mb-0 fw-bold"><i class="bi bi-bar-chart me-2"></i>Reports & Analytics</h6>
+                </div>
+                <div class="card-body p-3">
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'admin_dashboard:reports' %}" class="btn btn-outline-success btn-sm">
+                            <i class="bi bi-bar-chart me-1"></i> Sales Reports
+                        </a>
+                        <a href="{% url 'admin_dashboard:reports' %}" class="btn btn-outline-info btn-sm">
+                            <i class="bi bi-pie-chart me-1"></i> Revenue Analytics
+                        </a>
+                        <a href="{% url 'admin_dashboard:activity_logs' %}" class="btn btn-outline-secondary btn-sm">
+                            <i class="bi bi-clock-history me-1"></i> Activity Logs
+                        </a>
+                    </div>
+                    <hr class="my-3">
+                    <div class="d-flex justify-content-between small text-muted">
+                        <span>Revenue (Month)</span>
+                        <strong class="text-success">৳{{ revenue_month|floatformat:0 }}</strong>
+                    </div>
+                    <div class="d-flex justify-content-between small text-muted">
+                        <span>Revenue (Week)</span>
+                        <strong>৳{{ revenue_week|floatformat:0 }}</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Settings -->
+        <div class="col-lg-3 col-md-6">
+            <div class="card border-0 shadow-sm h-100" style="border-radius: 16px; overflow: hidden;">
+                <div class="card-header py-3" style="background: linear-gradient(135deg, #16a34a 0%, #0d9488 100%); color: white;">
+                    <h6 class="mb-0 fw-bold"><i class="bi bi-gear me-2"></i>Settings & Configuration</h6>
+                </div>
+                <div class="card-body p-3">
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'admin_dashboard:settings' %}" class="btn btn-outline-success btn-sm">
+                            <i class="bi bi-sliders me-1"></i> System Settings
+                        </a>
+                        <a href="{% url 'admin_dashboard:website_settings' %}" class="btn btn-outline-info btn-sm">
+                            <i class="bi bi-globe me-1"></i> Website Settings
+                        </a>
+                        <a href="{% url 'admin_dashboard:database_backup' %}" class="btn btn-outline-warning btn-sm">
+                            <i class="bi bi-database me-1"></i> Database Backup
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="col-lg-3 col-md-6">
+            <div class="card border-0 shadow-sm h-100" style="border-radius: 16px; overflow: hidden;">
+                <div class="card-header py-3" style="background: linear-gradient(135deg, #15803d 0%, #16a34a 100%); color: white;">
+                    <h6 class="mb-0 fw-bold"><i class="bi bi-lightning me-2"></i>Quick Actions</h6>
+                </div>
+                <div class="card-body p-3">
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'admin_dashboard:scan_item' %}" class="btn btn-outline-success btn-sm">
+                            <i class="bi bi-upc me-1"></i> Scan Item
+                        </a>
+                        <a href="{% url 'admin_dashboard:order_detail' 0 %}" class="btn btn-outline-info btn-sm">
+                            <i class="bi bi-receipt me-1"></i> Quick Order View
+                        </a>
+                        <a href="{% url 'store:home' %}" class="btn btn-success btn-sm">
+                            <i class="bi bi-shop me-1"></i> View Store
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Activity & Low Stock Alert -->
+    <div class="row g-4">
+        <!-- Recent Orders -->
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm" style="border-radius: 16px; overflow: hidden;">
+                <div class="card-header py-3" style="background: linear-gradient(135deg, #16a34a 0%, #15803d 100%); color: white;">
+                    <h6 class="mb-0 fw-bold"><i class="bi bi-clock-history me-2"></i>Recent Orders</h6>
                 </div>
                 <div class="card-body p-0">
-                    {% if recent_orders %}
                     <div class="table-responsive">
                         <table class="table table-hover mb-0">
                             <thead class="table-light">
                                 <tr>
                                     <th>Order #</th>
                                     <th>Customer</th>
-                                    <th>Total</th>
+                                    <th>Amount</th>
                                     <th>Status</th>
                                     <th>Date</th>
+                                    <th>Action</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {% for order in recent_orders %}
                                 <tr>
                                     <td><strong>{{ order.order_number }}</strong></td>
-                                    <td>{{ order.customer.user.first_name }} {{ order.customer.user.last_name }}</td>
+                                    <td>
+                                        {{ order.customer.user.first_name|default:order.customer.user.username }}
+                                        <br><small class="text-muted">{{ order.customer.user.email }}</small>
+                                    </td>
                                     <td>৳{{ order.total_amount }}</td>
-                                    <td><span class="badge bg-{% if order.status == 'delivered' %}success{% elif order.status == 'pending' %}warning{% elif order.status == 'cancelled' %}danger{% else %}info{% endif %}">{{ order.get_status_display }}</span></td>
-                                    <td>{{ order.created_at|date:"M j, Y" }}</td>
+                                    <td>
+                                        <span class="status-badge {{ order.status }}">{{ order.get_status_display }}</span>
+                                    </td>
+                                    <td>{{ order.created_at|date:"M d, Y" }}</td>
+                                    <td>
+                                        <a href="{% url 'admin_dashboard:order_detail' order.id %}" class="btn btn-sm btn-outline-success">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="6" class="text-center py-4 text-muted">No recent orders</td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
                         </table>
                     </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Low Stock Alerts -->
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm" style="border-radius: 16px; overflow: hidden;">
+                <div class="card-header py-3" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white;">
+                    <h6 class="mb-0 fw-bold"><i class="bi bi-exclamation-triangle me-2"></i>Low Stock Alerts</h6>
+                </div>
+                <div class="card-body p-0">
+                    {% if low_stock_products_list %}
+                    <div class="list-group list-group-flush">
+                        {% for product in low_stock_products_list %}
+                        <div class="list-group-item d-flex justify-content-between align-items-center py-3">
+                            <div>
+                                <strong>{{ product.name }}</strong>
+                                <br><small class="text-muted">SKU: {{ product.SKU }}</small>
+                            </div>
+                            <span class="badge bg-danger rounded-pill">{{ product.inventory.quantity_on_hand }} left</span>
+                        </div>
+                        {% endfor %}
+                    </div>
                     {% else %}
-                    <div class="text-center py-4 text-muted">No orders yet</div>
+                    <div class="text-center py-4 text-muted">
+                        <i class="bi bi-check-circle fs-1 text-success"></i>
+                        <p class="mb-0 mt-2">All products are well stocked!</p>
+                    </div>
                     {% endif %}
                 </div>
             </div>

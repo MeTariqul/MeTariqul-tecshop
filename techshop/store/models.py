@@ -56,6 +56,11 @@ class Product(models.Model):
     discount_label = models.CharField(max_length=100, blank=True,
                                        help_text="e.g. Summer Sale, Flash Deal")
     
+    # Tax Settings (product-wise)
+    tax_rate = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True,
+                                   help_text="Product-specific tax rate. Leave empty to use global rate.")
+    tax_exempt = models.BooleanField(default=False, help_text="Mark this product as tax-exempt")
+    
     # Web-specific fields
     is_available_online = models.BooleanField(default=True)
     featured_image = models.ImageField(upload_to='products/', blank=True, null=True)
@@ -190,5 +195,70 @@ class ProductImage(models.Model):
 
     def __str__(self):
         return f"Image for {self.product.name} ({self.sort_order})"
+
+
+class Review(models.Model):
+    """Product reviews - only for verified purchasers"""
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='reviews')
+    user = models.ForeignKey('orders.WebCustomer', on_delete=models.CASCADE, related_name='reviews')
+    rating = models.PositiveIntegerField(choices=[(i, i) for i in range(1, 6)], help_text="Rating from 1-5 stars")
+    title = models.CharField(max_length=200, blank=True)
+    comment = models.TextField(blank=True)
+    is_verified_purchase = models.BooleanField(default=True)
+    
+    # Admin response fields
+    admin_response = models.TextField(blank=True, help_text="Admin response to the review")
+    admin_response_by = models.ForeignKey('auth.User', on_delete=models.SET_NULL, null=True, blank=True, related_name='review_responses')
+    admin_response_at = models.DateTimeField(null=True, blank=True)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = 'product_reviews'
+        verbose_name_plural = 'Product Reviews'
+        ordering = ['-created_at']
+        unique_together = ['product', 'user']
+
+    def __str__(self):
+        return f"Review by {self.user} for {self.product.name} - {self.rating} stars"
+
+
+class ContactMessage(models.Model):
+    """Customer support/contact messages"""
+    name = models.CharField(max_length=100)
+    email = models.EmailField()
+    phone = models.CharField(max_length=20, blank=True)
+    subject = models.CharField(max_length=200)
+    message = models.TextField()
+    
+    # Customer info (if logged in)
+    customer = models.ForeignKey('orders.WebCustomer', on_delete=models.SET_NULL, null=True, blank=True, related_name='contact_messages')
+    
+    # Status and response
+    STATUS_CHOICES = [
+        ('new', 'New'),
+        ('read', 'Read'),
+        ('in_progress', 'In Progress'),
+        ('resolved', 'Resolved'),
+        ('closed', 'Closed'),
+    ]
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='new')
+    
+    # Admin response
+    admin_response = models.TextField(blank=True)
+    admin_response_by = models.ForeignKey('auth.User', on_delete=models.SET_NULL, null=True, blank=True, related_name='contact_responses')
+    admin_response_at = models.DateTimeField(null=True, blank=True)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        db_table = 'contact_messages'
+        verbose_name_plural = 'Contact Messages'
+        ordering = ['-created_at']
+    
+    def __str__(self):
+        return f"Message from {self.name} - {self.subject}"
 
 

@@ -6,7 +6,7 @@
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h4 class="mb-0">Orders Management</h4>
     <a href="{% url 'admin_dashboard:dashboard' %}" class="btn btn-outline-secondary">
-        <i class="bi bi-arrow-left me-2"></i>Back to Dashboard
+        <i class="bi bi-arrow-left me-2"></i>Director Dashboard
     </a>
 </div>
 
@@ -32,7 +32,7 @@
                 <input type="date" name="date_to" class="form-control" placeholder="To Date">
             </div>
             <div class="col-md-3">
-                <button type="submit" class="btn btn-primary w-100">
+                <button type="submit" class="btn btn-success w-100">
                     <i class="bi bi-filter me-2"></i>Filter
                 </button>
             </div>
@@ -70,7 +70,7 @@
                         <td>{{ order.created_at|date:"M d, Y H:i" }}</td>
                         <td>
                             <a href="{% url 'admin_dashboard:order_detail' order.id %}"
-                                class="btn btn-sm btn-outline-primary">
+                                class="btn btn-sm btn-outline-success">
                                 <i class="bi bi-eye"></i> View
                             </a>
                         </td>

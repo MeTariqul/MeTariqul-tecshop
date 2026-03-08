@@ -1,0 +1,253 @@
+{% extends 'admin/base.html' %}
+
+{% block admin_title %}Customer Support - TechShop{% endblock %}
+
+{% block admin_content %}
+<div class="container-fluid py-4">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="mb-0"><i class="bi bi-headset me-2"></i>Customer Support</h2>
+            <p class="text-muted mb-0">Manage customer inquiries and messages</p>
+        </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <p class="text-muted mb-1">Total Messages</p>
+                            <h3 class="mb-0">{{ total_messages }}</h3>
+                        </div>
+                        <div class="icon-box bg-primary-light text-primary">
+                            <i class="bi bi-envelope fs-4"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <p class="text-muted mb-1">New</p>
+                            <h3 class="mb-0 text-primary">{{ new_messages }}</h3>
+                        </div>
+                        <div class="icon-box bg-primary-light text-primary">
+                            <i class="bi bi-envelope-plus fs-4"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <p class="text-muted mb-1">In Progress</p>
+                            <h3 class="mb-0 text-warning">{{ pending_messages }}</h3>
+                        </div>
+                        <div class="icon-box bg-warning-light text-warning">
+                            <i class="bi bi-clock-history fs-4"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <p class="text-muted mb-1">Resolved</p>
+                            <h3 class="mb-0 text-success">{{ resolved_messages }}</h3>
+                        </div>
+                        <div class="icon-box bg-success-light text-success">
+                            <i class="bi bi-check-circle fs-4"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filter Tabs -->
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body py-3">
+            <div class="d-flex gap-2">
+                <a href="{% url 'admin_dashboard:customer_support' %}" class="btn {% if not status_filter %}btn-success{% else %}btn-outline-secondary{% endif %}">
+                    All Messages
+                </a>
+                <a href="?status=new" class="btn {% if status_filter == 'new' %}btn-success{% else %}btn-outline-secondary{% endif %}">
+                    New
+                </a>
+                <a href="?status=read" class="btn {% if status_filter == 'read' %}btn-success{% else %}btn-outline-secondary{% endif %}">
+                    Read
+                </a>
+                <a href="?status=in_progress" class="btn {% if status_filter == 'in_progress' %}btn-success{% else %}btn-outline-secondary{% endif %}">
+                    In Progress
+                </a>
+                <a href="?status=resolved" class="btn {% if status_filter == 'resolved' %}btn-success{% else %}btn-outline-secondary{% endif %}">
+                    Resolved
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Messages List -->
+    <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white border-0 py-3">
+            <h5 class="mb-0"><i class="bi bi-chat-dots me-2"></i>Customer Messages</h5>
+        </div>
+        <div class="card-body p-0">
+            {% if messages %}
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Status</th>
+                            <th>Customer</th>
+                            <th>Subject</th>
+                            <th>Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for msg in messages %}
+                        <tr>
+                            <td>
+                                <span class="badge bg-{% if msg.status == 'new' %}primary{% elif msg.status == 'read' %}info{% elif msg.status == 'in_progress' %}warning{% elif msg.status == 'resolved' %}success{% else %}secondary{% endif %}">
+                                    {{ msg.get_status_display }}
+                                </span>
+                            </td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="avatar-circle me-2" style="width: 35px; height: 35px; border-radius: 50%; background: linear-gradient(135deg, #16a34a, #15803d); color: white; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 12px;">
+                                        {{ msg.name|make_list|first|upper }}
+                                    </div>
+                                    <div>
+                                        <strong>{{ msg.name }}</strong>
+                                        <div class="small text-muted">{{ msg.email }}</div>
+                                        {% if msg.phone %}
+                                        <div class="small text-muted">{{ msg.phone }}</div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <div>{{ msg.subject }}</div>
+                                <div class="small text-muted text-truncate" style="max-width: 300px;">{{ msg.message|truncatechars:80 }}</div>
+                            </td>
+                            <td>
+                                <small class="text-muted">{{ msg.created_at|date:"M j, Y" }}</small>
+                                <div class="small text-muted">{{ msg.created_at|time:"H:i" }}</div>
+                            </td>
+                            <td>
+                                <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#viewModal{{ msg.id }}">
+                                    <i class="bi bi-eye me-1"></i>View
+                                </button>
+                            </td>
+                        </tr>
+
+                        <!-- View Modal -->
+                        <div class="modal fade" id="viewModal{{ msg.id }}" tabindex="-1" aria-labelledby="viewModalLabel{{ msg.id }}" aria-hidden="true">
+                            <div class="modal-dialog modal-lg">
+                                <div class="modal-content">
+                                    <div class="modal-header bg-light">
+                                        <h5 class="modal-title" id="viewModalLabel{{ msg.id }}">Message Details</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div class="row mb-3">
+                                            <div class="col-md-6">
+                                                <p class="mb-1"><strong>Name:</strong> {{ msg.name }}</p>
+                                                <p class="mb-1"><strong>Email:</strong> <a href="mailto:{{ msg.email }}">{{ msg.email }}</a></p>
+                                                {% if msg.phone %}
+                                                <p class="mb-1"><strong>Phone:</strong> {{ msg.phone }}</p>
+                                                {% endif %}
+                                            </div>
+                                            <div class="col-md-6">
+                                                <p class="mb-1"><strong>Subject:</strong> {{ msg.subject }}</p>
+                                                <p class="mb-1"><strong>Date:</strong> {{ msg.created_at|date:"F j, Y, g:i a" }}</p>
+                                                <p class="mb-1">
+                                                    <strong>Status:</strong> 
+                                                    <span class="badge bg-{% if msg.status == 'new' %}primary{% elif msg.status == 'read' %}info{% elif msg.status == 'in_progress' %}warning{% elif msg.status == 'resolved' %}success{% else %}secondary{% endif %}">
+                                                        {{ msg.get_status_display }}
+                                                    </span>
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <div class="mb-4">
+                                            <strong>Message:</strong>
+                                            <div class="p-3 bg-light rounded mt-2">{{ msg.message|linebreaks }}</div>
+                                        </div>
+
+                                        {% if msg.admin_response %}
+                                        <div class="mb-4">
+                                            <strong>Previous Response:</strong>
+                                            <div class="p-3" style="background: #d4edda; border-left: 3px solid #28a745; border-radius: 0 8px 8px 0;">
+                                                <div class="small text-muted mb-1">
+                                                    {% if msg.admin_response_by %}{{ msg.admin_response_by.get_full_name|default:msg.admin_response_by.username }}{% endif %} - {{ msg.admin_response_at|date:"F j, Y, g:i a" }}
+                                                </div>
+                                                {{ msg.admin_response|linebreaks }}
+                                            </div>
+                                        </div>
+                                        {% endif %}
+
+                                        <!-- Reply Form -->
+                                        <form method="POST" action="{% url 'admin_dashboard:respond_contact' msg.id %}">
+                                            {% csrf_token %}
+                                            <div class="mb-3">
+                                                <label class="form-label fw-bold">Your Response</label>
+                                                <textarea class="form-control" name="response_text" rows="4" placeholder="Write your response to this customer...">{% if msg.admin_response %}{{ msg.admin_response }}{% endif %}</textarea>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label fw-bold">Update Status</label>
+                                                <select class="form-select" name="status">
+                                                    <option value="read" {% if msg.status == 'read' %}selected{% endif %}>Mark as Read</option>
+                                                    <option value="in_progress" {% if msg.status == 'in_progress' %}selected{% endif %}>In Progress</option>
+                                                    <option value="resolved" {% if msg.status == 'resolved' %}selected{% endif %}>Resolved</option>
+                                                    <option value="closed" {% if msg.status == 'closed' %}selected{% endif %}>Closed</option>
+                                                </select>
+                                            </div>
+                                            <button type="submit" class="btn btn-success">
+                                                <i class="bi bi-send me-2"></i>Send Response
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="text-center py-5 text-muted">
+                <i class="bi bi-inbox fs-1 d-block mb-2"></i>
+                <p class="mb-0">No messages found</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+    .icon-box {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .bg-primary-light { background: #e7f1ff; }
+    .bg-success-light { background: #d4edda; }
+    .bg-warning-light { background: #fff3cd; }
+</style>
+{% endblock %}

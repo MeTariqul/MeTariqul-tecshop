@@ -1,0 +1,182 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Invoice {{ invoice.invoice_number }} - TechShop{% endblock %}
+
+{% block extra_css %}
+<style>
+    .invoice-container {
+        max-width: 800px;
+        margin: 0 auto;
+        background: white;
+        padding: 40px;
+    }
+    .invoice-header {
+        border-bottom: 2px solid #333;
+        padding-bottom: 20px;
+        margin-bottom: 30px;
+    }
+    .invoice-table th {
+        background: #333 !important;
+        color: white !important;
+    }
+    @media print {
+        .no-print { display: none !important; }
+        body { background: white !important; }
+        .invoice-container { box-shadow: none !important; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="invoice-container">
+        <!-- Header -->
+        <div class="invoice-header">
+            <div class="row">
+                <div class="col-md-6">
+                    <h2><strong>INVOICE</strong></h2>
+                    <p class="mb-0"><strong>{{ invoice.shop_name }}</strong></p>
+                    <p class="mb-0">{{ invoice.shop_address }}</p>
+                    <p class="mb-0">Phone: {{ invoice.shop_phone }}</p>
+                    <p class="mb-0">Email: {{ invoice.shop_email }}</p>
+                    {% if invoice.tax_number %}<p class="mb-0">Tax ID: {{ invoice.tax_number }}</p>{% endif %}
+                </div>
+                <div class="col-md-6 text-end">
+                    <h4>{{ invoice.invoice_number }}</h4>
+                    <p>Date: {{ invoice.invoice_date|date:"d M Y" }}</p>
+                    <p>Payment: 
+                        {% if invoice.payment_status == 'paid' %}<span class="badge bg-success">PAID</span>
+                        {% elif invoice.payment_status == 'partial' %}<span class="badge bg-warning">PARTIAL</span>
+                        {% else %}<span class="badge bg-danger">PENDING</span>{% endif %}
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Customer Info -->
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <h5><strong>BILL TO</strong></h5>
+                <p class="mb-0"><strong>{{ invoice.customer_name }}</strong></p>
+                <p class="mb-0">{{ invoice.customer_phone }}</p>
+                {% if invoice.customer_email %}<p class="mb-0">{{ invoice.customer_email }}</p>{% endif %}
+                <p class="mb-0">{{ invoice.billing_address|linebreaks }}</p>
+            </div>
+            <div class="col-md-6">
+                {% if invoice.shipping_address %}
+                <h5><strong>SHIP TO</strong></h5>
+                <p class="mb-0">{{ invoice.shipping_address|linebreaks }}</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Items Table -->
+        <table class="table invoice-table table-bordered mb-4">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Product</th>
+                    <th>SKU</th>
+                    <th class="text-center">Qty</th>
+                    <th class="text-end">Price</th>
+                    <th class="text-end">Tax</th>
+                    <th class="text-end">Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in invoice.items.all %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ item.product_name }}</td>
+                    <td>{{ item.product_sku }}</td>
+                    <td class="text-center">{{ item.quantity }}</td>
+                    <td class="text-end">{{ currency }} {{ item.unit_price|floatformat:2 }}</td>
+                    <td class="text-end">{{ currency }} {{ item.tax_amount|floatformat:2 }}</td>
+                    <td class="text-end">{{ currency }} {{ item.total|floatformat:2 }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <!-- Totals -->
+        <div class="row justify-content-end">
+            <div class="col-md-5">
+                <table class="table table-borderless">
+                    <tr>
+                        <td class="text-end"><strong>Subtotal:</strong></td>
+                        <td class="text-end">{{ currency }} {{ invoice.subtotal|floatformat:2 }}</td>
+                    </tr>
+                    {% if invoice.total_discount > 0 %}
+                    <tr>
+                        <td class="text-end"><strong>Discount:</strong></td>
+                        <td class="text-end">-{{ currency }} {{ invoice.total_discount|floatformat:2 }}</td>
+                    </tr>
+                    {% endif %}
+                    <tr>
+                        <td class="text-end"><strong>Tax (VAT):</strong></td>
+                        <td class="text-end">{{ currency }} {{ invoice.tax_amount|floatformat:2 }}</td>
+                    </tr>
+                    {% if invoice.shipping_cost > 0 %}
+                    <tr>
+                        <td class="text-end"><strong>Shipping:</strong></td>
+                        <td class="text-end">{{ currency }} {{ invoice.shipping_cost|floatformat:2 }}</td>
+                    </tr>
+                    {% endif %}
+                    <tr class="table-primary">
+                        <td class="text-end"><strong>Grand Total:</strong></td>
+                        <td class="text-end"><strong>{{ currency }} {{ invoice.grand_total|floatformat:2 }}</strong></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <!-- Payment Info -->
+        <div class="row mt-4">
+            <div class="col-md-12">
+                <table class="table table-bordered">
+                    <tr>
+                        <th>Payment Method</th>
+                        <th>Amount Paid</th>
+                        <th>Amount Due</th>
+                    </tr>
+                    <tr>
+                        <td>{{ invoice.get_payment_method_display|upper }}</td>
+                        <td>{{ currency }} {{ invoice.amount_paid|floatformat:2 }}</td>
+                        <td>{{ currency }} {{ invoice.amount_due|floatformat:2 }}</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="mt-5 pt-4 border-top">
+            <div class="row">
+                <div class="col-md-6">
+                    <p class="mb-1"><strong>Return Policy:</strong> {{ invoice.return_policy }}</p>
+                    <p><strong>Warranty:</strong> {{ invoice.warranty_info }}</p>
+                </div>
+                <div class="col-md-6 text-end">
+                    <p class="mb-1"><strong>Authorized Signature:</strong></p>
+                    <div style="height: 50px; border-bottom: 1px solid #333; width: 200px; float: right;"></div>
+                </div>
+            </div>
+            <div class="text-center mt-4">
+                <p class="text-muted mb-0">Thank you for shopping with us!</p>
+                <p class="small text-muted">This is a computer-generated invoice.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="text-center mt-4 no-print">
+        <button onclick="window.print()" class="btn btn-primary">
+            <i class="bi bi-printer me-2"></i>Print Invoice
+        </button>
+        <a href="{% url 'invoices:download_pdf' invoice.id %}" class="btn btn-success">
+            <i class="bi bi-download me-2"></i>Download PDF
+        </a>
+        <a href="{% url 'invoices:invoice_list' %}" class="btn btn-secondary">Back to List</a>
+    </div>
+</div>
+{% endblock %}

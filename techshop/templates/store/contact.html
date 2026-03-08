@@ -6,7 +6,7 @@
 {% block extra_css %}
 <style>
     .contact-header {
-        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+        background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
         padding: 60px 0;
     }
 
@@ -33,7 +33,7 @@
         align-items: center;
         justify-content: center;
         font-size: 1.5rem;
-        color: #0d6efd;
+        color: #16a34a;
         margin-bottom: 15px;
     }
 
@@ -47,8 +47,8 @@
 
     .form-control:focus,
     .form-select:focus {
-        border-color: #0d6efd;
-        box-shadow: 0 0 0 4px rgba(13, 110, 253, 0.1);
+        border-color: #16a34a;
+        box-shadow: 0 0 0 4px rgba(22, 163, 74, 0.1);
     }
 
     .btn {
@@ -165,7 +165,11 @@
                                 <label class="form-label">Email Address</label>
                                 <input type="email" name="email" class="form-control" required>
                             </div>
-                            <div class="col-12">
+                            <div class="col-md-6">
+                                <label class="form-label">Phone Number (Optional)</label>
+                                <input type="tel" name="phone" class="form-control" placeholder="+880 1XXXXXXXXX">
+                            </div>
+                            <div class="col-md-6">
                                 <label class="form-label">Subject</label>
                                 <select name="subject" class="form-select">
                                     <option value="">Select a topic</option>

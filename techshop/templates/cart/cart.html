@@ -1,211 +1,372 @@
 {% extends 'base.html' %}
+{% load static %}
 
-{% block title %}Shopping Cart - Tech Shop{% endblock %}
+{% block title %}Shopping Cart - TechShop{% endblock %}
 
 {% block extra_css %}
 <style>
-    /* Hide store navbar on cart page */
-    .navbar.navbar-expand-lg.navbar-light.bg-white.border-top {
-        display: none !important;
+    .navbar.navbar-expand-lg.navbar-light.bg-white.border-top { display: none !important; }
+    
+    .cart-container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+    .cart-title { font-size: 28px; font-weight: 700; color: #2c3e50; margin-bottom: 20px; }
+    
+    .cart-item {
+        display: flex;
+        gap: 20px;
+        padding: 20px;
+        border: none;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        border-radius: 8px;
+        margin-bottom: 15px;
+        background: #fff;
+    }
+    
+    .cart-item-img {
+        width: 150px;
+        height: 150px;
+        object-fit: contain;
+        border-radius: 4px;
+    }
+    
+    .cart-item-details { flex: 1; }
+    .cart-item-title {
+        font-size: 18px;
+        font-weight: 600;
+        color: #2c3e50;
+        text-decoration: none;
+    }
+    .cart-item-title:hover { color: #e77600; }
+    .cart-item-price { 
+        font-size: 20px; 
+        font-weight: 700; 
+        color: #B12704; 
+        margin: 10px 0; 
+    }
+    
+    .qty-control {
+        display: inline-flex;
+        align-items: center;
+        border: 1px solid #a6a6a6;
+        border-radius: 3px;
+        overflow: hidden;
+    }
+    
+    .qty-btn {
+        width: 30px;
+        height: 30px;
+        background: linear-gradient(to bottom,#f7f8fa,#e7e9ec);
+        border: none;
+        cursor: pointer;
+        font-size: 16px;
+    }
+    .qty-btn:hover { background: #e7e9ec; }
+    
+    .qty-input {
+        width: 50px;
+        height: 30px;
+        text-align: center;
+        border: none;
+        border-left: 1px solid #a6a6a6;
+        border-right: 1px solid #a6a6a6;
+    }
+    
+    .cart-actions {
+        margin-top: 15px;
+        font-size: 14px;
+    }
+    .cart-actions a {
+        color: #007185;
+        text-decoration: none;
+        margin-right: 15px;
+    }
+    .cart-actions a:hover { color: #e77600; }
+    
+    .summary-card {
+        position: sticky;
+        top: 20px;
+        background: #fff;
+        border: none;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        border-radius: 8px;
+        padding: 20px;
+    }
+    
+    .summary-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 10px 0;
+        border-bottom: 1px solid #eee;
+    }
+    
+    .summary-total {
+        font-size: 18px;
+        font-weight: 700;
+        padding: 15px 0;
+        border-top: 2px solid #eee;
+        margin-top: 10px;
+    }
+    
+    .checkout-btn {
+        width: 100%;
+        padding: 12px;
+        background: linear-gradient(to bottom,#f7c08b,#f0c14b);
+        border: 1px solid #a6a6a6;
+        border-radius: 20px;
+        font-weight: 600;
+        cursor: pointer;
+        margin-top: 15px;
+        color: #111;
+    }
+    .checkout-btn:hover { background: #f0b14b; }
+    
+    .coupon-box {
+        border: 1px solid #eee;
+        border-radius: 4px;
+        padding: 15px;
+        margin: 15px 0;
+    }
+    
+    .coupon-input {
+        width: 100%;
+        padding: 8px;
+        border: 1px solid #a6a6a6;
+        border-radius: 3px;
+        margin-bottom: 8px;
+    }
+    
+    .coupon-btn {
+        width: 100%;
+        padding: 8px;
+        background: linear-gradient(to bottom,#f7f8fa,#e7e9ec);
+        border: 1px solid #a6a6a6;
+        border-radius: 3px;
+        cursor: pointer;
+    }
+    
+    .empty-cart {
+        text-align: center;
+        padding: 60px;
+    }
+    .empty-cart i { font-size: 80px; color: #ddd; }
+    .empty-cart h3 { margin: 20px 0 10px; color: #2c3e50; }
+    
+    .saved-section {
+        margin-top: 30px;
+        padding: 20px;
+        border: none;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        border-radius: 8px;
+    }
+    
+    .saved-item {
+        display: flex;
+        gap: 15px;
+        padding: 15px 0;
+        border-bottom: 1px solid #eee;
+    }
+    
+    .saved-item-img {
+        width: 80px;
+        height: 80px;
+        object-fit: contain;
+    }
+    
+    .btn-tech {
+        background: linear-gradient(to bottom,#f7c08b,#f0c14b);
+        border: 1px solid #a6a6a6;
+        color: #111;
+        font-weight: 600;
+    }
+    .btn-tech:hover { background: #f0b14b; }
+    
+    .text-tech { color: #e77600; }
+    
+    @media (max-width: 768px) {
+        .cart-item { flex-direction: column; }
+        .cart-item-img { width: 100%; height: auto; }
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="container my-4">
-    <h1><i class="bi bi-cart"></i> Shopping Cart</h1>
-
+<div class="cart-container">
+    <h1 class="cart-title"><i class="bi bi-cart3"></i> Shopping Cart</h1>
+    
+    {% if messages %}
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+    
     {% if cart_items %}
     <div class="row">
-        <div class="col-md-8">
-            <div class="card border-0 shadow-sm">
-                <div class="card-header bg-white border-bottom py-3">
-                    <h5 class="mb-0 fw-bold">Your Items ({{ cart_item_count }} items)</h5>
+        <div class="col-lg-8">
+            {% for item in cart_items %}
+            <div class="cart-item">
+                {% if item.product.featured_image %}
+                <img src="{{ item.product.featured_image.url }}" class="cart-item-img" alt="{{ item.product.name }}">
+                {% else %}
+                <div class="cart-item-img bg-light d-flex align-items-center justify-content-center">
+                    <i class="bi bi-image text-muted" style="font-size: 40px;"></i>
                 </div>
-                <div class="card-body">
-                    {% for item in cart_items %}
-                    <div class="row mb-3 pb-3 border-bottom">
-                        <div class="col-md-2">
-                            {% if item.product.featured_image %}
-                            <img src="{{ item.product.featured_image.url }}" class="img-fluid rounded"
-                                alt="{{ item.product.name }}" style="height: 80px; object-fit: cover;">
-                            {% else %}
-                            <div class="bg-light d-flex align-items-center justify-content-center rounded"
-                                style="height: 80px;">
-                                <i class="bi bi-laptop text-muted"></i>
-                            </div>
-                            {% endif %}
-                        </div>
-                        <div class="col-md-5">
-                            <h6><a href="{% url 'store:product_detail' item.product.SKU %}"
-                                    class="text-decoration-none">{{ item.product.name }}</a></h6>
-                            <p class="text-muted small mb-1">SKU: {{ item.product.SKU }}</p>
-                            {% if item.product.has_offer %}
-                            <p class="text-muted small">
-                                Price: <span class="text-danger">{{ currency_short_form }} {{ item.product.discounted_price }}</span>
-                                <span class="text-decoration-line-through">{{ currency_short_form }} {{ item.product.selling_price }}</span>
-                                <span class="badge bg-danger ms-1">{{ item.product.discount_percentage|floatformat:0 }}%
-                                    OFF</span>
-                            </p>
-                            {% else %}
-                            <p class="text-muted small">Price: {{ currency_short_form }} {{ item.product.selling_price }}</p>
-                            {% endif %}
-                        </div>
-                        <div class="col-md-3">
-                            <form method="post" action="{% url 'cart:update_cart_item' item.product.SKU %}"
-                                class="update-form">
-                                {% csrf_token %}
-                                <div class="input-group input-group-sm">
-                                    <input type="number" class="form-control quantity-input" name="quantity"
-                                        value="{{ item.quantity }}" min="1" max="{{ item.inventory.quantity_on_hand }}"
-                                        data-sku="{{ item.product.SKU }}">
-                                    <span class="input-group-text">of {{ item.inventory.quantity_on_hand }}
-                                        available</span>
-                                    <button class="btn btn-tech update-btn" type="submit">Update</button>
-                                </div>
-                            </form>
-                        </div>
-                        <div class="col-md-2 text-end">
-                            <p class="fw-bold item-subtotal">{{ currency_short_form }} {{ item.item_total|floatformat:2 }}</p>
-                            <form method="post" action="{% url 'cart:remove_from_cart' item.product.SKU %}"
-                                class="d-inline">
-                                {% csrf_token %}
-                                <button type="submit" class="btn btn-tech btn-sm">
-                                    <i class="bi bi-trash"></i> Remove
-                                </button>
-                            </form>
-                        </div>
+                {% endif %}
+                
+                <div class="cart-item-details">
+                    <a href="{% url 'store:product_detail' item.product.SKU %}" class="cart-item-title">
+                        {{ item.product.name }}
+                    </a>
+                    
+                    <div class="cart-item-price">
+                        {% if item.product.has_offer %}
+                        {{ currency_short_form }} {{ item.product.discounted_price }}
+                        <span class="text-decoration-line-through text-muted" style="font-size: 14px;">{{ currency_short_form }} {{ item.product.selling_price }}</span>
+                        {% else %}
+                        {{ currency_short_form }} {{ item.product.selling_price }}
+                        {% endif %}
                     </div>
-                    {% endfor %}
+                    
+                    <div class="qty-control">
+                        <button class="qty-btn" onclick="updateQty('{{ item.product.SKU }}', -1)">−</button>
+                        <input type="text" class="qty-input" value="{{ item.quantity }}" id="qty-{{ item.product.SKU }}" readonly>
+                        <button class="qty-btn" onclick="updateQty('{{ item.product.SKU }}', 1)">+</button>
+                    </div>
+                    
+                    <div class="cart-actions">
+                        <a href="#" onclick="saveForLater('{{ item.product.SKU }}'); return false;"><i class="bi bi-heart"></i> Save for later</a>
+                        <a href="#" onclick="removeItem('{{ item.product.SKU }}'); return false;" class="text-danger"><i class="bi bi-trash"></i> Delete</a>
+                    </div>
+                </div>
+                
+                <div style="text-align: right;">
+                    <div class="h5 cart-item-price">{{ currency_short_form }} {{ item.item_total|floatformat:2 }}</div>
                 </div>
             </div>
+            {% endfor %}
         </div>
-
-        <div class="col-md-4">
-            <div class="card border-0 shadow-sm">
-                <div class="card-header bg-white border-bottom py-3">
-                    <h5 class="mb-0 fw-bold">Order Summary</h5>
+        
+        <div class="col-lg-4">
+            <div class="summary-card">
+                <div class="coupon-box">
+                    <strong><i class="bi bi-gift"></i> Gift card or promo code</strong>
+                    <form onsubmit="applyCoupon(event)" class="mt-2">
+                        <input type="text" class="coupon-input" id="coupon-code" placeholder="Enter code">
+                        <button type="submit" class="coupon-btn">Apply</button>
+                    </form>
+                    <div id="coupon-msg" style="font-size: 12px; margin-top: 5px;"></div>
                 </div>
-                <div class="card-body">
-                    <div class="d-flex justify-content-between mb-2">
-                        <span>Subtotal ({{ cart_item_count }} items):</span>
-                        <span class="fw-bold cart-subtotal">{{ currency_short_form }} {{ cart_total|floatformat:2 }}</span>
-                    </div>
-                    <div class="d-flex justify-content-between mb-2">
-                        <span>Shipping:</span>
-                        <span>
-                            {% if shipping_cost == 0 %}
-                            <span class="text-success">FREE</span>
-                            {% else %}
-                            <span>{{ currency_short_form }} {{ shipping_cost }}</span>
-                            {% endif %}
-                        </span>
-                    </div>
-                    <div class="d-flex justify-content-between mb-2">
-                        <span>Tax (8%):</span>
-                        <span class="tax-amount">{{ currency_short_form }} {{ tax_amount|floatformat:2 }}</span>
-                    </div>
-                    <hr>
-                    <div class="d-flex justify-content-between mb-3">
-                        <span class="h5">Total:</span>
-                        <span class="h5 text-primary cart-total">
-                            {{ currency_short_form }} {{ total_amount|floatformat:2 }}
-                        </span>
-                    </div>
-                    <div class="d-grid">
-                        <a href="{% url 'orders:checkout' %}" class="btn btn-tech btn-lg">
-                            <i class="bi bi-credit-card"></i> Proceed to Checkout
-                        </a>
-                    </div>
+                
+                <div class="summary-row">
+                    <span>Subtotal ({{ cart_item_count }} items)</span>
+                    <span>{{ currency_short_form }} {{ subtotal|floatformat:2 }}</span>
                 </div>
-            </div>
-
-            <div class="card mt-3">
-                <div class="card-body text-center">
-                    <i class="bi bi-shield-check display-4 text-success mb-3"></i>
-                    <h6>Secure Checkout</h6>
-                    <p class="small text-muted mb-0">Your payment information is encrypted and secure</p>
+                
+                {% if discount_amount > 0 %}
+                <div class="summary-row">
+                    <span>Discount ({{ coupon_code }})</span>
+                    <span class="text-success">-{{ currency_short_form }} {{ discount_amount|floatformat:2 }}</span>
+                </div>
+                {% endif %}
+                
+                <div class="summary-row">
+                    <span>Shipping</span>
+                    <span>{% if shipping_cost == 0 %}<span class="text-success">FREE</span>{% else %}{{ currency_short_form }} {{ shipping_cost|floatformat:2 }}{% endif %}</span>
+                </div>
+                
+                <div class="summary-row">
+                    <span>Tax</span>
+                    <span>{{ currency_short_form }} {{ tax_amount|floatformat:2 }}</span>
+                </div>
+                
+                <div class="summary-total summary-row">
+                    <span>Total</span>
+                    <span>{{ currency_short_form }} {{ total_amount|floatformat:2 }}</span>
+                </div>
+                
+                <a href="{% url 'orders:checkout' %}" class="checkout-btn">
+                    <i class="bi bi-lock"></i> Proceed to Checkout
+                </a>
+                
+                <div style="text-align: center; margin-top: 15px;">
+                    <a href="{% url 'store:product_list' %}" style="color: #007185;"><i class="bi bi-arrow-left"></i> Continue Shopping</a>
                 </div>
             </div>
         </div>
     </div>
+    
+    {% if saved_count > 0 %}
+    <div class="saved-section">
+        <h4><i class="bi bi-heart-fill"></i> Saved for later ({{ saved_count }} items)</h4>
+    </div>
+    {% endif %}
+    
     {% else %}
-    <div class="text-center py-5">
-        <i class="bi bi-cart-x display-1 text-muted mb-3"></i>
+    <div class="empty-cart">
+        <i class="bi bi-cart-x"></i>
         <h3>Your cart is empty</h3>
-        <p class="text-muted">Add some products to your cart to get started</p>
-        <a href="{% url 'store:product_list' %}" class="btn btn-tech btn-lg">
-            <i class="bi bi-shop"></i> Continue Shopping
-        </a>
+        <p>Looks like you haven't added anything to your cart yet.</p>
+        <a href="{% url 'store:product_list' %}" class="btn btn-tech">Shop Now</a>
     </div>
     {% endif %}
 </div>
 
-<style>
-    .quantity-input:focus {
-        box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
-    }
-
-    .update-btn {
-        border-left: none;
-    }
-</style>
-
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        // Handle quantity updates
-        document.querySelectorAll('.update-form').forEach(form => {
-            form.addEventListener('submit', function (e) {
-                e.preventDefault();
+function updateQty(sku, change) {
+    let qty = parseInt(document.getElementById('qty-' + sku).value) + change;
+    if (qty < 1) qty = 1;
+    
+    fetch(`/cart/update/${sku}/`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'X-CSRFToken': '{{ csrf_token }}',
+            'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: `quantity=${qty}`
+    }).then(() => location.reload());
+}
 
-                const sku = this.querySelector('.quantity-input').dataset.sku;
-                const quantity = this.querySelector('.quantity-input').value;
+function removeItem(sku) {
+    if (confirm('Remove this item from cart?')) {
+        fetch(`/cart/remove/${sku}/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-CSRFToken': '{{ csrf_token }}',
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        }).then(() => location.reload());
+    }
+}
 
-                fetch(`/cart/update/${sku}/`, {  // Using URL directly since template tag won't work here
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
-                        'X-Requested-With': 'XMLHttpRequest'
-                    },
-                    body: `quantity=${quantity}`
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            // Update the UI
-                            document.querySelector(`[data-sku="${sku}"]`).closest('.row')
-                                .querySelector('.item-subtotal').textContent = `{{ currency_short_form }}${data.item_subtotal}`;
-                            document.querySelector('.cart-subtotal').textContent = `{{ currency_short_form }}${data.cart_total}`;
-                            document.querySelector('.tax-amount').textContent = `{{ currency_short_form }}${data.tax_amount}`;
+function saveForLater(sku) {
+    fetch(`/cart/save-later/${sku}/`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'X-CSRFToken': '{{ csrf_token }}',
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    }).then(() => location.reload());
+}
 
-                            const shippingEl = document.querySelector('.shipping-cost');
-                            if (parseFloat(data.shipping_cost) === 0) {
-                                if (shippingEl) shippingEl.innerHTML = '<span class="text-success">FREE</span>';
-                            } else {
-                                if (shippingEl) shippingEl.textContent = `{{ currency_short_form }}${data.shipping_cost}`;
-                            }
-
-                            document.querySelector('.cart-total').textContent = `{{ currency_short_form }}${data.total_amount}`;
-
-                            // Show success message
-                            const alertDiv = document.createElement('div');
-                            alertDiv.className = 'alert alert-success alert-dismissible fade show';
-                            alertDiv.innerHTML = `
-                        Item quantity updated successfully
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                    `;
-                            document.querySelector('.container').insertBefore(alertDiv, document.querySelector('.row'));
-
-                            setTimeout(() => {
-                                if (alertDiv.parentNode) {
-                                    alertDiv.remove();
-                                }
-                            }, 3000);
-                        }
-                    });
-            });
-        });
-    });
+function applyCoupon(e) {
+    e.preventDefault();
+    const code = document.getElementById('coupon-code').value.trim().toUpperCase();
+    const validCodes = ['SAVE10', 'SAVE20', 'WELCOME', 'FLAT50', 'FLAT100'];
+    
+    if (validCodes.includes(code)) {
+        fetch('/cart/apply-coupon/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-CSRFToken': '{{ csrf_token }}',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: `code=${code}`
+        }).then(() => location.reload());
+    } else {
+        document.getElementById('coupon-msg').innerHTML = '<span class="text-danger">Invalid coupon code</span>';
+    }
+}
 </script>
 {% endblock %}

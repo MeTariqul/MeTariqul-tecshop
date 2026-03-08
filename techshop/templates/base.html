@@ -20,13 +20,28 @@
             font-family: 'Poppins', sans-serif;
         }
         
+        /* White-Green Theme Styles */
+        .text-primary {
+            color: var(--primary-color, #16a34a) !important;
+        }
+        
+        .btn-primary {
+            background-color: #16a34a;
+            border-color: #16a34a;
+        }
+        
+        .btn-primary:hover {
+            background-color: #15803d;
+            border-color: #15803d;
+        }
+        
         /* Cookie Consent Banner */
         .cookie-banner {
             position: fixed;
             bottom: 0;
             left: 0;
             right: 0;
-            background: #2c3e50;
+            background: #16a34a;
             color: white;
             padding: 15px 0;
             z-index: 9999;
@@ -34,12 +49,12 @@
         }
         
         .cookie-banner a {
-            color: #3498db;
+            color: #dcfce7;
             text-decoration: underline;
         }
         
         .cookie-banner a:hover {
-            color: #5dade2;
+            color: #ffffff;
         }
     </style>
 </head>
@@ -117,8 +132,7 @@
                                 <li><a class="dropdown-item" href="{% url 'orders:order_history' %}">My Orders</a></li>
                                 {% if user.is_staff %}
                                 <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item fw-bold" href="{% url 'admin_dashboard:dashboard' %}"><i class="bi bi-speedometer2 me-1"></i>Admin Dashboard</a></li>
-                                <li><a class="dropdown-item" href="{% url 'admin_dashboard:director_dashboard' %}">Director Dashboard</a></li>
+                                <li><a class="dropdown-item fw-bold" href="{% url 'admin_dashboard:dashboard' %}"><i class="bi bi-speedometer2 me-1"></i>Director Dashboard</a></li>
                                 <li><a class="dropdown-item" href="{% url 'admin_dashboard:warehouse_dashboard' %}">Warehouse</a></li>
                                 <li><a class="dropdown-item" href="{% url 'admin_dashboard:fulfillment_dashboard' %}">Fulfillment</a></li>
                                 {% endif %}
@@ -150,12 +164,13 @@
         </div>
     </div>
 
-    <!-- Navigation Bar -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-white border-top">
+    <!-- Navigation Bar (Home Page Only) -->
+    {% if request.path == '/' %}
+    <nav class="navbar navbar-expand-lg navbar-light bg-white border-top border-success border-3">
         <div class="container">
             <!-- Category Dropdown -->
             <div class="dropdown">
-                <button class="btn btn-primary dropdown-toggle d-flex align-items-center gap-2" type="button" data-bs-toggle="dropdown">
+                <button class="btn btn-success dropdown-toggle d-flex align-items-center gap-2" type="button" data-bs-toggle="dropdown">
                     <i class="bi bi-grid-3x3-gap"></i>
                     <span class="d-none d-lg-inline">Categories</span>
                 </button>
@@ -175,7 +190,6 @@
             </button>
 
             <div class="collapse navbar-collapse" id="mainMenu">
-                {% if request.path == '/' %}
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <li class="nav-item">
                         <a class="nav-link fw-medium" href="{% url 'store:home' %}">Home</a>
@@ -190,19 +204,15 @@
                         <a class="nav-link fw-medium" href="{% url 'store:product_list' %}?category=2">Monitors</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link fw-medium text-danger" href="{% url 'store:product_list' %}">
+                        <a class="nav-link fw-medium" href="{% url 'store:product_list' %}">
                             <i class="bi bi-fire me-1"></i>Hot Deals
                         </a>
                     </li>
                 </ul>
-                {% endif %}
-                <div class="d-flex align-items-center gap-3">
-                    <a class="nav-link fw-medium" href="{% url 'store:contact' %}">Contact</a>
-                    <a class="nav-link fw-medium" href="{% url 'store:about' %}">About</a>
-                </div>
             </div>
         </div>
     </nav>
+    {% endif %}
 
     <!-- Messages -->
     {% if messages %}
@@ -249,11 +259,11 @@
                 <div class="col-lg-2 col-md-6 mb-4 mb-lg-0">
                     <h5>Customer Service</h5>
                     <ul class="footer-links">
-                        <li><a href="#">Terms & Conditions</a></li>
-                        <li><a href="#">Privacy Policy</a></li>
-                        <li><a href="#">Return & Refund</a></li>
-                        <li><a href="#">Shipping Policy</a></li>
-                        <li><a href="#">Track Order</a></li>
+                        <li><a href="{% url 'store:terms' %}">Terms & Conditions</a></li>
+                        <li><a href="{% url 'store:privacy' %}">Privacy Policy</a></li>
+                        <li><a href="{% url 'store:return_refund' %}">Return & Refund</a></li>
+                        <li><a href="{% url 'store:shipping' %}">Shipping Policy</a></li>
+                        <li><a href="{% url 'store:track_order' %}">Track Order</a></li>
                     </ul>
                 </div>
                 <div class="col-lg-3 col-md-6 mb-4 mb-lg-0">

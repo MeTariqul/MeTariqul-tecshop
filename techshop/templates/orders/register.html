@@ -3,108 +3,355 @@
 
 {% block title %}Register - Tech Shop{% endblock %}
 
+{% block extra_css %}
+<style>
+    :root {
+        --primary-green: #16a34a;
+        --dark-green: #15803d;
+        --light-green: #dcfce7;
+    }
+    
+    .register-page {
+        min-height: 80vh;
+        display: flex;
+        align-items: center;
+        background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 50%, #bbf7d0 100%);
+        padding: 2rem 0;
+    }
+    
+    .register-card {
+        border: none;
+        border-radius: 24px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        background: white;
+    }
+    
+    .register-header {
+        background: linear-gradient(135deg, var(--primary-green) 0%, var(--dark-green) 100%);
+        padding: 2.5rem 2rem;
+        text-align: center;
+        color: white;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .register-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.08'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        opacity: 0.5;
+    }
+    
+    .register-icon {
+        width: 70px;
+        height: 70px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1rem;
+        font-size: 2rem;
+        position: relative;
+    }
+    
+    .register-header h3 {
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        position: relative;
+    }
+    
+    .register-header p {
+        opacity: 0.9;
+        margin-bottom: 0;
+        position: relative;
+    }
+    
+    .register-body {
+        padding: 2rem;
+    }
+    
+    .form-label {
+        font-weight: 600;
+        color: #374151;
+        margin-bottom: 0.5rem;
+    }
+    
+    .form-label .required {
+        color: #dc2626;
+    }
+    
+    .input-group {
+        position: relative;
+    }
+    
+    .input-icon {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        z-index: 10;
+        color: #9ca3af;
+    }
+    
+    .form-control {
+        border: 2px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 0.875rem 1rem;
+        font-size: 1rem;
+        transition: all 0.3s;
+    }
+    
+    .form-control:focus {
+        border-color: var(--primary-green);
+        box-shadow: 0 0 0 4px rgba(22, 163, 74, 0.1);
+    }
+    
+    .form-control.is-invalid {
+        border-color: #dc2626;
+    }
+    
+    .invalid-feedback {
+        color: #dc2626;
+        font-size: 0.875rem;
+    }
+    
+    .form-text {
+        color: #6b7280;
+        font-size: 0.875rem;
+    }
+    
+    .password-hint {
+        background: #f0fdf4;
+        border: 1px solid #bbf7d0;
+        border-radius: 12px;
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .password-hint-title {
+        font-weight: 600;
+        color: var(--dark-green);
+        margin-bottom: 0.5rem;
+    }
+    
+    .password-hint ul {
+        margin-bottom: 0;
+        padding-left: 1.25rem;
+    }
+    
+    .password-hint li {
+        color: #15803d;
+        font-size: 0.875rem;
+    }
+    
+    .section-title {
+        font-weight: 600;
+        color: #374151;
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid #e5e7eb;
+    }
+    
+    .location-btn {
+        background: transparent;
+        border: 2px solid var(--primary-green);
+        color: var(--primary-green);
+        border-radius: 10px;
+        padding: 0.5rem 1rem;
+        font-size: 0.875rem;
+        font-weight: 500;
+        transition: all 0.3s;
+        width: 100%;
+    }
+    
+    .location-btn:hover {
+        background: var(--primary-green);
+        color: white;
+    }
+    
+    .btn-register {
+        background: linear-gradient(135deg, var(--primary-green) 0%, var(--dark-green) 100%);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        padding: 1rem;
+        font-weight: 600;
+        font-size: 1rem;
+        transition: all 0.3s;
+        width: 100%;
+    }
+    
+    .btn-register:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(22, 163, 74, 0.35);
+        color: white;
+    }
+    
+    .login-link {
+        text-align: center;
+        margin-top: 1.5rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid #e5e7eb;
+    }
+    
+    .login-link a {
+        color: var(--primary-green);
+        font-weight: 600;
+        text-decoration: none;
+        transition: color 0.3s;
+    }
+    
+    .login-link a:hover {
+        color: var(--dark-green);
+    }
+    
+    .alert-danger {
+        border-radius: 12px;
+        border: none;
+        background: #fef2f2;
+        color: #dc2626;
+    }
+    
+    .optional-badge {
+        background: #f3f4f6;
+        color: #6b7280;
+        font-size: 0.75rem;
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        font-weight: 500;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="container my-5">
-    <div class="row justify-content-center">
-        <div class="col-md-6 col-lg-5">
-            <!-- Header -->
-            <div class="text-center mb-4">
-                <i class="bi bi-person-plus-fill display-3 text-secondary"></i>
-                <h3 class="fw-bold mt-2">Create Account</h3>
-                <p class="text-muted">Join Tech Shop for exclusive deals and offers</p>
-            </div>
-
-            <div class="card border-0 shadow-sm">
-                <div class="card-body p-4">
-                    <form method="post">
-                        {% csrf_token %}
-
-                        {% if form.non_field_errors %}
-                        <div class="alert alert-danger py-2 small">
-                            {{ form.non_field_errors }}
+<div class="register-page">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8 col-lg-6">
+                <div class="register-card">
+                    <div class="register-header">
+                        <div class="register-icon">
+                            <i class="bi bi-person-plus"></i>
                         </div>
-                        {% endif %}
+                        <h3>Create Account</h3>
+                        <p>Join Tech Shop for exclusive deals and offers</p>
+                    </div>
+                    <div class="register-body">
+                        <form method="post">
+                            {% csrf_token %}
 
-                        <div class="mb-3">
-                            <label for="{{ form.username.id_for_label }}" class="form-label fw-bold">Username <span
-                                    class="text-danger">*</span></label>
-                            <input type="text" class="form-control {% if form.username.errors %}is-invalid{% endif %}"
-                                id="{{ form.username.id_for_label }}" name="{{ form.username.name }}"
-                                value="{{ form.username.value|default:'' }}" placeholder="Choose a username">
-                            {% if form.username.errors %}
-                            <div class="invalid-feedback">{{ form.username.errors }}</div>
+                            {% if form.non_field_errors %}
+                            <div class="alert alert-danger py-3 mb-4">
+                                <i class="bi bi-exclamation-triangle me-2"></i>
+                                {{ form.non_field_errors }}
+                            </div>
                             {% endif %}
-                            <div class="form-text small">Letters, digits and @/./+/-/_ only.</div>
-                        </div>
 
-                        <div class="row g-3 mb-3">
-                            <div class="col-md-6">
-                                <label for="{{ form.password1.id_for_label }}" class="form-label fw-bold">Password <span
-                                        class="text-danger">*</span></label>
-                                <input type="password"
-                                    class="form-control {% if form.password1.errors %}is-invalid{% endif %}"
-                                    id="{{ form.password1.id_for_label }}" name="{{ form.password1.name }}"
-                                    placeholder="Create password">
-                                {% if form.password1.errors %}
-                                <div class="invalid-feedback">{{ form.password1.errors }}</div>
+                            <!-- Account Info -->
+                            <h6 class="section-title">
+                                <i class="bi bi-person-badge me-2"></i>Account Information
+                            </h6>
+                            
+                            <div class="mb-4">
+                                <label for="{{ form.username.id_for_label }}" class="form-label">
+                                    Username <span class="required">*</span>
+                                </label>
+                                <input type="text" 
+                                    class="form-control {% if form.username.errors %}is-invalid{% endif %}"
+                                    id="{{ form.username.id_for_label }}" 
+                                    name="{{ form.username.name }}"
+                                    value="{{ form.username.value|default:'' }}" 
+                                    placeholder="Choose a username">
+                                {% if form.username.errors %}
+                                <div class="invalid-feedback">{{ form.username.errors }}</div>
                                 {% endif %}
+                                <div class="form-text">Letters, digits and @/./+/-/_ only.</div>
                             </div>
-                            <div class="col-md-6">
-                                <label for="{{ form.password2.id_for_label }}" class="form-label fw-bold">Confirm <span
-                                        class="text-danger">*</span></label>
-                                <input type="password"
-                                    class="form-control {% if form.password2.errors %}is-invalid{% endif %}"
-                                    id="{{ form.password2.id_for_label }}" name="{{ form.password2.name }}"
-                                    placeholder="Confirm password">
-                                {% if form.password2.errors %}
-                                <div class="invalid-feedback">{{ form.password2.errors }}</div>
-                                {% endif %}
+
+                            <div class="row g-3 mb-4">
+                                <div class="col-md-6">
+                                    <label for="{{ form.password1.id_for_label }}" class="form-label">
+                                        Password <span class="required">*</span>
+                                    </label>
+                                    <input type="password"
+                                        class="form-control {% if form.password1.errors %}is-invalid{% endif %}"
+                                        id="{{ form.password1.id_for_label }}" 
+                                        name="{{ form.password1.name }}"
+                                        placeholder="Create password">
+                                    {% if form.password1.errors %}
+                                    <div class="invalid-feedback">{{ form.password1.errors }}</div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="{{ form.password2.id_for_label }}" class="form-label">
+                                        Confirm Password <span class="required">*</span>
+                                    </label>
+                                    <input type="password"
+                                        class="form-control {% if form.password2.errors %}is-invalid{% endif %}"
+                                        id="{{ form.password2.id_for_label }}" 
+                                        name="{{ form.password2.name }}"
+                                        placeholder="Confirm password">
+                                    {% if form.password2.errors %}
+                                    <div class="invalid-feedback">{{ form.password2.errors }}</div>
+                                    {% endif %}
+                                </div>
                             </div>
-                        </div>
 
-                        <div class="small text-muted mb-4 bg-light p-3 rounded">
-                            <i class="bi bi-info-circle me-1"></i> Password must be at least 8 characters, not entirely
-                            numeric, and not too common.
-                        </div>
+                            <div class="password-hint mb-4">
+                                <div class="password-hint-title">
+                                    <i class="bi bi-shield-check me-2"></i>Password Requirements
+                                </div>
+                                <ul>
+                                    <li>At least 8 characters long</li>
+                                    <li>Not entirely numeric</li>
+                                    <li>Not too common</li>
+                                </ul>
+                            </div>
 
-                        <!-- Address Section -->
-                        <h6 class="fw-bold mb-3">Address Information (Optional)</h6>
-                        <div class="mb-3">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <label for="address" class="form-label">Address</label>
-                                <button type="button" class="btn btn-sm btn-outline-primary mb-2"
-                                    onclick="getLocation()">
-                                    <i class="bi bi-geo-alt me-1"></i> Use My Location
+                            <!-- Address Section -->
+                            <h6 class="section-title">
+                                <i class="bi bi-house me-2"></i>Address Information 
+                                <span class="optional-badge">Optional</span>
+                            </h6>
+                            
+                            <div class="mb-3">
+                                <label for="address" class="form-label">Street Address</label>
+                                <input type="text" class="form-control" id="address" name="address"
+                                    placeholder="Enter your street address">
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="city" class="form-label">City</label>
+                                    <input type="text" class="form-control" id="city" name="city" placeholder="Enter city">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="zip_code" class="form-label">ZIP Code</label>
+                                    <input type="text" class="form-control" id="zip_code" name="zip_code"
+                                        placeholder="Enter ZIP code">
+                                </div>
+                            </div>
+
+                            <div class="mt-4">
+                                <button type="submit" class="btn-register">
+                                    <i class="bi bi-person-plus me-2"></i> Create Account
                                 </button>
                             </div>
-                            <input type="text" class="form-control" id="address" name="address"
-                                placeholder="Enter your street address">
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="city" class="form-label">City</label>
-                                <input type="text" class="form-control" id="city" name="city" placeholder="Enter city">
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="zip_code" class="form-label">ZIP Code</label>
-                                <input type="text" class="form-control" id="zip_code" name="zip_code"
-                                    placeholder="Enter ZIP code">
-                            </div>
-                        </div>
+                        </form>
 
-                        <div class="d-grid">
-                            <button type="submit" class="btn btn-tech py-2 fw-bold">
-                                <i class="bi bi-person-plus me-2"></i> Create Account
-                            </button>
+                        <div class="login-link">
+                            <p class="text-muted mb-0">Already have an account?
+                                <a href="{% url 'login' %}">Sign in</a>
+                            </p>
                         </div>
-                    </form>
+                    </div>
                 </div>
-            </div>
-
-            <div class="text-center mt-4">
-                <p class="text-muted mb-0">Already have an account?
-                    <a href="{% url 'login' %}" class="text-primary fw-bold text-decoration-none">Sign in</a>
-                </p>
             </div>
         </div>
     </div>
@@ -122,36 +369,20 @@
     function showPosition(position) {
         var lat = position.coords.latitude;
         var lon = position.coords.longitude;
-
-        // Show loading
         var btn = event.target;
         var originalText = btn.innerHTML;
         btn.innerHTML = '<i class="bi bi-hourglass-split me-1"></i> Getting location...';
         btn.disabled = true;
 
-        // Use Nominatim for reverse geocoding (free OpenStreetMap service)
         fetch('https://nominatim.openstreetmap.org/reverse?format=json&lat=' + lat + '&lon=' + lon)
             .then(response => response.json())
             .then(data => {
                 if (data.address) {
-                    // Fill in address
-                    var addressParts = [];
-                    if (data.address.house_number) addressParts.push(data.address.house_number);
-                    if (data.address.road) addressParts.push(data.address.road);
-                    if (data.address.neighbourhood) addressParts.push(data.address.neighbourhood);
-                    if (data.address.suburb) addressParts.push(data.address.suburb);
-
-                    document.getElementById('address').value = addressParts.join(', ') || data.display_name.split(',').slice(0, 2).join(',');
-
-                    // Fill in city
+                    document.getElementById('address').value = data.display_name.split(',').slice(0, 3).join(',');
                     var city = data.address.city || data.address.town || data.address.village || data.address.county;
                     document.getElementById('city').value = city || '';
-
-                    // Fill in zip
                     document.getElementById('zip_code').value = data.address.postcode || '';
                 }
-
-                // Reset button
                 btn.innerHTML = originalText;
                 btn.disabled = false;
             })
