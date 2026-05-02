@@ -1,216 +1,298 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Contact Us - TechShop{% endblock %}
+{% block title %}Contact Us | Premium Collection{% endblock %}
 
 {% block extra_css %}
 <style>
-    .contact-header {
-        background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
-        padding: 60px 0;
+    .contact-hero {
+        background: linear-gradient(135deg, #0b0f19 0%, #1e1b4b 100%);
+        padding: 80px 0;
+        color: white;
+        text-align: center;
+        border-radius: 0 0 40px 40px;
+        margin-bottom: 60px;
+        position: relative;
+        overflow: hidden;
     }
 
-    .contact-card {
-        border: none;
-        border-radius: 15px;
-        padding: 30px;
-        background: #fff;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-        transition: all 0.3s ease;
+    .hero-title {
+        font-family: 'Outfit', sans-serif;
+        font-size: 48px;
+        font-weight: 800;
+        margin-bottom: 16px;
+        background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
     }
 
-    .contact-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+    .hero-subtitle {
+        font-size: 18px;
+        color: #94a3b8;
+        max-width: 600px;
+        margin: 0 auto;
     }
 
-    .contact-icon {
-        width: 60px;
-        height: 60px;
-        border-radius: 50%;
-        background: rgba(13, 110, 253, 0.1);
+    .contact-layout {
+        display: grid;
+        grid-template-columns: 1fr 2fr;
+        gap: 40px;
+        margin-bottom: 80px;
+    }
+
+    .info-card {
+        background: var(--surface-color);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-lg);
+        padding: 40px;
+        box-shadow: var(--shadow-sm);
+        height: 100%;
+    }
+
+    .info-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 16px;
+        margin-bottom: 32px;
+    }
+
+    .info-item:last-child { margin-bottom: 0; }
+
+    .info-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: var(--radius-md);
+        background: rgba(79, 70, 229, 0.1);
+        color: var(--primary);
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 1.5rem;
-        color: #16a34a;
-        margin-bottom: 15px;
+        font-size: 24px;
+        flex-shrink: 0;
     }
 
-    .form-control,
-    .form-select {
-        border-radius: 10px;
-        padding: 12px 15px;
-        border: 2px solid #e9ecef;
-        transition: all 0.3s ease;
+    .info-content h4 {
+        font-family: 'Outfit', sans-serif;
+        font-size: 18px;
+        font-weight: 700;
+        color: var(--text-main);
+        margin-bottom: 8px;
     }
 
-    .form-control:focus,
-    .form-select:focus {
-        border-color: #16a34a;
-        box-shadow: 0 0 0 4px rgba(22, 163, 74, 0.1);
+    .info-content p {
+        font-size: 15px;
+        color: var(--text-muted);
+        line-height: 1.6;
+        margin: 0;
     }
 
-    .btn {
-        border-radius: 10px;
-        padding: 12px 25px;
-        transition: all 0.3s ease;
+    .form-card {
+        background: var(--surface-color);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-lg);
+        padding: 40px;
+        box-shadow: var(--shadow-sm);
     }
 
-    .btn:hover {
+    .form-header {
+        margin-bottom: 32px;
+    }
+
+    .form-header h3 {
+        font-family: 'Outfit', sans-serif;
+        font-size: 28px;
+        font-weight: 800;
+        color: var(--text-main);
+        margin-bottom: 8px;
+    }
+
+    .form-header p {
+        color: var(--text-muted);
+        font-size: 15px;
+    }
+
+    .form-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 24px;
+    }
+
+    .form-group.full {
+        grid-column: 1 / -1;
+    }
+
+    .form-label {
+        display: block;
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--text-main);
+        margin-bottom: 8px;
+    }
+
+    .form-control, .form-select {
+        width: 100%;
+        padding: 14px 16px;
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-md);
+        font-family: 'Inter', sans-serif;
+        font-size: 15px;
+        background: var(--bg-color);
+        color: var(--text-main);
+        transition: all var(--transition-fast);
+    }
+
+    .form-control:focus, .form-select:focus {
+        outline: none;
+        border-color: var(--primary);
+        background: var(--surface-color);
+        box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+    }
+
+    textarea.form-control {
+        resize: vertical;
+        min-height: 120px;
+    }
+
+    .btn-submit {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 16px 32px;
+        background: linear-gradient(135deg, var(--primary) 0%, #6366f1 100%);
+        color: white;
+        border: none;
+        border-radius: var(--radius-md);
+        font-family: 'Outfit', sans-serif;
+        font-size: 16px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all var(--transition-bounce);
+        box-shadow: var(--shadow-glow);
+    }
+
+    .btn-submit:hover {
         transform: translateY(-2px);
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 12px 24px rgba(79, 70, 229, 0.3);
     }
 
-    .map-container {
-        border-radius: 15px;
+    /* Map styling */
+    .map-wrapper {
+        border-radius: var(--radius-lg);
         overflow: hidden;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        border: 1px solid var(--border-color);
+        height: 400px;
+        margin-bottom: 80px;
     }
 
-    @keyframes fadeInUp {
-        from {
-            opacity: 0;
-            transform: translateY(30px);
-        }
-
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
+    .map-wrapper iframe {
+        width: 100%;
+        height: 100%;
+        border: none;
     }
 
-    .animate-delay-1 {
-        animation: fadeInUp 0.6s ease 0.1s forwards;
-        opacity: 0;
-    }
-
-    .animate-delay-2 {
-        animation: fadeInUp 0.6s ease 0.2s forwards;
-        opacity: 0;
-    }
-
-    .animate-delay-3 {
-        animation: fadeInUp 0.6s ease 0.3s forwards;
-        opacity: 0;
+    @media (max-width: 991px) {
+        .contact-layout { grid-template-columns: 1fr; }
+        .form-grid { grid-template-columns: 1fr; }
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<!-- Header -->
-<section class="contact-header">
+<div class="contact-hero">
     <div class="container">
-        <div class="row">
-            <div class="col-12 text-center text-white">
-                <h1 class="display-4 mb-3 animate-delay-1">Contact Us</h1>
-                <p class="lead animate-delay-2">We're here to help! Get in touch with our team</p>
+        <h1 class="hero-title">Get in Touch</h1>
+        <p class="hero-subtitle">Our premium concierge team is ready to assist you with any inquiries regarding our products, orders, or services.</p>
+    </div>
+</div>
+
+<div class="container">
+    <div class="contact-layout">
+        <!-- Info Column -->
+        <div>
+            <div class="info-card">
+                <div class="info-item">
+                    <div class="info-icon"><i class="bi bi-geo-alt-fill"></i></div>
+                    <div class="info-content">
+                        <h4>Premium Storefront</h4>
+                        <p>123 Tech Boulevard, Suite 100<br>Metropolis, NY 10001<br>United States</p>
+                    </div>
+                </div>
+
+                <div class="info-item">
+                    <div class="info-icon"><i class="bi bi-telephone-fill"></i></div>
+                    <div class="info-content">
+                        <h4>Direct Line</h4>
+                        <p>+1 (800) PREMIUM<br>+1 (555) 123-4567<br>Mon-Fri, 9am - 8pm EST</p>
+                    </div>
+                </div>
+
+                <div class="info-item">
+                    <div class="info-icon"><i class="bi bi-envelope-fill"></i></div>
+                    <div class="info-content">
+                        <h4>Email Support</h4>
+                        <p>concierge@premiumtech.com<br>support@premiumtech.com</p>
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
-</section>
 
-<!-- Contact Info & Form -->
-<section class="py-5">
-    <div class="container">
-        <div class="row g-4">
-            <!-- Contact Information -->
-            <div class="col-lg-4">
-                <div class="contact-card mb-4 animate-delay-1">
-                    <div class="contact-icon">
-                        <i class="bi bi-geo-alt"></i>
-                    </div>
-                    <h5>Visit Our Store</h5>
-                    <p class="text-muted mb-0">
-                        123 Tech Street<br>
-                        Dhaka 1200, Bangladesh
-                    </p>
+        <!-- Form Column -->
+        <div>
+            <div class="form-card">
+                <div class="form-header">
+                    <h3>Send a Message</h3>
+                    <p>We typically reply within 2 hours during normal business operations.</p>
                 </div>
-
-                <div class="contact-card mb-4 animate-delay-2">
-                    <div class="contact-icon">
-                        <i class="bi bi-telephone"></i>
-                    </div>
-                    <h5>Call Us</h5>
-                    <p class="text-muted mb-0">
-                        +880 1234 567890<br>
-                        +880 9876 543210
-                    </p>
-                </div>
-
-                <div class="contact-card animate-delay-3">
-                    <div class="contact-icon">
-                        <i class="bi bi-envelope"></i>
-                    </div>
-                    <h5>Email Us</h5>
-                    <p class="text-muted mb-0">
-                        info@techshop.com<br>
-                        support@techshop.com
-                    </p>
-                </div>
-            </div>
-
-            <!-- Contact Form -->
-            <div class="col-lg-8">
-                <div class="contact-card">
-                    <h4 class="mb-4">Send us a Message</h4>
-                    <form method="post">
-                        {% csrf_token %}
-                        <div class="row g-3">
-                            <div class="col-md-6">
-                                <label class="form-label">Your Name</label>
-                                <input type="text" name="name" class="form-control" required>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Email Address</label>
-                                <input type="email" name="email" class="form-control" required>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Phone Number (Optional)</label>
-                                <input type="tel" name="phone" class="form-control" placeholder="+880 1XXXXXXXXX">
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Subject</label>
-                                <select name="subject" class="form-select">
-                                    <option value="">Select a topic</option>
-                                    <option value="general">General Inquiry</option>
-                                    <option value="order">Order Related</option>
-                                    <option value="product">Product Information</option>
-                                    <option value="support">Technical Support</option>
-                                    <option value="business">Business Inquiry</option>
-                                    <option value="other">Other</option>
-                                </select>
-                            </div>
-                            <div class="col-12">
-                                <label class="form-label">Message</label>
-                                <textarea name="message" class="form-control" rows="5" required></textarea>
-                            </div>
-                            <div class="col-12">
-                                <button type="submit" class="btn btn-primary btn-lg">
-                                    <i class="bi bi-send me-2"></i>Send Message
-                                </button>
-                            </div>
+                
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label">Full Name</label>
+                            <input type="text" name="name" class="form-control" required placeholder="John Doe">
                         </div>
-                    </form>
-                </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Email Address</label>
+                            <input type="email" name="email" class="form-control" required placeholder="john@example.com">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Phone Number (Optional)</label>
+                            <input type="tel" name="phone" class="form-control" placeholder="+1 (555) 000-0000">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Inquiry Type</label>
+                            <select name="subject" class="form-select" required>
+                                <option value="" disabled selected>Select an option</option>
+                                <option value="general">General Question</option>
+                                <option value="order">Order Status/Issue</option>
+                                <option value="product">Product Information</option>
+                                <option value="support">Technical Support</option>
+                                <option value="business">Business / Wholesale</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group full">
+                            <label class="form-label">Your Message</label>
+                            <textarea name="message" class="form-control" required placeholder="How can we help you today?"></textarea>
+                        </div>
+                        
+                        <div class="form-group full" style="margin-bottom: 0;">
+                            <button type="submit" class="btn-submit">
+                                <i class="bi bi-send-fill"></i> Send Message
+                            </button>
+                        </div>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
-</section>
 
-<!-- Map Section -->
-<section class="py-5 bg-light">
-    <div class="container">
-        <div class="row">
-            <div class="col-12">
-                <div class="map-container">
-                    <iframe
-                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d365.0!2d90.4!3d23.8!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMjPCsDQ4JzAwLjAiTiA5MMKwMjQnMDAuMCJF!5e0!3m2!1sen!2sbd!4v1234567890"
-                        width="100%" height="400" style="border:0;" allowfullscreen="" loading="lazy">
-                    </iframe>
-                </div>
-            </div>
-        </div>
+    <!-- Map Section -->
+    <div class="map-wrapper">
+        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3022.1!2d-73.98!3d40.75!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNDDCsDQ1JzAwLjAiTiA3M8KwNTgnMDAuMCJX!5e0!3m2!1sen!2sus!4v1234567890" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
     </div>
-</section>
+</div>
 {% endblock %}

@@ -1,365 +1,149 @@
 {% extends 'admin/base.html' %}
 
-{% block admin_title %}Director Dashboard - Executive Overview{% endblock %}
+{% block admin_title %}Executive Dashboard{% endblock %}
 
 {% block admin_content %}
-<div class="container-fluid py-4">
-    <!-- Header -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h2 class="mb-0"><i class="bi bi-building me-2"></i>Executive Dashboard</h2>
-            <p class="text-muted mb-0">Business Overview & Performance</p>
-        </div>
-        <div class="d-flex gap-2">
-            <a href="{% url 'admin_dashboard:customer_support' %}" class="btn btn-outline-success btn-sm">
-                <i class="bi bi-headset me-1"></i> Support
-            </a>
-            <a href="{% url 'admin_dashboard:staff_list' %}" class="btn btn-outline-primary btn-sm">
-                <i class="bi bi-people me-1"></i> Staff
-            </a>
-            <a href="{% url 'admin_dashboard:orders' %}" class="btn btn-outline-primary btn-sm">
-                <i class="bi bi-receipt me-1"></i> Orders
-            </a>
-            <a href="{% url 'admin_dashboard:products' %}" class="btn btn-outline-primary btn-sm">
-                <i class="bi bi-box me-1"></i> Products
-            </a>
-            <a href="{% url 'admin_dashboard:customers' %}" class="btn btn-outline-primary btn-sm">
-                <i class="bi bi-person-heart me-1"></i> Customers
-            </a>
-            <a href="{% url 'admin_dashboard:suppliers' %}" class="btn btn-outline-primary btn-sm">
-                <i class="bi bi-building me-1"></i> Suppliers
-            </a>
-        </div>
+<div class="page-header">
+    <div>
+        <h4><i class="bi bi-building me-2" style="color:#4f46e5;"></i>Executive Dashboard</h4>
+        <p style="color:#94a3b8;margin:4px 0 0;font-size:14px;">Business Overview & Performance</p>
     </div>
+</div>
 
-    <!-- KPI Cards Row -->
-    <div class="row g-4 mb-4">
-        <!-- Today's Sales -->
-        <div class="col-md-3">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-start">
-                        <div>
-                            <p class="text-muted mb-1">Today's Sales</p>
-                            <h3 class="mb-0">৳{{ today_sales|floatformat:0 }}</h3>
-                            <small class="text-success"><i class="bi bi-arrow-up"></i> {{ today_order_count }} orders</small>
-                        </div>
-                        <div class="icon-box bg-primary-light text-primary">
-                            <i class="bi bi-currency-taka fs-4"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+<!-- KPI Cards -->
+<div class="row g-3 mb-4">
+    <div class="col-xl-3 col-md-6">
+        <div class="stat-card"><div class="stat-icon indigo"><i class="bi bi-currency-dollar"></i></div><div class="stat-value">৳{{ today_sales|floatformat:0|default:"0" }}</div><div class="stat-label">Today's Sales · {{ today_order_count|default:"0" }} orders</div></div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <div class="stat-card"><div class="stat-icon emerald"><i class="bi bi-graph-up-arrow"></i></div><div class="stat-value">৳{{ month_sales|floatformat:0|default:"0" }}</div><div class="stat-label">This Month Revenue</div></div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <div class="stat-card"><div class="stat-icon amber"><i class="bi bi-box-seam"></i></div><div class="stat-value">৳{{ total_inventory_value|floatformat:0|default:"0" }}</div><div class="stat-label">Inventory Value · {{ total_stock|default:"0" }} units</div></div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <div class="stat-card"><div class="stat-icon sky"><i class="bi bi-truck"></i></div><div class="stat-value">{{ pending_pos|default:"0" }}</div><div class="stat-label">Pending Purchase Orders</div></div>
+    </div>
+</div>
 
-        <!-- This Month -->
-        <div class="col-md-3">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-start">
-                        <div>
-                            <p class="text-muted mb-1">This Month</p>
-                            <h3 class="mb-0">৳{{ month_sales|floatformat:0 }}</h3>
-                            <small class="text-muted">Total revenue</small>
-                        </div>
-                        <div class="icon-box bg-success-light text-success">
-                            <i class="bi bi-graph-up-arrow fs-4"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Inventory Value -->
-        <div class="col-md-3">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-start">
-                        <div>
-                            <p class="text-muted mb-1">Inventory Value</p>
-                            <h3 class="mb-0">৳{{ total_inventory_value|floatformat:0 }}</h3>
-                            <small class="text-muted">{{ total_stock }} units in stock</small>
-                        </div>
-                        <div class="icon-box bg-warning-light text-warning">
-                            <i class="bi bi-box-seam fs-4"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Pending POs -->
-        <div class="col-md-3">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-start">
-                        <div>
-                            <p class="text-muted mb-1">Pending Orders</p>
-                            <h3 class="mb-0">{{ pending_pos }}</h3>
-                            <small class="text-muted">Purchase orders</small>
-                        </div>
-                        <div class="icon-box bg-info-light text-info">
-                            <i class="bi bi-truck fs-4"></i>
-                        </div>
-                    </div>
+<div class="row g-4 mb-4">
+    <!-- Quick Actions -->
+    <div class="col-md-6">
+        <div class="admin-card">
+            <div class="card-header-custom"><i class="bi bi-lightning"></i> Quick Actions</div>
+            <div class="card-body-custom">
+                <div class="row g-3">
+                    <div class="col-6"><a href="{% url 'admin_dashboard:warehouse_dashboard' %}" class="btn btn-outline-primary w-100 py-3" style="border-radius:12px;"><i class="bi bi-boxes d-block mb-1" style="font-size:24px;"></i>Warehouse</a></div>
+                    <div class="col-6"><a href="{% url 'admin_dashboard:fulfillment_dashboard' %}" class="btn btn-outline-primary w-100 py-3" style="border-radius:12px;"><i class="bi bi-scroll d-block mb-1" style="font-size:24px;"></i>Fulfillment</a></div>
+                    <div class="col-6"><a href="{% url 'admin_dashboard:purchase_orders' %}" class="btn btn-outline-primary w-100 py-3" style="border-radius:12px;"><i class="bi bi-cart-plus d-block mb-1" style="font-size:24px;"></i>Purchase Orders</a></div>
+                    <div class="col-6"><a href="{% url 'admin_dashboard:suppliers' %}" class="btn btn-outline-primary w-100 py-3" style="border-radius:12px;"><i class="bi bi-building d-block mb-1" style="font-size:24px;"></i>Suppliers</a></div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Second Row -->
-    <div class="row g-4 mb-4">
-        <!-- Quick Links -->
-        <div class="col-md-6">
-            <div class="card border-0 shadow-sm">
-                <div class="card-header bg-white border-0 py-3">
-                    <h5 class="mb-0"><i class="bi bi-lightning me-2"></i>Quick Actions</h5>
+    <!-- Low Stock -->
+    <div class="col-md-6">
+        <div class="admin-card" style="border-left:3px solid #f59e0b;">
+            <div class="card-header-custom"><i class="bi bi-exclamation-triangle" style="color:#f59e0b !important;"></i> Low Stock Alerts <span class="badge" style="background:#fef3c7;color:#92400e;margin-left:auto;">{{ low_stock_items|length }} items</span></div>
+            <div class="card-body-custom p-0">
+                {% if low_stock_items %}
+                <div class="table-responsive" style="max-height:280px;overflow-y:auto;">
+                    <table class="table table-hover mb-0" style="font-size:14px;">
+                        <thead><tr><th style="background:#f8fafc;padding:10px 20px;font-size:11px;font-weight:700;color:#475569;text-transform:uppercase;">Product</th><th style="background:#f8fafc;padding:10px 20px;font-size:11px;font-weight:700;color:#475569;text-transform:uppercase;">Stock</th><th style="background:#f8fafc;padding:10px 20px;font-size:11px;font-weight:700;color:#475569;text-transform:uppercase;"></th></tr></thead>
+                        <tbody>
+                            {% for product in low_stock_items %}
+                            <tr>
+                                <td style="padding:10px 20px;"><strong style="color:#0f172a;font-size:13px;">{{ product.name }}</strong></td>
+                                <td style="padding:10px 20px;">{% if product.inventory.quantity_on_hand == 0 %}<span class="badge" style="background:#fef2f2;color:#ef4444;">Out</span>{% else %}<span class="badge" style="background:#fef3c7;color:#92400e;">{{ product.inventory.quantity_on_hand }}</span>{% endif %}</td>
+                                <td style="padding:10px 20px;"><a href="{% url 'admin_dashboard:create_purchase_order' %}" class="btn btn-sm btn-outline-primary" style="padding:2px 8px;font-size:12px;"><i class="bi bi-plus"></i></a></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
                 </div>
-                <div class="card-body">
-                    <div class="row g-3">
-                        <div class="col-6">
-                            <a href="{% url 'admin_dashboard:warehouse_dashboard' %}" class="btn btn-outline-primary w-100 py-3">
-                                <i class="bi bi-boxes fs-4 d-block mb-2"></i>
-                                Warehouse
-                            </a>
-                        </div>
-                        <div class="col-6">
-                            <a href="{% url 'admin_dashboard:fulfillment_dashboard' %}" class="btn btn-outline-success w-100 py-3">
-                                <i class="bi bi-scroll fs-4 d-block mb-2"></i>
-                                Fulfillment
-                            </a>
-                        </div>
-                        <div class="col-6">
-                            <a href="{% url 'admin_dashboard:purchase_orders' %}" class="btn btn-outline-warning w-100 py-3">
-                                <i class="bi bi-cart-plus fs-4 d-block mb-2"></i>
-                                New PO
-                            </a>
-                        </div>
-                        <div class="col-6">
-                            <a href="{% url 'admin_dashboard:suppliers' %}" class="btn btn-outline-info w-100 py-3">
-                                <i class="bi bi-building fs-4 d-block mb-2"></i>
-                                Suppliers
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Low Stock Alerts -->
-        <div class="col-md-6">
-            <div class="card border-0 shadow-sm">
-                <div class="card-header bg-white border-0 py-3 d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0"><i class="bi bi-exclamation-triangle me-2 text-warning"></i>Low Stock Alerts</h5>
-                    <span class="badge bg-warning">{{ low_stock_items|length }} items</span>
-                </div>
-                <div class="card-body p-0">
-                    {% if low_stock_items %}
-                    <div class="table-responsive">
-                        <table class="table table-hover mb-0">
-                            <thead class="table-light">
-                                <tr>
-                                    <th>Product</th>
-                                    <th>Stock</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for product in low_stock_items %}
-                                <tr>
-                                    <td>{{ product.name }}</td>
-                                    <td>
-                                        {% if product.inventory.quantity_on_hand == 0 %}
-                                        <span class="badge bg-danger">Out of Stock</span>
-                                        {% else %}
-                                        <span class="badge bg-warning text-dark">{{ product.inventory.quantity_on_hand }} left</span>
-                                        {% endif %}
-                                    </td>
-                                    <td>
-                                        <a href="{% url 'admin_dashboard:create_purchase_order' %}" class="btn btn-sm btn-outline-primary">
-                                            <i class="bi bi-plus"></i> Order
-                                        </a>
-                                    </td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                    {% else %}
-                    <div class="text-center py-4 text-muted">
-                        <i class="bi bi-check-circle fs-1 d-block mb-2"></i>
-                        All products are well stocked!
-                    </div>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Recent Orders -->
-    <div class="row">
-        <div class="col-12">
-            <div class="card border-0 shadow-sm">
-                <div class="card-header bg-white border-0 py-3">
-                    <h5 class="mb-0"><i class="bi bi-clock-history me-2"></i>Recent Orders</h5>
-                </div>
-                <div class="card-body p-0">
-                    <div class="table-responsive">
-                        <table class="table table-hover mb-0">
-                            <thead class="table-light">
-                                <tr>
-                                    <th>Order ID</th>
-                                    <th>Customer</th>
-                                    <th>Amount</th>
-                                    <th>Status</th>
-                                    <th>Date</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for order in recent_orders %}
-                                <tr>
-                                    <td>#{{ order.id }}</td>
-                                    <td>{{ order.customer.user.first_name|default:order.customer.user.username }}</td>
-                                    <td>৳{{ order.total_amount }}</td>
-                                    <td>
-                                        <span class="badge bg-{% if order.status == 'delivered' %}success{% elif order.status == 'pending' %}warning{% elif order.status == 'cancelled' %}danger{% else %}info{% endif %}">
-                                            {{ order.get_status_display }}
-                                        </span>
-                                    </td>
-                                    <td>{{ order.created_at|date:"M j, Y" }}</td>
-                                </tr>
-                                {% empty %}
-                                <tr>
-                                    <td colspan="5" class="text-center py-4 text-muted">No recent orders</td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Customer Reviews Section -->
-    <div class="row mt-4">
-        <div class="col-12">
-            <div class="card border-0 shadow-sm">
-                <div class="card-header bg-white border-0 py-3 d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0"><i class="bi bi-chat-square-text me-2 text-success"></i>Customer Reviews</h5>
-                    {% if pending_reviews > 0 %}
-                    <span class="badge bg-warning">{{ pending_reviews }} Pending Responses</span>
-                    {% endif %}
-                </div>
-                <div class="card-body p-0">
-                    {% if recent_reviews %}
-                    <div class="reviews-list" style="max-height: 500px; overflow-y: auto;">
-                        {% for review in recent_reviews %}
-                        <div class="review-item p-4 border-bottom">
-                            <div class="d-flex justify-content-between align-items-start mb-2">
-                                <div class="d-flex align-items-center">
-                                    <div class="reviewer-avatar me-3" style="width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #16a34a, #15803d); color: white; display: flex; align-items: center; justify-content: center; font-weight: 600;">
-                                        {{ review.user.user.username|make_list|first|upper }}
-                                    </div>
-                                    <div>
-                                        <strong>{{ review.user.user.get_full_name|default:review.user.user.username }}</strong>
-                                        <div class="text-muted small">{{ review.product.name }}</div>
-                                    </div>
-                                </div>
-                                <div class="text-end">
-                                    <div class="rating-stars text-warning mb-1">
-                                        {% for i in "12345" %}
-                                        <i class="bi bi-star{% if forloop.counter <= review.rating %}-fill{% endif %}"></i>
-                                        {% endfor %}
-                                    </div>
-                                    <small class="text-muted">{{ review.created_at|date:"M j, Y" }}</small>
-                                </div>
-                            </div>
-                            
-                            {% if review.title %}
-                            <h6 class="fw-bold mb-1">{{ review.title }}</h6>
-                            {% endif %}
-                            
-                            <p class="mb-2">{{ review.comment|truncatechars:200 }}</p>
-                            
-                            <!-- Admin Response (if exists) -->
-                            {% if review.admin_response %}
-                            <div class="admin-response p-3 ms-4" style="background: #f0fdf4; border-left: 3px solid #16a34a; border-radius: 0 8px 8px 0;">
-                                <div class="d-flex align-items-center mb-1">
-                                    <i class="bi bi-shop text-success me-2"></i>
-                                    <strong class="text-success small">TechShop Response</strong>
-                                    {% if review.admin_response_at %}
-                                    <small class="text-muted ms-2">{{ review.admin_response_at|date:"M j, Y" }}</small>
-                                    {% endif %}
-                                </div>
-                                <p class="mb-0 small">{{ review.admin_response }}</p>
-                            </div>
-                            {% else %}
-                            <!-- Reply Button -->
-                            <button class="btn btn-sm btn-outline-success" data-bs-toggle="modal" data-bs-target="#replyModal{{ review.id }}">
-                                <i class="bi bi-reply me-1"></i>Reply
-                            </button>
-                            
-                            <!-- Reply Modal -->
-                            <div class="modal fade" id="replyModal{{ review.id }}" tabindex="-1" aria-labelledby="replyModalLabel{{ review.id }}" aria-hidden="true">
-                                <div class="modal-dialog">
-                                    <div class="modal-content">
-                                        <div class="modal-header bg-success text-white">
-                                            <h5 class="modal-title" id="replyModalLabel{{ review.id }}">Reply to Review</h5>
-                                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                                        </div>
-                                        <form method="POST" action="{% url 'admin_dashboard:respond_review' review.id %}">
-                                            {% csrf_token %}
-                                            <div class="modal-body">
-                                                <div class="mb-3">
-                                                    <label class="form-label fw-bold">Your Response</label>
-                                                    <textarea class="form-control" name="response_text" rows="4" placeholder="Write your response to this customer review..." required></textarea>
-                                                </div>
-                                                <div class="p-3 bg-light rounded">
-                                                    <small class="text-muted">
-                                                        <strong>Original Review:</strong><br>
-                                                        "{{ review.comment|truncatechars:150 }}"
-                                                    </small>
-                                                </div>
-                                            </div>
-                                            <div class="modal-footer">
-                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                                <button type="submit" class="btn btn-success">
-                                                    <i class="bi bi-send me-1"></i>Send Response
-                                                </button>
-                                            </div>
-                                        </form>
-                                    </div>
-                                </div>
-                            </div>
-                            {% endif %}
-                        </div>
-                        {% endfor %}
-                    </div>
-                    {% else %}
-                    <div class="text-center py-5 text-muted">
-                        <i class="bi bi-chat-square-text fs-1 d-block mb-2"></i>
-                        No reviews yet
-                    </div>
-                    {% endif %}
-                </div>
+                {% else %}
+                <div class="empty-state" style="padding:40px;"><i class="bi bi-check-circle" style="color:#10b981;"></i><br>All stocked!</div>
+                {% endif %}
             </div>
         </div>
     </div>
 </div>
 
-<style>
-    .icon-box {
-        width: 48px;
-        height: 48px;
-        border-radius: 12px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-    .bg-primary-light { background: #e7f1ff; }
-    .bg-success-light { background: #d4edda; }
-    .bg-warning-light { background: #fff3cd; }
-    .bg-info-light { background: #cce5ff; }
-</style>
+<!-- Recent Orders -->
+<div class="table-card mb-4">
+    <div class="card-header-custom" style="padding:20px 24px;border-bottom:1px solid #e2e8f0;font-family:'Outfit',sans-serif;font-size:16px;font-weight:700;color:#0f172a;display:flex;align-items:center;gap:10px;">
+        <i class="bi bi-clock-history" style="color:#4f46e5;"></i> Recent Orders
+    </div>
+    <div class="table-responsive">
+        <table class="table table-hover mb-0">
+            <thead><tr><th>Order</th><th>Customer</th><th>Amount</th><th>Status</th><th>Date</th></tr></thead>
+            <tbody>
+                {% for order in recent_orders %}
+                <tr>
+                    <td><strong style="color:#0f172a;">#{{ order.id }}</strong></td>
+                    <td>{{ order.customer.user.first_name|default:order.customer.user.username }}</td>
+                    <td><strong>৳{{ order.total_amount }}</strong></td>
+                    <td><span class="status-badge {{ order.status }}">{{ order.get_status_display }}</span></td>
+                    <td style="white-space:nowrap;">{{ order.created_at|date:"M j, Y" }}</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="5" class="empty-state"><i class="bi bi-inbox"></i><br>No recent orders</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Reviews -->
+<div class="admin-card">
+    <div class="card-header-custom">
+        <i class="bi bi-chat-square-text"></i> Customer Reviews
+        {% if pending_reviews > 0 %}<span class="badge" style="background:#fef3c7;color:#92400e;margin-left:auto;">{{ pending_reviews }} Pending</span>{% endif %}
+    </div>
+    <div class="card-body-custom p-0">
+        {% if recent_reviews %}
+        <div style="max-height:500px;overflow-y:auto;">
+            {% for review in recent_reviews %}
+            <div style="padding:20px 24px;border-bottom:1px solid #f1f5f9;">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                    <div class="d-flex align-items-center gap-3">
+                        <div style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#4f46e5,#818cf8);color:white;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;">{{ review.user.user.username|make_list|first|upper }}</div>
+                        <div><strong style="color:#0f172a;">{{ review.user.user.get_full_name|default:review.user.user.username }}</strong><br><small style="color:#94a3b8;">{{ review.product.name }}</small></div>
+                    </div>
+                    <div class="text-end">
+                        <div style="color:#f59e0b;">{% for i in "12345" %}<i class="bi bi-star{% if forloop.counter <= review.rating %}-fill{% endif %}"></i>{% endfor %}</div>
+                        <small style="color:#94a3b8;">{{ review.created_at|date:"M j, Y" }}</small>
+                    </div>
+                </div>
+                {% if review.title %}<h6 style="font-weight:700;color:#0f172a;margin:0 0 4px;">{{ review.title }}</h6>{% endif %}
+                <p style="color:#475569;margin:0 0 12px;font-size:14px;">{{ review.comment|truncatechars:200 }}</p>
+                {% if review.admin_response %}
+                <div style="background:#f0fdf4;border-left:3px solid #10b981;padding:12px 16px;border-radius:0 10px 10px 0;">
+                    <div style="color:#94a3b8;font-size:12px;margin-bottom:4px;"><i class="bi bi-shop me-1" style="color:#10b981;"></i><strong style="color:#10b981;">TechShop Response</strong>{% if review.admin_response_at %} · {{ review.admin_response_at|date:"M j, Y" }}{% endif %}</div>
+                    <p style="margin:0;color:#065f46;font-size:14px;">{{ review.admin_response }}</p>
+                </div>
+                {% else %}
+                <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#replyModal{{ review.id }}"><i class="bi bi-reply"></i> Reply</button>
+                <div class="modal fade" id="replyModal{{ review.id }}" tabindex="-1">
+                    <div class="modal-dialog"><div class="modal-content" style="border-radius:16px;border:none;">
+                        <div class="modal-header" style="padding:20px 24px;border-bottom:1px solid #f1f5f9;"><h5 style="font-family:'Outfit',sans-serif;font-weight:700;margin:0;">Reply to Review</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+                        <form method="POST" action="{% url 'admin_dashboard:respond_review' review.id %}">{% csrf_token %}
+                            <div class="modal-body" style="padding:24px;">
+                                <div class="mb-3"><label class="form-label" style="font-weight:700;">Your Response</label><textarea class="form-control" name="response_text" rows="4" style="resize:vertical;" placeholder="Write your response..." required></textarea></div>
+                                <div style="background:#f8fafc;padding:12px 16px;border-radius:10px;"><small style="color:#94a3b8;"><strong>Original:</strong> "{{ review.comment|truncatechars:150 }}"</small></div>
+                            </div>
+                            <div class="modal-footer" style="padding:16px 24px;border-top:1px solid #f1f5f9;"><button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button><button type="submit" class="btn btn-primary"><i class="bi bi-send"></i> Send</button></div>
+                        </form>
+                    </div></div>
+                </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state"><i class="bi bi-chat-square-text"></i><br>No reviews yet</div>
+        {% endif %}
+    </div>
+</div>
 {% endblock %}

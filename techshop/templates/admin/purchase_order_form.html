@@ -1,86 +1,54 @@
 {% extends 'admin/base.html' %}
 
-{% block admin_title %}Create Purchase Order{% endblock %}
+{% block admin_title %}New Purchase Order{% endblock %}
 
 {% block admin_content %}
-<div class="container-fluid py-4">
-    <div class="row">
-        <div class="col-lg-8">
-            <div class="card border-0 shadow-sm mb-4">
-                <div class="card-header bg-white py-3">
-                    <h5 class="mb-0"><i class="bi bi-cart me-2"></i>New Purchase Order</h5>
-                </div>
-                <div class="card-body">
-                    <form method="post" id="poForm">
-                        {% csrf_token %}
-                        <div class="mb-3">
-                            <label class="form-label">Supplier</label>
-                            <select name="supplier" class="form-select" required>
-                                <option value="">Select Supplier</option>
-                                {% for supplier in suppliers %}
-                                <option value="{{ supplier.id }}">{{ supplier.name }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Expected Delivery Date</label>
-                            <input type="date" name="expected_delivery" class="form-control">
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Notes</label>
-                            <textarea name="notes" class="form-control" rows="2"></textarea>
-                        </div>
+<div class="page-header">
+    <h4><i class="bi bi-cart-plus me-2" style="color:#4f46e5;"></i>New Purchase Order</h4>
+    <a href="{% url 'admin_dashboard:purchase_orders' %}" class="btn btn-outline-secondary btn-sm"><i class="bi bi-arrow-left"></i> Back</a>
+</div>
 
-                        <hr>
+<div class="row g-4">
+    <div class="col-lg-8">
+        <div class="admin-card">
+            <div class="card-body-custom">
+                <form method="post" id="poForm">
+                    {% csrf_token %}
+                    <div class="mb-3"><label class="form-label">Supplier</label><select name="supplier" class="form-select" required><option value="">Select Supplier</option>{% for supplier in suppliers %}<option value="{{ supplier.id }}">{{ supplier.name }}</option>{% endfor %}</select></div>
+                    <div class="mb-3"><label class="form-label">Expected Delivery</label><input type="date" name="expected_delivery" class="form-control"></div>
+                    <div class="mb-3"><label class="form-label">Notes</label><textarea name="notes" class="form-control" rows="2" style="resize:vertical;"></textarea></div>
 
-                        <h6 class="mb-3">Order Items</h6>
+                    <div style="border-top:1px solid #e2e8f0;padding-top:20px;margin-top:20px;">
+                        <h6 style="font-family:'Outfit',sans-serif;font-weight:700;color:#0f172a;margin-bottom:16px;"><i class="bi bi-list-ul me-2" style="color:#4f46e5;"></i>Order Items</h6>
                         <div id="itemsContainer">
                             <div class="row g-2 mb-2 item-row">
-                                <div class="col-md-6">
-                                    <select name="product[]" class="form-select">
-                                        <option value="">Select Product</option>
-                                        {% for product in products %}
-                                        <option value="{{ product.id }}">{{ product.name }}</option>
-                                        {% endfor %}
-                                    </select>
-                                </div>
-                                <div class="col-md-2">
-                                    <input type="number" name="quantity[]" class="form-control" placeholder="Qty" min="1" value="1">
-                                </div>
-                                <div class="col-md-3">
-                                    <input type="number" name="unit_price[]" class="form-control" placeholder="Unit Price" step="0.01">
-                                </div>
-                                <div class="col-md-1">
-                                    <button type="button" class="btn btn-outline-danger" onclick="this.closest('.item-row').remove()">×</button>
-                                </div>
+                                <div class="col-md-6"><select name="product[]" class="form-select"><option value="">Select Product</option>{% for product in products %}<option value="{{ product.id }}">{{ product.name }}</option>{% endfor %}</select></div>
+                                <div class="col-md-2"><input type="number" name="quantity[]" class="form-control" placeholder="Qty" min="1" value="1"></div>
+                                <div class="col-md-3"><input type="number" name="unit_price[]" class="form-control" placeholder="Price" step="0.01"></div>
+                                <div class="col-md-1"><button type="button" class="btn btn-outline-danger btn-sm" onclick="this.closest('.item-row').remove()">×</button></div>
                             </div>
                         </div>
-                        <button type="button" class="btn btn-outline-primary btn-sm" onclick="addItem()">
-                            <i class="bi bi-plus me-1"></i> Add Item
-                        </button>
+                        <button type="button" class="btn btn-outline-primary btn-sm" onclick="addItem()"><i class="bi bi-plus"></i> Add Item</button>
+                    </div>
 
-                        <hr>
-                        <div class="d-flex gap-2">
-                            <button type="submit" name="action" value="draft" class="btn btn-secondary">Save as Draft</button>
-                            <button type="submit" name="action" value="send" class="btn btn-primary">Send to Supplier</button>
-                        </div>
-                    </form>
-                </div>
+                    <div style="border-top:1px solid #e2e8f0;padding-top:20px;margin-top:24px;display:flex;gap:12px;">
+                        <button type="submit" name="action" value="draft" class="btn btn-outline-secondary"><i class="bi bi-save"></i> Save Draft</button>
+                        <button type="submit" name="action" value="send" class="btn btn-primary"><i class="bi bi-send"></i> Send to Supplier</button>
+                    </div>
+                </form>
             </div>
         </div>
-        <div class="col-lg-4">
-            <div class="card border-0 shadow-sm">
-                <div class="card-header bg-white py-3">
-                    <h6 class="mb-0">Instructions</h6>
-                </div>
-                <div class="card-body">
-                    <ul class="small mb-0">
-                        <li>Select a supplier from the list</li>
-                        <li>Add products with quantities</li>
-                        <li>Enter unit price from supplier</li>
-                        <li>Save as draft or send directly</li>
-                    </ul>
-                </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="admin-card">
+            <div class="card-header-custom"><i class="bi bi-info-circle"></i> Instructions</div>
+            <div class="card-body-custom">
+                <ol style="margin:0;padding-left:18px;color:#475569;font-size:14px;line-height:1.8;">
+                    <li>Select a supplier from the list</li>
+                    <li>Add products with quantities</li>
+                    <li>Enter unit price from supplier</li>
+                    <li>Save as draft or send directly</li>
+                </ol>
             </div>
         </div>
     </div>
@@ -88,29 +56,11 @@
 
 <script>
 function addItem() {
-    const container = document.getElementById('itemsContainer');
-    const row = document.createElement('div');
-    row.className = 'row g-2 mb-2 item-row';
-    row.innerHTML = `
-        <div class="col-md-6">
-            <select name="product[]" class="form-select">
-                <option value="">Select Product</option>
-                {% for product in products %}
-                <option value="{{ product.id }}">{{ product.name }}</option>
-                {% endfor %}
-            </select>
-        </div>
-        <div class="col-md-2">
-            <input type="number" name="quantity[]" class="form-control" placeholder="Qty" min="1" value="1">
-        </div>
-        <div class="col-md-3">
-            <input type="number" name="unit_price[]" class="form-control" placeholder="Unit Price" step="0.01">
-        </div>
-        <div class="col-md-1">
-            <button type="button" class="btn btn-outline-danger" onclick="this.closest('.item-row').remove()">×</button>
-        </div>
-    `;
-    container.appendChild(row);
+    const c = document.getElementById('itemsContainer');
+    const r = document.createElement('div');
+    r.className = 'row g-2 mb-2 item-row';
+    r.innerHTML = `<div class="col-md-6"><select name="product[]" class="form-select"><option value="">Select Product</option>{% for product in products %}<option value="{{ product.id }}">{{ product.name }}</option>{% endfor %}</select></div><div class="col-md-2"><input type="number" name="quantity[]" class="form-control" placeholder="Qty" min="1" value="1"></div><div class="col-md-3"><input type="number" name="unit_price[]" class="form-control" placeholder="Price" step="0.01"></div><div class="col-md-1"><button type="button" class="btn btn-outline-danger btn-sm" onclick="this.closest('.item-row').remove()">×</button></div>`;
+    c.appendChild(r);
 }
 </script>
 {% endblock %}

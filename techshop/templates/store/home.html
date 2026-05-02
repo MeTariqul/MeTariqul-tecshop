@@ -1,324 +1,709 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}TechShop - Your Trusted Tech Store in Bangladesh{% endblock %}
+{% block title %}TechShop Premium - The Future of Tech{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Hero Section */
+    .hero {
+        position: relative;
+        min-height: 85vh;
+        display: flex;
+        align-items: center;
+        background: radial-gradient(circle at 70% 50%, #1e1b4b 0%, #020617 100%);
+        overflow: hidden;
+        border-radius: 0 0 40px 40px;
+        margin-top: -85px; /* Pull up under transparent navbar */
+        padding-top: 120px;
+        color: white;
+    }
+
+    /* Abstract shapes in background */
+    .hero-shape-1 {
+        position: absolute;
+        top: -20%;
+        left: -10%;
+        width: 800px;
+        height: 800px;
+        background: radial-gradient(circle, rgba(79, 70, 229, 0.15) 0%, transparent 70%);
+        border-radius: 50%;
+        filter: blur(60px);
+        animation: float 15s ease-in-out infinite;
+    }
+
+    .hero-shape-2 {
+        position: absolute;
+        bottom: -20%;
+        right: -10%;
+        width: 600px;
+        height: 600px;
+        background: radial-gradient(circle, rgba(236, 72, 153, 0.15) 0%, transparent 70%);
+        border-radius: 50%;
+        filter: blur(60px);
+        animation: float 20s ease-in-out infinite reverse;
+    }
+
+    @keyframes float {
+        0%, 100% { transform: translateY(0) scale(1); }
+        50% { transform: translateY(-30px) scale(1.05); }
+    }
+
+    .hero-content {
+        position: relative;
+        z-index: 10;
+        max-width: 650px;
+    }
+
+    .hero-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 16px;
+        border-radius: var(--radius-full);
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(10px);
+        font-size: 14px;
+        font-weight: 600;
+        color: #e0e7ff;
+        margin-bottom: 24px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    .hero-badge i {
+        color: #ec4899;
+    }
+
+    .hero-title {
+        font-size: clamp(48px, 6vw, 72px);
+        font-weight: 800;
+        line-height: 1.1;
+        margin-bottom: 24px;
+        background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .hero-title span {
+        background: linear-gradient(135deg, #818cf8 0%, #ec4899 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .hero-desc {
+        font-size: 18px;
+        color: #94a3b8;
+        line-height: 1.7;
+        margin-bottom: 40px;
+        max-width: 500px;
+    }
+
+    .hero-actions {
+        display: flex;
+        gap: 16px;
+    }
+
+    .btn-hero {
+        padding: 16px 36px;
+        font-size: 16px;
+    }
+
+    .btn-glass {
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        color: white;
+        backdrop-filter: blur(10px);
+    }
+    
+    .btn-glass:hover {
+        background: rgba(255, 255, 255, 0.2);
+        transform: translateY(-2px);
+    }
+
+    .hero-visual {
+        position: absolute;
+        right: 5%;
+        top: 50%;
+        transform: translateY(-40%);
+        z-index: 5;
+        width: 45%;
+        perspective: 1000px;
+    }
+
+    .hero-visual img {
+        width: 100%;
+        transform: rotateY(-15deg) rotateX(5deg);
+        filter: drop-shadow(0 30px 40px rgba(0,0,0,0.5));
+        transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .hero-visual:hover img {
+        transform: rotateY(0deg) rotateX(0deg) translateY(-10px);
+    }
+
+    /* Section Utilities */
+    .section-spacing {
+        padding: 100px 0;
+    }
+
+    .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        margin-bottom: 48px;
+    }
+
+    .section-title {
+        font-size: 36px;
+        font-weight: 800;
+        color: var(--text-main);
+    }
+
+    .section-subtitle {
+        color: var(--primary);
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        font-size: 14px;
+        margin-bottom: 8px;
+        display: block;
+    }
+
+    .view-all-link {
+        font-weight: 600;
+        color: var(--primary);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 15px;
+    }
+
+    .view-all-link:hover {
+        color: var(--primary-hover);
+        gap: 12px;
+    }
+
+    /* Premium Product Grid */
+    .product-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 32px;
+    }
+
+    .product-card {
+        background: var(--surface-color);
+        border-radius: var(--radius-lg);
+        overflow: hidden;
+        border: 1px solid var(--border-color);
+        transition: all var(--transition-bounce);
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        position: relative;
+    }
+
+    .product-card:hover {
+        transform: translateY(-12px);
+        box-shadow: var(--shadow-lg);
+        border-color: rgba(79, 70, 229, 0.3);
+    }
+
+    .product-img-wrap {
+        position: relative;
+        padding-top: 80%; /* 4:5 aspect ratio */
+        background: #f1f5f9;
+        overflow: hidden;
+    }
+
+    .product-img {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        padding: 24px;
+        transition: transform var(--transition-bounce);
+    }
+
+    .product-card:hover .product-img {
+        transform: scale(1.1);
+    }
+
+    .product-badges {
+        position: absolute;
+        top: 16px;
+        left: 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        z-index: 2;
+    }
+
+    .badge {
+        padding: 6px 12px;
+        border-radius: var(--radius-full);
+        font-size: 11px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        backdrop-filter: blur(8px);
+    }
+
+    .badge-new {
+        background: rgba(79, 70, 229, 0.9);
+        color: white;
+    }
+
+    .badge-sale {
+        background: rgba(236, 72, 153, 0.9);
+        color: white;
+    }
+
+    .product-actions-hover {
+        position: absolute;
+        right: 16px;
+        top: 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        opacity: 0;
+        transform: translateX(20px);
+        transition: all var(--transition-smooth);
+        z-index: 2;
+    }
+
+    .product-card:hover .product-actions-hover {
+        opacity: 1;
+        transform: translateX(0);
+    }
+
+    .hover-btn {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: white;
+        border: none;
+        box-shadow: var(--shadow-sm);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--text-main);
+        cursor: pointer;
+        transition: all var(--transition-fast);
+        font-size: 16px;
+    }
+
+    .hover-btn:hover {
+        background: var(--primary);
+        color: white;
+        transform: scale(1.1);
+    }
+
+    .product-info {
+        padding: 24px;
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+    }
+
+    .product-cat {
+        font-size: 12px;
+        color: var(--text-muted);
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-bottom: 8px;
+    }
+
+    .product-name {
+        font-size: 18px;
+        font-weight: 700;
+        margin-bottom: 12px;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .product-name a {
+        color: var(--text-main);
+    }
+
+    .product-name a:hover {
+        color: var(--primary);
+    }
+
+    .product-meta {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 16px;
+    }
+
+    .stars {
+        color: var(--warning);
+        font-size: 14px;
+    }
+
+    .review-count {
+        font-size: 13px;
+        color: var(--text-muted);
+    }
+
+    .product-bottom {
+        margin-top: auto;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .price-box {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .price-current {
+        font-size: 20px;
+        font-weight: 800;
+        font-family: 'Outfit', sans-serif;
+        color: var(--text-main);
+    }
+
+    .price-old {
+        font-size: 13px;
+        color: var(--text-muted);
+        text-decoration: line-through;
+    }
+
+    .add-cart-btn {
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        background: var(--bg-color);
+        border: 1px solid var(--border-color);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--primary);
+        font-size: 20px;
+        cursor: pointer;
+        transition: all var(--transition-bounce);
+    }
+
+    .add-cart-btn:hover:not(:disabled) {
+        background: var(--primary);
+        color: white;
+        border-color: var(--primary);
+        transform: scale(1.05);
+    }
+    
+    .add-cart-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    /* Features Grid */
+    .features-wrap {
+        background: var(--surface-color);
+        padding: 80px 0;
+        border-top: 1px solid var(--border-color);
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .features-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 32px;
+    }
+
+    .feature-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+
+    .feature-icon-box {
+        width: 72px;
+        height: 72px;
+        border-radius: 20px;
+        background: linear-gradient(135deg, rgba(79, 70, 229, 0.1) 0%, rgba(236, 72, 153, 0.1) 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 32px;
+        color: var(--primary);
+        margin-bottom: 24px;
+        transition: transform var(--transition-bounce);
+    }
+
+    .feature-item:hover .feature-icon-box {
+        transform: translateY(-8px) rotate(5deg);
+        background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+        color: white;
+        box-shadow: var(--shadow-glow);
+    }
+
+    .feature-item h4 {
+        font-size: 18px;
+        margin-bottom: 8px;
+    }
+
+    .feature-item p {
+        font-size: 14px;
+        color: var(--text-muted);
+    }
+
+    /* Promo Banner */
+    .promo-banner {
+        border-radius: var(--radius-lg);
+        overflow: hidden;
+        position: relative;
+        padding: 80px 60px;
+        display: flex;
+        align-items: center;
+        margin-top: 100px;
+    }
+
+    .promo-bg {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        z-index: 1;
+    }
+
+    .promo-overlay {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(90deg, rgba(2, 6, 23, 0.9) 0%, rgba(2, 6, 23, 0.4) 100%);
+        z-index: 2;
+    }
+
+    .promo-content {
+        position: relative;
+        z-index: 3;
+        max-width: 500px;
+        color: white;
+    }
+
+    .promo-content h2 {
+        font-size: 42px;
+        color: white;
+        margin-bottom: 16px;
+    }
+
+    .promo-content p {
+        font-size: 18px;
+        color: #cbd5e1;
+        margin-bottom: 32px;
+    }
+
+    @media (max-width: 1024px) {
+        .hero-visual { display: none; }
+        .hero-content { margin: 0 auto; text-align: center; }
+        .hero-actions { justify-content: center; }
+        .features-grid { grid-template-columns: repeat(2, 1fr); gap: 48px; }
+    }
+
+    @media (max-width: 768px) {
+        .hero-title { font-size: 40px; }
+        .section-header { flex-direction: column; align-items: flex-start; gap: 16px; }
+        .features-grid { grid-template-columns: 1fr; }
+        .promo-banner { padding: 40px 24px; text-align: center; }
+        .promo-overlay { background: rgba(2, 6, 23, 0.8); }
+    }
+</style>
+{% endblock %}
 
 {% block content %}
+
 <!-- Hero Section -->
-<section class="hero-section">
-    <div class="hero-shapes">
-        <div class="shape shape-1"></div>
-        <div class="shape shape-2"></div>
-    </div>
-    <div class="container">
-        <div class="row align-items-center">
-            <div class="col-lg-6">
-                <div class="hero-content">
-                    <div class="hero-badge mb-3">
-                        <span class="badge bg-primary rounded-pill">
-                            <i class="bi bi-lightning-charge-fill me-1"></i> New Collection 2026
-                        </span>
-                    </div>
-                    <h1 class="hero-title animate-fade-in-up">
-                        Your Trusted <span>Tech Store</span> in Bangladesh
-                    </h1>
-                    <p class="hero-subtitle animate-fade-in-up delay-1">
-                        Discover the latest laptops, computers, and tech accessories. 
-                        Get authentic products with official warranty and fast delivery across Bangladesh.
-                    </p>
-                    
-                    <!-- Quick Search in Hero -->
-                    <div class="hero-search animate-fade-in-up delay-2">
-                        <form action="{% url 'store:product_list' %}" method="get" class="d-flex gap-2">
-                            <input type="text" name="search" class="form-control form-control-lg" 
-                                placeholder="What are you looking for?" style="max-width: 300px;">
-                            <button type="submit" class="btn btn-primary btn-lg">
-                                <i class="bi bi-search"></i>
-                            </button>
-                        </form>
-                    </div>
+<section class="hero">
+    <div class="hero-shape-1"></div>
+    <div class="hero-shape-2"></div>
+    
+    <div class="container" style="position: relative; height: 100%;">
+        <div class="hero-content">
+            <div class="hero-badge">
+                <i class="bi bi-stars"></i> Next Generation Tech
+            </div>
+            <h1 class="hero-title">
+                Experience The <span>Future</span> Of Innovation
+            </h1>
+            <p class="hero-desc">
+                Elevate your digital lifestyle with our curated collection of premium devices. Unparalleled performance meets breathtaking design.
+            </p>
+            <div class="hero-actions">
+                <a href="{% url 'store:product_list' %}" class="btn btn-primary btn-hero">
+                    Explore Collection
+                </a>
+                <a href="{% url 'store:about' %}" class="btn btn-glass btn-hero">
+                    Our Story
+                </a>
+            </div>
+        </div>
 
-                    <div class="hero-buttons animate-fade-in-up delay-2 mt-4">
-                        <a href="{% url 'store:product_list' %}" class="btn-primary-custom">
-                            <i class="bi bi-shop me-2"></i>Shop Now
-                        </a>
-                        <a href="{% url 'store:about' %}" class="btn-outline-custom">
-                            Learn More
-                        </a>
-                    </div>
-                    
-                    <!-- Trust Stats -->
-                    <div class="hero-stats animate-fade-in-up delay-3 mt-4">
-                        <div class="row text-center">
-                            <div class="col-4">
-                                <h4 class="mb-0 fw-bold">500+</h4>
-                                <small class="text-muted">Products</small>
-                            </div>
-                            <div class="col-4">
-                                <h4 class="mb-0 fw-bold">10K+</h4>
-                                <small class="text-muted">Customers</small>
-                            </div>
-                            <div class="col-4">
-                                <h4 class="mb-0 fw-bold">4.8★</h4>
-                                <small class="text-muted">Rating</small>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-6">
-                <div class="hero-image">
-                    <img src="https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=600" alt="Laptop"
-                        class="img-fluid">
-                </div>
-            </div>
+        <div class="hero-visual">
+            <!-- Using a high-quality tech placeholder image -->
+            <img src="https://images.unsplash.com/photo-1603302576837-37561b2e2302?q=80&w=1000&auto=format&fit=crop" alt="Premium Tech Display" style="border-radius: 24px;">
         </div>
     </div>
 </section>
 
-<!-- Featured Products -->
-<section class="featured-section">
+<!-- Features Strip -->
+<div class="features-wrap">
     <div class="container">
-        <div class="section-header">
-            <h2 class="section-title">Featured Products</h2>
-            <a href="{% url 'store:product_list' %}" class="view-all">
-                View All <i class="bi bi-arrow-right"></i>
-            </a>
-        </div>
-
-        <div class="row g-4">
-            {% for product in featured_products %}
-            <div class="col-6 col-md-4 col-lg-3">
-                <div class="product-card">
-                    <div class="product-image-wrapper">
-                        {% if product.featured_image %}
-                        <img src="{{ product.featured_image.url }}" alt="{{ product.name }}">
-                        {% else %}
-                        <div class="d-flex align-items-center justify-content-center h-100 bg-light">
-                            <i class="bi bi-image text-muted" style="font-size: 3rem;"></i>
-                        </div>
-                        {% endif %}
-
-                        <div class="product-badges">
-                            {% if product.is_available_online %}
-                            <span class="badge-new">New</span>
-                            {% endif %}
-                        </div>
-
-                        <div class="product-actions">
-                            <button class="product-action-btn" title="Quick View" data-bs-toggle="modal" data-bs-target="#quickView{{ product.SKU }}">
-                                <i class="bi bi-eye"></i>
-                            </button>
-                            <button class="product-action-btn" title="Add to Wishlist">
-                                <i class="bi bi-heart"></i>
-                            </button>
-                            <a href="{% url 'cart:add_to_compare' product.SKU %}" class="product-action-btn" title="Add to Compare">
-                                <i class="bi bi-arrow-repeat"></i>
-                            </a>
-                        </div>
-                    </div>
-
-                    <div class="product-content">
-                        {% if product.category %}
-                        <span class="product-category">{{ product.category.name }}</span>
-                        {% endif %}
-                        <h3 class="product-title">
-                            <a href="{% url 'store:product_detail' product.SKU %}">{{ product.name }}</a>
-                        </h3>
-
-                        <div class="product-rating">
-                            <span class="rating-stars">
-                                {% if product.avg_rating %}
-                                <i class="bi bi-star-fill"></i>
-                                <i class="bi bi-star-fill"></i>
-                                <i class="bi bi-star-fill"></i>
-                                <i class="bi bi-star-fill"></i>
-                                <i class="bi bi-star-half"></i>
-                                {% else %}
-                                <i class="bi bi-star"></i>
-                                <i class="bi bi-star"></i>
-                                <i class="bi bi-star"></i>
-                                <i class="bi bi-star"></i>
-                                <i class="bi bi-star"></i>
-                                {% endif %}
-                            </span>
-                            <span class="rating-count">({{ product.avg_rating|default:0 }})</span>
-                        </div>
-
-                        <div class="product-price">
-                            <span class="price-current">{{ currency_short_form }} {{ product.selling_price }}</span>
-                            {% if product.cost_price > product.selling_price %}
-                            <span class="price-old">{{ currency_short_form }} {{ product.cost_price }}</span>
-                            {% endif %}
-                        </div>
-
-                        {% if product.stock_quantity > 10 %}
-                        <span class="stock-status stock-in"><i class="bi bi-check-circle me-1"></i>In Stock</span>
-                        {% elif product.stock_quantity > 0 %}
-                        <span class="stock-status stock-low"><i class="bi bi-exclamation-triangle me-1"></i>Low
-                            Stock</span>
-                        {% else %}
-                        <span class="stock-status stock-out"><i class="bi bi-x-circle me-1"></i>Out of Stock</span>
-                        {% endif %}
-                    </div>
+        <div class="features-grid">
+            <div class="feature-item">
+                <div class="feature-icon-box">
+                    <i class="bi bi-shield-check"></i>
                 </div>
+                <h4>Premium Quality</h4>
+                <p>100% authentic products with official manufacturer warranty.</p>
             </div>
-            {% empty %}
-            <div class="col-12 text-center py-5">
-                <i class="bi bi-inbox" style="font-size: 3rem; color: #ccc;"></i>
-                <p class="mt-3 text-muted">No featured products available yet.</p>
-                <a href="{% url 'store:product_list' %}" class="btn btn-primary mt-2">Browse Products</a>
-            </div>
-            {% endfor %}
-        </div>
-    </div>
-</section>
-
-<!-- Quick View Modal Template -->
-{% for product in featured_products %}
-<div class="modal fade" id="quickView{{ product.SKU }}" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">{{ product.name }}</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <div class="row">
-                    <div class="col-md-6">
-                        {% if product.featured_image %}
-                        <img src="{{ product.featured_image.url }}" class="img-fluid rounded" alt="{{ product.name }}">
-                        {% else %}
-                        <div class="bg-light d-flex align-items-center justify-content-center" style="height: 300px;">
-                            <i class="bi bi-image text-muted" style="font-size: 3rem;"></i>
-                        </div>
-                        {% endif %}
-                    </div>
-                    <div class="col-md-6">
-                        <h4 class="text-primary">{{ currency_short_form }} {{ product.selling_price }}</h4>
-                        {% if product.cost_price > product.selling_price %}
-                        <p class="text-muted"><del>{{ currency_short_form }} {{ product.cost_price }}</del></p>
-                        {% endif %}
-                        
-                        <p class="mt-3">{{ product.description|truncatewords:30 }}</p>
-                        
-                        {% if product.stock_quantity > 0 %}
-                        <span class="badge bg-success">In Stock</span>
-                        {% else %}
-                        <span class="badge bg-danger">Out of Stock</span>
-                        {% endif %}
-                        
-                        <div class="mt-4">
-                            <form method="post" action="{% url 'cart:add_to_cart' product.SKU %}">
-                                {% csrf_token %}
-                                <div class="d-flex gap-2">
-                                    <input type="number" name="quantity" value="1" min="1" max="{{ product.stock_quantity }}" class="form-control" style="width: 80px;">
-                                    <button type="submit" class="btn btn-warning">
-                                        <i class="bi bi-cart-plus"></i> Add to Cart
-                                    </button>
-                                </div>
-                            </form>
-                        </div>
-                        
-                        <div class="mt-3">
-                            <a href="{% url 'store:product_detail' product.SKU %}" class="btn btn-outline-primary">View Full Details</a>
-                        </div>
-                    </div>
+            <div class="feature-item">
+                <div class="feature-icon-box">
+                    <i class="bi bi-lightning-charge"></i>
                 </div>
+                <h4>Express Delivery</h4>
+                <p>Lightning-fast shipping across all major cities nationwide.</p>
+            </div>
+            <div class="feature-item">
+                <div class="feature-icon-box">
+                    <i class="bi bi-arrow-return-left"></i>
+                </div>
+                <h4>Hassle-Free Returns</h4>
+                <p>30-day seamless return policy for your peace of mind.</p>
+            </div>
+            <div class="feature-item">
+                <div class="feature-icon-box">
+                    <i class="bi bi-headset"></i>
+                </div>
+                <h4>Concierge Support</h4>
+                <p>24/7 dedicated assistance from our tech experts.</p>
             </div>
         </div>
     </div>
 </div>
-{% endfor %}
 
-<!-- Banner Section -->
-<section class="banner-section">
-    <div class="container">
-        <div class="row g-4">
-            <div class="col-md-6">
-                <div class="banner-card">
-                    <img src="https://images.unsplash.com/photo-1593640408182-31c70c8268f5?w=800" alt="Gaming">
-                    <div class="banner-overlay">
-                        <div class="banner-content">
-                            <h3>Gaming Collection</h3>
-                            <p>Level up your gaming experience</p>
-                            <a href="{% url 'store:product_list' %}" class="btn-primary-custom btn-sm">Shop Now</a>
-                        </div>
-                    </div>
+<!-- Featured Products -->
+<section class="section-spacing container">
+    <div class="section-header">
+        <div>
+            <span class="section-subtitle">Curated Collection</span>
+            <h2 class="section-title">Trending Now</h2>
+        </div>
+        <a href="{% url 'store:product_list' %}" class="view-all-link">
+            Explore All Products <i class="bi bi-arrow-right"></i>
+        </a>
+    </div>
+
+    <div class="product-grid">
+        {% for product in featured_products %}
+        <div class="product-card">
+            <div class="product-img-wrap">
+                {% if product.featured_image %}
+                <img src="{{ product.featured_image.url }}" alt="{{ product.name }}" class="product-img">
+                {% else %}
+                <div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center;">
+                    <i class="bi bi-laptop text-muted" style="font-size: 48px;"></i>
+                </div>
+                {% endif %}
+                
+                <div class="product-badges">
+                    {% if product.is_available_online %}
+                    <span class="badge badge-new">New</span>
+                    {% endif %}
+                    {% if product.has_offer %}
+                    <span class="badge badge-sale">{{ product.discount_percentage }}% OFF</span>
+                    {% endif %}
+                </div>
+
+                <div class="product-actions-hover">
+                    <a href="{% url 'store:product_detail' product.SKU %}" class="hover-btn" title="Quick View">
+                        <i class="bi bi-eye"></i>
+                    </a>
+                    <!-- Form for wishlist would go here, using a placeholder icon -->
+                    <button class="hover-btn" title="Add to Wishlist">
+                        <i class="bi bi-heart"></i>
+                    </button>
                 </div>
             </div>
-            <div class="col-md-6">
-                <div class="banner-card">
-                    <img src="https://images.unsplash.com/photo-1587831990711-23ca6441447b?w=800" alt="Office">
-                    <div class="banner-overlay">
-                        <div class="banner-content">
-                            <h3>Office Essentials</h3>
-                            <p>Everything you need for work</p>
-                            <a href="{% url 'store:product_list' %}" class="btn-primary-custom btn-sm">Shop Now</a>
-                        </div>
+
+            <div class="product-info">
+                {% if product.category %}
+                <span class="product-cat">{{ product.category.name }}</span>
+                {% endif %}
+                
+                <h3 class="product-name">
+                    <a href="{% url 'store:product_detail' product.SKU %}">{{ product.name }}</a>
+                </h3>
+
+                <div class="product-meta">
+                    <div class="stars">
+                        {% if product.avg_rating %}
+                        <i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-half"></i>
+                        {% else %}
+                        <i class="bi bi-star"></i><i class="bi bi-star"></i><i class="bi bi-star"></i><i class="bi bi-star"></i><i class="bi bi-star"></i>
+                        {% endif %}
                     </div>
+                    <span class="review-count">({{ product.avg_rating|default:0 }})</span>
+                </div>
+
+                <div class="product-bottom">
+                    <div class="price-box">
+                        {% if product.has_offer %}
+                        <span class="price-current">{{ currency_short_form }} {{ product.discounted_price }}</span>
+                        <span class="price-old">{{ currency_short_form }} {{ product.selling_price }}</span>
+                        {% else %}
+                        <span class="price-current">{{ currency_short_form }} {{ product.selling_price }}</span>
+                        {% endif %}
+                    </div>
+
+                    {% if product.inventory and product.inventory.quantity_on_hand > 0 %}
+                    <form method="post" action="{% url 'cart:add_to_cart' product.SKU %}" style="margin: 0;">
+                        {% csrf_token %}
+                        <button type="submit" class="add-cart-btn" title="Add to Cart">
+                            <i class="bi bi-plus-lg"></i>
+                        </button>
+                    </form>
+                    {% else %}
+                    <button class="add-cart-btn" disabled title="Out of Stock">
+                        <i class="bi bi-x-lg"></i>
+                    </button>
+                    {% endif %}
                 </div>
             </div>
+        </div>
+        {% empty %}
+        <div style="grid-column: 1/-1; text-align: center; padding: 60px 0;">
+            <i class="bi bi-box-seam" style="font-size: 48px; color: var(--text-muted);"></i>
+            <h3 style="margin-top: 16px;">Collection Updating</h3>
+            <p style="color: var(--text-muted);">We are currently curating our premium selection.</p>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Promo Banner -->
+    <div class="promo-banner">
+        <img src="https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=2000&auto=format&fit=crop" class="promo-bg" alt="Cyber Workspace">
+        <div class="promo-overlay"></div>
+        <div class="promo-content">
+            <span class="section-subtitle" style="color: #ec4899; margin-bottom: 12px;">Limited Time Offer</span>
+            <h2>Build Your Dream Workspace</h2>
+            <p>Get up to 25% off on our premium collection of mechanical keyboards, ultra-wide monitors, and ergonomic accessories.</p>
+            <a href="{% url 'store:product_list' %}" class="btn btn-primary" style="padding: 14px 32px;">Shop Setup Collection</a>
         </div>
     </div>
 </section>
 
-<!-- Why Choose Us -->
-<section class="category-section">
-    <div class="container">
-        <h2 class="section-title">Why Choose TechShop?</h2>
-        <div class="row g-4">
-            <div class="col-md-3">
-                <div class="category-card">
-                    <div class="category-icon" style="background: #16a34a;">
-                        <i class="bi bi-shield-check"></i>
-                    </div>
-                    <h4>100% Authentic</h4>
-                    <p>All products are genuine with official warranty</p>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="category-card">
-                    <div class="category-icon" style="background: #16a34a;">
-                        <i class="bi bi-truck"></i>
-                    </div>
-                    <h4>Fast Delivery</h4>
-                    <p>Quick delivery across Bangladesh</p>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="category-card">
-                    <div class="category-icon" style="background: #22c55e;">
-                        <i class="bi bi-arrow-repeat"></i>
-                    </div>
-                    <h4>Easy Returns</h4>
-                    <p>30-day return policy</p>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="category-card">
-                    <div class="category-icon" style="background: #16a34a;">
-                        <i class="bi bi-headset"></i>
-                    </div>
-                    <h4>24/7 Support</h4>
-                    <p>Dedicated customer support</p>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- Newsletter -->
-<section class="newsletter-section">
-    <div class="container">
-        <div class="newsletter-content">
-            <h3>Subscribe to Our Newsletter</h3>
-            <p>Get the latest deals and updates directly to your inbox</p>
-            <form class="newsletter-form">
-                <input type="email" placeholder="Enter your email address">
-                <button type="submit">Subscribe</button>
-            </form>
-        </div>
-    </div>
-</section>
 {% endblock %}

@@ -1,202 +1,130 @@
 {% extends 'admin/base.html' %}
 
-{% block admin_title %}Warehouse Dashboard - Inventory Management{% endblock %}
+{% block admin_title %}Warehouse{% endblock %}
 
 {% block admin_content %}
-<div class="container-fluid py-4">
-    <!-- Header -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h2 class="mb-0"><i class="bi bi-boxes me-2"></i>Warehouse Dashboard</h2>
-            <p class="text-muted mb-0">Stock Management & Receiving</p>
-        </div>
-        <div class="d-flex gap-2">
-            <a href="{% url 'admin_dashboard:stock_transfer' %}" class="btn btn-outline-primary">
-                <i class="bi bi-arrow-left-right me-1"></i> Transfer
-            </a>
-            <a href="{% url 'admin_dashboard:cycle_count' %}" class="btn btn-outline-warning">
-                <i class="bi bi-clipboard-check me-1"></i> Cycle Count
-            </a>
-            <a href="{% url 'admin_dashboard:purchase_orders' %}" class="btn btn-outline-primary">
-                <i class="bi bi-list-check me-1"></i> Purchase Orders
-            </a>
-            <a href="{% url 'admin_dashboard:create_purchase_order' %}" class="btn btn-primary">
-                <i class="bi bi-plus-lg me-1"></i> New PO
-            </a>
+<div class="page-header">
+    <div>
+        <h4><i class="bi bi-boxes me-2" style="color:#4f46e5;"></i>Warehouse Dashboard</h4>
+        <p style="color:#94a3b8;margin:4px 0 0;font-size:14px;">Stock Management & Receiving</p>
+    </div>
+    <div class="d-flex gap-2 flex-wrap">
+        <a href="{% url 'admin_dashboard:stock_transfer' %}" class="btn btn-outline-primary btn-sm"><i class="bi bi-arrow-left-right"></i> Transfer</a>
+        <a href="{% url 'admin_dashboard:cycle_count' %}" class="btn btn-outline-primary btn-sm"><i class="bi bi-clipboard-check"></i> Cycle Count</a>
+        <a href="{% url 'admin_dashboard:purchase_orders' %}" class="btn btn-outline-primary btn-sm"><i class="bi bi-list-check"></i> POs</a>
+        <a href="{% url 'admin_dashboard:create_purchase_order' %}" class="btn btn-primary btn-sm"><i class="bi bi-plus-lg"></i> New PO</a>
+    </div>
+</div>
+
+<!-- Stats -->
+<div class="row g-3 mb-4">
+    <div class="col-md-3 col-6">
+        <div class="stat-card"><div class="stat-icon emerald"><i class="bi bi-check-circle"></i></div><div class="stat-value">{{ in_stock_count|default:"0" }}</div><div class="stat-label">In Stock</div></div>
+    </div>
+    <div class="col-md-3 col-6">
+        <div class="stat-card"><div class="stat-icon amber"><i class="bi bi-exclamation-triangle"></i></div><div class="stat-value">{{ low_stock_count|default:"0" }}</div><div class="stat-label">Low Stock</div></div>
+    </div>
+    <div class="col-md-3 col-6">
+        <div class="stat-card"><div class="stat-icon rose"><i class="bi bi-x-circle"></i></div><div class="stat-value">{{ out_of_stock_count|default:"0" }}</div><div class="stat-label">Out of Stock</div></div>
+    </div>
+    <div class="col-md-3 col-6">
+        <div class="stat-card"><div class="stat-icon indigo"><i class="bi bi-box-seam"></i></div><div class="stat-value">{{ total_products|default:"0" }}</div><div class="stat-label">Total Products</div></div>
+    </div>
+</div>
+
+<!-- Pending Receiving -->
+{% if pending_receiving %}
+<div class="table-card mb-4">
+    <div class="card-header-custom" style="padding:20px 24px;border-bottom:1px solid #e2e8f0;font-family:'Outfit',sans-serif;font-size:16px;font-weight:700;color:#0f172a;display:flex;align-items:center;gap:10px;">
+        <i class="bi bi-truck" style="color:#4f46e5;"></i> Pending Shipments
+    </div>
+    <div class="table-responsive">
+        <table class="table table-hover mb-0">
+            <thead><tr><th>PO Number</th><th>Supplier</th><th>Expected</th><th>Items</th><th>Total</th><th>Action</th></tr></thead>
+            <tbody>
+                {% for po in pending_receiving %}
+                <tr>
+                    <td><strong style="color:#0f172a;">{{ po.po_number }}</strong></td>
+                    <td>{{ po.supplier.name }}</td>
+                    <td style="white-space:nowrap;">{{ po.expected_delivery|date:"M j, Y" }}</td>
+                    <td>{{ po.items.count }} items</td>
+                    <td><strong>৳{{ po.total_amount }}</strong></td>
+                    <td><a href="{% url 'admin_dashboard:receive_po' po.id %}" class="btn btn-success btn-sm"><i class="bi bi-check2-all"></i> Receive</a></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endif %}
+
+<div class="row g-4">
+    <!-- Low Stock -->
+    <div class="col-lg-6">
+        <div class="admin-card" style="border-left:3px solid #f59e0b;">
+            <div class="card-header-custom"><i class="bi bi-exclamation-triangle" style="color:#f59e0b !important;"></i> Low Stock Items</div>
+            <div class="card-body-custom p-0">
+                {% if low_stock_items %}
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0" style="font-size:14px;">
+                        <thead><tr>
+                            <th style="background:#f8fafc;padding:12px 20px;font-size:12px;font-weight:700;color:#475569;text-transform:uppercase;">Product</th>
+                            <th style="background:#f8fafc;padding:12px 20px;font-size:12px;font-weight:700;color:#475569;text-transform:uppercase;">Stock</th>
+                            <th style="background:#f8fafc;padding:12px 20px;font-size:12px;font-weight:700;color:#475569;text-transform:uppercase;">Reorder</th>
+                        </tr></thead>
+                        <tbody>
+                            {% for product in low_stock_items %}
+                            <tr>
+                                <td style="padding:12px 20px;"><strong style="color:#0f172a;">{{ product.name }}</strong><br><small style="color:#94a3b8;">{{ product.SKU }}</small></td>
+                                <td style="padding:12px 20px;">
+                                    {% if product.inventory.quantity_on_hand == 0 %}
+                                    <span class="badge" style="background:#fef2f2;color:#ef4444;">Out of Stock</span>
+                                    {% else %}
+                                    <span class="badge" style="background:#fef3c7;color:#92400e;">{{ product.inventory.quantity_on_hand }}</span>
+                                    {% endif %}
+                                </td>
+                                <td style="padding:12px 20px;color:#64748b;">{{ product.inventory.reorder_level }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="empty-state" style="padding:40px;"><i class="bi bi-check-circle" style="color:#10b981;"></i><br>All products well stocked!</div>
+                {% endif %}
+            </div>
         </div>
     </div>
 
-    <!-- Stats Cards -->
-    <div class="row g-4 mb-4">
-        <div class="col-md-3">
-            <div class="card border-0 shadow-sm">
-                <div class="card-body text-center">
-                    <h2 class="mb-1 text-success">{{ in_stock_count }}</h2>
-                    <p class="text-muted mb-0">In Stock</p>
+    <!-- Recent Movements -->
+    <div class="col-lg-6">
+        <div class="admin-card">
+            <div class="card-header-custom"><i class="bi bi-arrow-left-right"></i> Recent Movements</div>
+            <div class="card-body-custom p-0">
+                {% if recent_movements %}
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0" style="font-size:14px;">
+                        <thead><tr>
+                            <th style="background:#f8fafc;padding:12px 20px;font-size:12px;font-weight:700;color:#475569;text-transform:uppercase;">Product</th>
+                            <th style="background:#f8fafc;padding:12px 20px;font-size:12px;font-weight:700;color:#475569;text-transform:uppercase;">Type</th>
+                            <th style="background:#f8fafc;padding:12px 20px;font-size:12px;font-weight:700;color:#475569;text-transform:uppercase;">Qty</th>
+                            <th style="background:#f8fafc;padding:12px 20px;font-size:12px;font-weight:700;color:#475569;text-transform:uppercase;">Date</th>
+                        </tr></thead>
+                        <tbody>
+                            {% for movement in recent_movements %}
+                            <tr>
+                                <td style="padding:12px 20px;"><strong style="color:#0f172a;">{{ movement.product.name }}</strong><br><small style="color:#94a3b8;">{{ movement.reference_number }}</small></td>
+                                <td style="padding:12px 20px;"><span class="badge" style="{% if movement.movement_type == 'received' %}background:#d1fae5;color:#065f46;{% elif movement.movement_type == 'sold' %}background:#e0e7ff;color:#3730a3;{% elif movement.movement_type == 'adjusted' %}background:#fef3c7;color:#92400e;{% else %}background:#f1f5f9;color:#64748b;{% endif %}">{{ movement.get_movement_type_display }}</span></td>
+                                <td style="padding:12px 20px;font-weight:700;{% if movement.quantity > 0 %}color:#10b981;{% else %}color:#ef4444;{% endif %}">{% if movement.quantity > 0 %}+{% endif %}{{ movement.quantity }}</td>
+                                <td style="padding:12px 20px;white-space:nowrap;"><small style="color:#94a3b8;">{{ movement.created_at|date:"M j, g:i A" }}</small></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
                 </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card border-0 shadow-sm">
-                <div class="card-body text-center">
-                    <h2 class="mb-1 text-warning">{{ low_stock_count }}</h2>
-                    <p class="text-muted mb-0">Low Stock</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card border-0 shadow-sm">
-                <div class="card-body text-center">
-                    <h2 class="mb-1 text-danger">{{ out_of_stock_count }}</h2>
-                    <p class="text-muted mb-0">Out of Stock</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card border-0 shadow-sm">
-                <div class="card-body text-center">
-                    <h2 class="mb-1">{{ total_products }}</h2>
-                    <p class="text-muted mb-0">Total Products</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Pending Receiving -->
-    {% if pending_receiving %}
-    <div class="card border-0 shadow-sm mb-4">
-        <div class="card-header bg-white border-0 py-3">
-            <h5 class="mb-0"><i class="bi bi-truck me-2 text-primary"></i>Pending Shipments to Receive</h5>
-        </div>
-        <div class="card-body p-0">
-            <div class="table-responsive">
-                <table class="table table-hover mb-0">
-                    <thead class="table-light">
-                        <tr>
-                            <th>PO Number</th>
-                            <th>Supplier</th>
-                            <th>Expected</th>
-                            <th>Items</th>
-                            <th>Total</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for po in pending_receiving %}
-                        <tr>
-                            <td><strong>{{ po.po_number }}</strong></td>
-                            <td>{{ po.supplier.name }}</td>
-                            <td>{{ po.expected_delivery|date:"M j, Y" }}</td>
-                            <td>{{ po.items.count }} items</td>
-                            <td>৳{{ po.total_amount }}</td>
-                            <td>
-                                <a href="{% url 'admin_dashboard:receive_po' po.id %}" class="btn btn-success btn-sm">
-                                    <i class="bi bi-check2-all me-1"></i> Receive
-                                </a>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-    {% endif %}
-
-    <div class="row g-4">
-        <!-- Low Stock Items -->
-        <div class="col-lg-6">
-            <div class="card border-0 shadow-sm">
-                <div class="card-header bg-white border-0 py-3 d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0"><i class="bi bi-exclamation-triangle me-2 text-warning"></i>Low Stock Items</h5>
-                    <span class="badge bg-warning">{{ low_stock_items|length }}</span>
-                </div>
-                <div class="card-body p-0">
-                    {% if low_stock_items %}
-                    <div class="table-responsive">
-                        <table class="table table-hover mb-0">
-                            <thead class="table-light">
-                                <tr>
-                                    <th>Product</th>
-                                    <th>Current Stock</th>
-                                    <th>Reorder Level</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for product in low_stock_items %}
-                                <tr>
-                                    <td>
-                                        <strong>{{ product.name }}</strong><br>
-                                        <small class="text-muted">{{ product.SKU }}</small>
-                                    </td>
-                                    <td>
-                                        {% if product.inventory.quantity_on_hand == 0 %}
-                                        <span class="badge bg-danger">Out of Stock</span>
-                                        {% else %}
-                                        <span class="badge bg-warning">{{ product.inventory.quantity_on_hand }}</span>
-                                        {% endif %}
-                                    </td>
-                                    <td>{{ product.inventory.reorder_level }}</td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                    {% else %}
-                    <div class="text-center py-4 text-muted">
-                        <i class="bi bi-check-circle fs-1 d-block mb-2"></i>
-                        All products are well stocked!
-                    </div>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-
-        <!-- Recent Movements -->
-        <div class="col-lg-6">
-            <div class="card border-0 shadow-sm">
-                <div class="card-header bg-white border-0 py-3">
-                    <h5 class="mb-0"><i class="bi bi-arrow-left-right me-2"></i>Recent Inventory Movements</h5>
-                </div>
-                <div class="card-body p-0">
-                    {% if recent_movements %}
-                    <div class="table-responsive">
-                        <table class="table table-hover mb-0">
-                            <thead class="table-light">
-                                <tr>
-                                    <th>Product</th>
-                                    <th>Type</th>
-                                    <th>Qty</th>
-                                    <th>Date</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for movement in recent_movements %}
-                                <tr>
-                                    <td>
-                                        <strong>{{ movement.product.name }}</strong><br>
-                                        <small class="text-muted">{{ movement.reference_number }}</small>
-                                    </td>
-                                    <td>
-                                        <span class="badge bg-{% if movement.movement_type == 'received' %}success{% elif movement.movement_type == 'sold' %}primary{% elif movement.movement_type == 'adjusted' %}warning{% else %}secondary{% endif %}">
-                                            {{ movement.get_movement_type_display }}
-                                        </span>
-                                    </td>
-                                    <td>
-                                        {% if movement.quantity > 0 %}+{% endif %}{{ movement.quantity }}
-                                    </td>
-                                    <td><small>{{ movement.created_at|date:"M j, g:i A" }}</small></td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                    {% else %}
-                    <div class="text-center py-4 text-muted">
-                        No movements yet
-                    </div>
-                    {% endif %}
-                </div>
+                {% else %}
+                <div class="empty-state" style="padding:40px;"><i class="bi bi-inbox"></i><br>No movements yet</div>
+                {% endif %}
             </div>
         </div>
     </div>

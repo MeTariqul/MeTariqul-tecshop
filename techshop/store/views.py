@@ -1,6 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.db.models import Q, Avg
 from django.contrib import messages
+from django.core.paginator import Paginator
 from .models import Product, Category, Review
 
 # ====================
@@ -204,10 +205,16 @@ def product_list(request):
             Q(SKU__icontains=search_query)
         )
     
+    # Pagination
+    paginator = Paginator(products, 12) # Show 12 products per page
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    
     categories = Category.objects.all()
     
     context = {
-        'products': products,
+        'products': page_obj, # Pass page_obj instead of queryset
+        'page_obj': page_obj,
         'categories': categories,
         'current_category': category_id,
         'search_query': search_query,
@@ -225,8 +232,14 @@ def product_list_by_category(request, category_id):
     ).select_related('inventory')
     categories = Category.objects.all()
     
+    # Pagination
+    paginator = Paginator(products, 12)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    
     context = {
-        'products': products,
+        'products': page_obj,
+        'page_obj': page_obj,
         'categories': categories,
         'current_category': category_id,
         'category': category,

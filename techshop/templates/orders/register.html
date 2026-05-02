@@ -1,414 +1,319 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Register - Tech Shop{% endblock %}
+{% block title %}Create Account | Premium Collection{% endblock %}
 
 {% block extra_css %}
 <style>
-    :root {
-        --primary-green: #16a34a;
-        --dark-green: #15803d;
-        --light-green: #dcfce7;
-    }
-    
-    .register-page {
+    .auth-page {
         min-height: 80vh;
         display: flex;
         align-items: center;
-        background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 50%, #bbf7d0 100%);
-        padding: 2rem 0;
-    }
-    
-    .register-card {
-        border: none;
-        border-radius: 24px;
-        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
-        overflow: hidden;
-        background: white;
-    }
-    
-    .register-header {
-        background: linear-gradient(135deg, var(--primary-green) 0%, var(--dark-green) 100%);
-        padding: 2.5rem 2rem;
-        text-align: center;
-        color: white;
+        justify-content: center;
+        background: var(--bg-color);
+        padding: 80px 20px;
         position: relative;
         overflow: hidden;
     }
     
-    .register-header::before {
+    .auth-page::before {
         content: '';
         position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.08'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
-        opacity: 0.5;
-    }
-    
-    .register-icon {
-        width: 70px;
-        height: 70px;
+        top: -20%;
+        left: -10%;
+        width: 600px;
+        height: 600px;
+        background: radial-gradient(circle, rgba(79, 70, 229, 0.1) 0%, transparent 70%);
         border-radius: 50%;
-        background: rgba(255, 255, 255, 0.2);
+        z-index: 0;
+    }
+
+    .auth-page::after {
+        content: '';
+        position: absolute;
+        bottom: -20%;
+        right: -10%;
+        width: 500px;
+        height: 500px;
+        background: radial-gradient(circle, rgba(236, 72, 153, 0.05) 0%, transparent 70%);
+        border-radius: 50%;
+        z-index: 0;
+    }
+
+    .auth-card {
+        width: 100%;
+        max-width: 600px;
+        background: var(--surface-color);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-lg);
+        position: relative;
+        z-index: 10;
+        overflow: hidden;
+    }
+
+    .auth-header {
+        background: linear-gradient(135deg, #0b0f19 0%, #1e1b4b 100%);
+        padding: 40px;
+        text-align: center;
+        color: white;
+    }
+
+    .auth-icon {
+        width: 64px;
+        height: 64px;
+        background: rgba(255,255,255,0.1);
+        border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
-        margin: 0 auto 1rem;
-        font-size: 2rem;
-        position: relative;
+        font-size: 28px;
+        margin: 0 auto 16px;
+        backdrop-filter: blur(10px);
     }
-    
-    .register-header h3 {
-        font-weight: 700;
-        margin-bottom: 0.5rem;
-        position: relative;
+
+    .auth-title {
+        font-family: 'Outfit', sans-serif;
+        font-size: 28px;
+        font-weight: 800;
+        margin-bottom: 8px;
     }
-    
-    .register-header p {
-        opacity: 0.9;
-        margin-bottom: 0;
-        position: relative;
+
+    .auth-subtitle {
+        color: #94a3b8;
+        font-size: 15px;
     }
-    
-    .register-body {
-        padding: 2rem;
+
+    .auth-body {
+        padding: 40px;
     }
-    
+
+    .form-group {
+        margin-bottom: 24px;
+    }
+
     .form-label {
+        font-size: 14px;
         font-weight: 600;
-        color: #374151;
-        margin-bottom: 0.5rem;
+        color: var(--text-main);
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
     }
-    
-    .form-label .required {
-        color: #dc2626;
+
+    .required-star {
+        color: var(--danger);
     }
-    
-    .input-group {
-        position: relative;
-    }
-    
-    .input-icon {
-        position: absolute;
-        left: 1rem;
-        top: 50%;
-        transform: translateY(-50%);
-        z-index: 10;
-        color: #9ca3af;
-    }
-    
+
     .form-control {
-        border: 2px solid #e5e7eb;
-        border-radius: 12px;
-        padding: 0.875rem 1rem;
-        font-size: 1rem;
-        transition: all 0.3s;
+        width: 100%;
+        padding: 14px 16px;
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-md);
+        font-family: 'Inter', sans-serif;
+        font-size: 15px;
+        background: var(--bg-color);
+        color: var(--text-main);
+        transition: all var(--transition-fast);
     }
-    
+
     .form-control:focus {
-        border-color: var(--primary-green);
-        box-shadow: 0 0 0 4px rgba(22, 163, 74, 0.1);
+        outline: none;
+        border-color: var(--primary);
+        background: var(--surface-color);
+        box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
     }
-    
+
     .form-control.is-invalid {
-        border-color: #dc2626;
-    }
-    
-    .invalid-feedback {
-        color: #dc2626;
-        font-size: 0.875rem;
-    }
-    
-    .form-text {
-        color: #6b7280;
-        font-size: 0.875rem;
-    }
-    
-    .password-hint {
-        background: #f0fdf4;
-        border: 1px solid #bbf7d0;
-        border-radius: 12px;
-        padding: 1rem;
-        margin-bottom: 1.5rem;
-    }
-    
-    .password-hint-title {
-        font-weight: 600;
-        color: var(--dark-green);
-        margin-bottom: 0.5rem;
-    }
-    
-    .password-hint ul {
-        margin-bottom: 0;
-        padding-left: 1.25rem;
-    }
-    
-    .password-hint li {
-        color: #15803d;
-        font-size: 0.875rem;
-    }
-    
-    .section-title {
-        font-weight: 600;
-        color: #374151;
-        margin-bottom: 1rem;
-        padding-bottom: 0.5rem;
-        border-bottom: 2px solid #e5e7eb;
-    }
-    
-    .location-btn {
-        background: transparent;
-        border: 2px solid var(--primary-green);
-        color: var(--primary-green);
-        border-radius: 10px;
-        padding: 0.5rem 1rem;
-        font-size: 0.875rem;
-        font-weight: 500;
-        transition: all 0.3s;
-        width: 100%;
-    }
-    
-    .location-btn:hover {
-        background: var(--primary-green);
-        color: white;
-    }
-    
-    .btn-register {
-        background: linear-gradient(135deg, var(--primary-green) 0%, var(--dark-green) 100%);
-        color: white;
-        border: none;
-        border-radius: 12px;
-        padding: 1rem;
-        font-weight: 600;
-        font-size: 1rem;
-        transition: all 0.3s;
-        width: 100%;
-    }
-    
-    .btn-register:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 25px rgba(22, 163, 74, 0.35);
-        color: white;
-    }
-    
-    .login-link {
-        text-align: center;
-        margin-top: 1.5rem;
-        padding-top: 1.5rem;
-        border-top: 1px solid #e5e7eb;
-    }
-    
-    .login-link a {
-        color: var(--primary-green);
-        font-weight: 600;
-        text-decoration: none;
-        transition: color 0.3s;
-    }
-    
-    .login-link a:hover {
-        color: var(--dark-green);
-    }
-    
-    .alert-danger {
-        border-radius: 12px;
-        border: none;
+        border-color: var(--danger);
         background: #fef2f2;
-        color: #dc2626;
     }
-    
-    .optional-badge {
-        background: #f3f4f6;
-        color: #6b7280;
-        font-size: 0.75rem;
-        padding: 0.25rem 0.5rem;
-        border-radius: 4px;
+
+    .invalid-feedback {
+        color: var(--danger);
+        font-size: 13px;
+        margin-top: 6px;
+        font-weight: 500;
+    }
+
+    .form-hint {
+        color: var(--text-muted);
+        font-size: 13px;
+        margin-top: 6px;
+    }
+
+    .section-divider {
+        display: flex;
+        align-items: center;
+        text-align: center;
+        margin: 32px 0;
+        color: var(--text-muted);
+        font-size: 14px;
+        font-weight: 600;
+    }
+
+    .section-divider::before,
+    .section-divider::after {
+        content: '';
+        flex: 1;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .section-divider:not(:empty)::before { margin-right: .25em; }
+    .section-divider:not(:empty)::after { margin-left: .25em; }
+
+    .btn-submit {
+        width: 100%;
+        padding: 16px;
+        background: linear-gradient(135deg, var(--primary) 0%, #6366f1 100%);
+        color: white;
+        border: none;
+        border-radius: var(--radius-md);
+        font-family: 'Outfit', sans-serif;
+        font-size: 16px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all var(--transition-bounce);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        box-shadow: var(--shadow-glow);
+        margin-top: 16px;
+    }
+
+    .btn-submit:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 24px rgba(79, 70, 229, 0.3);
+    }
+
+    .auth-footer {
+        text-align: center;
+        margin-top: 32px;
+        padding-top: 24px;
+        border-top: 1px solid var(--border-color);
+        font-size: 15px;
+        color: var(--text-muted);
+    }
+
+    .auth-footer a {
+        color: var(--primary);
+        font-weight: 600;
+        transition: color var(--transition-fast);
+    }
+
+    .auth-footer a:hover {
+        color: var(--text-main);
+        text-decoration: underline;
+    }
+
+    .alert-box {
+        background: #fef2f2;
+        border-left: 4px solid var(--danger);
+        padding: 16px;
+        border-radius: var(--radius-md);
+        color: var(--danger);
+        font-size: 14px;
+        margin-bottom: 24px;
         font-weight: 500;
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="register-page">
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-md-8 col-lg-6">
-                <div class="register-card">
-                    <div class="register-header">
-                        <div class="register-icon">
-                            <i class="bi bi-person-plus"></i>
-                        </div>
-                        <h3>Create Account</h3>
-                        <p>Join Tech Shop for exclusive deals and offers</p>
+<div class="auth-page">
+    <div class="auth-card">
+        <div class="auth-header">
+            <div class="auth-icon"><i class="bi bi-person-plus-fill"></i></div>
+            <h1 class="auth-title">Create Account</h1>
+            <p class="auth-subtitle">Join the premium tech community.</p>
+        </div>
+        
+        <div class="auth-body">
+            <form method="post">
+                {% csrf_token %}
+
+                {% if form.non_field_errors %}
+                <div class="alert-box">
+                    <i class="bi bi-exclamation-octagon-fill me-2"></i>
+                    {{ form.non_field_errors }}
+                </div>
+                {% endif %}
+
+                <div class="form-group">
+                    <label for="{{ form.username.id_for_label }}" class="form-label">
+                        <i class="bi bi-person"></i> Username <span class="required-star">*</span>
+                    </label>
+                    <input type="text" 
+                        class="form-control {% if form.username.errors %}is-invalid{% endif %}"
+                        id="{{ form.username.id_for_label }}" 
+                        name="{{ form.username.name }}"
+                        value="{{ form.username.value|default:'' }}" 
+                        placeholder="Choose a unique username">
+                    {% if form.username.errors %}
+                    <div class="invalid-feedback">{{ form.username.errors }}</div>
+                    {% endif %}
+                    <div class="form-hint">Only letters, numbers, and @/./+/-/_ are allowed.</div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 form-group">
+                        <label for="{{ form.password1.id_for_label }}" class="form-label">
+                            <i class="bi bi-shield-lock"></i> Password <span class="required-star">*</span>
+                        </label>
+                        <input type="password"
+                            class="form-control {% if form.password1.errors %}is-invalid{% endif %}"
+                            id="{{ form.password1.id_for_label }}" 
+                            name="{{ form.password1.name }}"
+                            placeholder="Create password">
+                        {% if form.password1.errors %}
+                        <div class="invalid-feedback">{{ form.password1.errors }}</div>
+                        {% endif %}
                     </div>
-                    <div class="register-body">
-                        <form method="post">
-                            {% csrf_token %}
-
-                            {% if form.non_field_errors %}
-                            <div class="alert alert-danger py-3 mb-4">
-                                <i class="bi bi-exclamation-triangle me-2"></i>
-                                {{ form.non_field_errors }}
-                            </div>
-                            {% endif %}
-
-                            <!-- Account Info -->
-                            <h6 class="section-title">
-                                <i class="bi bi-person-badge me-2"></i>Account Information
-                            </h6>
-                            
-                            <div class="mb-4">
-                                <label for="{{ form.username.id_for_label }}" class="form-label">
-                                    Username <span class="required">*</span>
-                                </label>
-                                <input type="text" 
-                                    class="form-control {% if form.username.errors %}is-invalid{% endif %}"
-                                    id="{{ form.username.id_for_label }}" 
-                                    name="{{ form.username.name }}"
-                                    value="{{ form.username.value|default:'' }}" 
-                                    placeholder="Choose a username">
-                                {% if form.username.errors %}
-                                <div class="invalid-feedback">{{ form.username.errors }}</div>
-                                {% endif %}
-                                <div class="form-text">Letters, digits and @/./+/-/_ only.</div>
-                            </div>
-
-                            <div class="row g-3 mb-4">
-                                <div class="col-md-6">
-                                    <label for="{{ form.password1.id_for_label }}" class="form-label">
-                                        Password <span class="required">*</span>
-                                    </label>
-                                    <input type="password"
-                                        class="form-control {% if form.password1.errors %}is-invalid{% endif %}"
-                                        id="{{ form.password1.id_for_label }}" 
-                                        name="{{ form.password1.name }}"
-                                        placeholder="Create password">
-                                    {% if form.password1.errors %}
-                                    <div class="invalid-feedback">{{ form.password1.errors }}</div>
-                                    {% endif %}
-                                </div>
-                                <div class="col-md-6">
-                                    <label for="{{ form.password2.id_for_label }}" class="form-label">
-                                        Confirm Password <span class="required">*</span>
-                                    </label>
-                                    <input type="password"
-                                        class="form-control {% if form.password2.errors %}is-invalid{% endif %}"
-                                        id="{{ form.password2.id_for_label }}" 
-                                        name="{{ form.password2.name }}"
-                                        placeholder="Confirm password">
-                                    {% if form.password2.errors %}
-                                    <div class="invalid-feedback">{{ form.password2.errors }}</div>
-                                    {% endif %}
-                                </div>
-                            </div>
-
-                            <div class="password-hint mb-4">
-                                <div class="password-hint-title">
-                                    <i class="bi bi-shield-check me-2"></i>Password Requirements
-                                </div>
-                                <ul>
-                                    <li>At least 8 characters long</li>
-                                    <li>Not entirely numeric</li>
-                                    <li>Not too common</li>
-                                </ul>
-                            </div>
-
-                            <!-- Address Section -->
-                            <h6 class="section-title">
-                                <i class="bi bi-house me-2"></i>Address Information 
-                                <span class="optional-badge">Optional</span>
-                            </h6>
-                            
-                            <div class="mb-3">
-                                <label for="address" class="form-label">Street Address</label>
-                                <input type="text" class="form-control" id="address" name="address"
-                                    placeholder="Enter your street address">
-                            </div>
-                            
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label for="city" class="form-label">City</label>
-                                    <input type="text" class="form-control" id="city" name="city" placeholder="Enter city">
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label for="zip_code" class="form-label">ZIP Code</label>
-                                    <input type="text" class="form-control" id="zip_code" name="zip_code"
-                                        placeholder="Enter ZIP code">
-                                </div>
-                            </div>
-
-                            <div class="mt-4">
-                                <button type="submit" class="btn-register">
-                                    <i class="bi bi-person-plus me-2"></i> Create Account
-                                </button>
-                            </div>
-                        </form>
-
-                        <div class="login-link">
-                            <p class="text-muted mb-0">Already have an account?
-                                <a href="{% url 'login' %}">Sign in</a>
-                            </p>
-                        </div>
+                    
+                    <div class="col-md-6 form-group">
+                        <label for="{{ form.password2.id_for_label }}" class="form-label">
+                            <i class="bi bi-shield-check"></i> Confirm <span class="required-star">*</span>
+                        </label>
+                        <input type="password"
+                            class="form-control {% if form.password2.errors %}is-invalid{% endif %}"
+                            id="{{ form.password2.id_for_label }}" 
+                            name="{{ form.password2.name }}"
+                            placeholder="Repeat password">
+                        {% if form.password2.errors %}
+                        <div class="invalid-feedback">{{ form.password2.errors }}</div>
+                        {% endif %}
                     </div>
                 </div>
+
+                <div class="section-divider">Optional Shipping Details</div>
+                
+                <div class="form-group">
+                    <label for="address" class="form-label"><i class="bi bi-geo-alt"></i> Street Address</label>
+                    <input type="text" class="form-control" id="address" name="address" placeholder="123 Main St">
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6 form-group">
+                        <label for="city" class="form-label">City</label>
+                        <input type="text" class="form-control" id="city" name="city" placeholder="City">
+                    </div>
+                    <div class="col-md-6 form-group">
+                        <label for="zip_code" class="form-label">ZIP Code</label>
+                        <input type="text" class="form-control" id="zip_code" name="zip_code" placeholder="Postal Code">
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-submit">
+                    <i class="bi bi-person-plus"></i> Register Now
+                </button>
+            </form>
+
+            <div class="auth-footer">
+                Already have an account? <a href="{% url 'login' %}">Sign In</a>
             </div>
         </div>
     </div>
 </div>
-
-<script>
-    function getLocation() {
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(showPosition, showError);
-        } else {
-            alert("Geolocation is not supported by this browser.");
-        }
-    }
-
-    function showPosition(position) {
-        var lat = position.coords.latitude;
-        var lon = position.coords.longitude;
-        var btn = event.target;
-        var originalText = btn.innerHTML;
-        btn.innerHTML = '<i class="bi bi-hourglass-split me-1"></i> Getting location...';
-        btn.disabled = true;
-
-        fetch('https://nominatim.openstreetmap.org/reverse?format=json&lat=' + lat + '&lon=' + lon)
-            .then(response => response.json())
-            .then(data => {
-                if (data.address) {
-                    document.getElementById('address').value = data.display_name.split(',').slice(0, 3).join(',');
-                    var city = data.address.city || data.address.town || data.address.village || data.address.county;
-                    document.getElementById('city').value = city || '';
-                    document.getElementById('zip_code').value = data.address.postcode || '';
-                }
-                btn.innerHTML = originalText;
-                btn.disabled = false;
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('Unable to get address from location. Please enter manually.');
-                btn.innerHTML = originalText;
-                btn.disabled = false;
-            });
-    }
-
-    function showError(error) {
-        switch (error.code) {
-            case error.PERMISSION_DENIED:
-                alert("User denied the request for Geolocation.");
-                break;
-            case error.POSITION_UNAVAILABLE:
-                alert("Location information is unavailable.");
-                break;
-            case error.TIMEOUT:
-                alert("The request to get user location timed out.");
-                break;
-            default:
-                alert("An unknown error occurred.");
-                break;
-        }
-    }
-</script>
 {% endblock %}

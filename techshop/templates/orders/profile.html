@@ -1,241 +1,286 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}My Profile - TechShop{% endblock %}
+{% block title %}My Profile | Premium Collection{% endblock %}
 
 {% block extra_css %}
 <style>
-    /* Hide store navbar on profile page */
-    .navbar.navbar-expand-lg.navbar-light.bg-white.border-top {
-        display: none !important;
-    }
-    
-    :root {
-        --primary-green: #16a34a;
-        --dark-green: #15803d;
-        --light-green: #dcfce7;
-    }
-    
-    .profile-card {
-        border: none;
-        border-radius: 16px;
-        overflow: hidden;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-    }
-
-    .profile-header {
-        background: linear-gradient(135deg, var(--primary-green) 0%, var(--dark-green) 100%);
+    /* Header Gradient */
+    .shop-header {
+        background: linear-gradient(135deg, #0b0f19 0%, #1e1b4b 100%);
+        padding: 60px 0;
+        margin-bottom: 48px;
+        border-radius: 0 0 40px 40px;
         color: white;
-        padding: 2.5rem 2rem;
         position: relative;
+        overflow: hidden;
     }
 
-    .profile-header::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
-        opacity: 0.5;
+    .shop-title {
+        font-size: 40px;
+        font-weight: 800;
+        margin-bottom: 12px;
+        background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        position: relative;
+        z-index: 10;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+
+    /* Layout */
+    .profile-layout {
+        display: grid;
+        grid-template-columns: 280px 1fr;
+        gap: 40px;
+        margin-bottom: 80px;
+    }
+
+    /* Sidebar Navigation */
+    .sidebar-card {
+        background: var(--surface-color);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-lg);
+        overflow: hidden;
+        position: sticky;
+        top: 100px;
+        box-shadow: var(--shadow-sm);
+    }
+
+    .profile-summary {
+        padding: 32px 24px;
+        text-align: center;
+        border-bottom: 1px solid var(--border-color);
+        background: linear-gradient(to bottom, rgba(79,70,229,0.05), transparent);
     }
 
     .avatar-wrapper {
         position: relative;
         display: inline-block;
+        margin-bottom: 16px;
     }
 
     .avatar-circle {
-        width: 120px;
-        height: 120px;
+        width: 100px;
+        height: 100px;
         border-radius: 50%;
         object-fit: cover;
-        border: 5px solid rgba(255, 255, 255, 0.4);
-        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        border: 4px solid var(--surface-color);
+        box-shadow: var(--shadow-md);
+        background: var(--bg-color);
     }
 
     .avatar-letter {
-        width: 120px;
-        height: 120px;
+        width: 100px;
+        height: 100px;
         border-radius: 50%;
-        background: rgba(255, 255, 255, 0.25);
+        background: linear-gradient(135deg, var(--primary) 0%, #6366f1 100%);
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 3rem;
+        font-family: 'Outfit', sans-serif;
+        font-size: 40px;
+        font-weight: 800;
+        color: white;
+        border: 4px solid var(--surface-color);
+        box-shadow: var(--shadow-md);
+    }
+
+    .profile-name {
+        font-family: 'Outfit', sans-serif;
+        font-size: 20px;
         font-weight: 700;
-        color: #fff;
-        border: 5px solid rgba(255, 255, 255, 0.4);
-        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        color: var(--text-main);
+        margin-bottom: 4px;
     }
 
-    .avatar-upload-btn {
-        position: absolute;
-        bottom: 5px;
-        right: 5px;
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        background: #fff;
-        color: var(--primary-green);
-        border: 3px solid var(--primary-green);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        transition: all 0.3s;
-        font-size: 1rem;
-    }
-
-    .avatar-upload-btn:hover {
-        background: var(--primary-green);
-        color: #fff;
-        transform: scale(1.1);
-    }
-
-    .sidebar-card {
-        border: none;
-        border-radius: 16px;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-        overflow: hidden;
+    .profile-email {
+        font-size: 14px;
+        color: var(--text-muted);
     }
 
     .sidebar-menu {
         list-style: none;
-        padding: 0;
+        padding: 16px 0;
         margin: 0;
     }
 
     .sidebar-menu li a {
         display: flex;
         align-items: center;
-        padding: 1rem 1.5rem;
-        color: #495057;
-        text-decoration: none;
-        transition: all 0.3s;
-        border-left: 4px solid transparent;
+        gap: 12px;
+        padding: 12px 24px;
+        color: var(--text-muted);
+        font-weight: 600;
+        transition: all var(--transition-fast);
+        border-left: 3px solid transparent;
     }
 
     .sidebar-menu li a:hover {
-        background: var(--light-green);
-        color: var(--primary-green);
-        border-left-color: var(--primary-green);
+        background: var(--bg-color);
+        color: var(--text-main);
     }
 
     .sidebar-menu li a.active {
-        background: var(--light-green);
-        color: var(--primary-green);
-        border-left-color: var(--primary-green);
-        font-weight: 600;
+        background: rgba(79,70,229,0.05);
+        color: var(--primary);
+        border-left-color: var(--primary);
     }
 
     .sidebar-menu li a i {
-        width: 24px;
-        font-size: 1.1rem;
+        font-size: 20px;
     }
 
+    /* Main Content */
     .content-card {
-        border: none;
-        border-radius: 16px;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        background: var(--surface-color);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-lg);
+        padding: 40px;
+        box-shadow: var(--shadow-sm);
     }
 
-    .content-card .card-header {
-        background: white;
-        border-bottom: 2px solid #f0f0f0;
-        padding: 1.5rem 2rem;
-        border-radius: 16px 16px 0 0 !important;
+    .content-header {
+        margin-bottom: 32px;
+        padding-bottom: 24px;
+        border-bottom: 1px solid var(--border-color);
     }
 
-    .content-card .card-body {
-        padding: 2rem;
+    .content-title {
+        font-family: 'Outfit', sans-serif;
+        font-size: 24px;
+        font-weight: 800;
+        color: var(--text-main);
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .form-group {
+        margin-bottom: 24px;
     }
 
     .form-label {
+        font-size: 14px;
         font-weight: 600;
-        color: #374151;
-        margin-bottom: 0.5rem;
+        color: var(--text-main);
+        margin-bottom: 8px;
+        display: block;
     }
 
     .form-control {
-        border: 2px solid #e5e7eb;
-        border-radius: 10px;
-        padding: 0.75rem 1rem;
-        transition: all 0.3s;
+        width: 100%;
+        padding: 14px 16px;
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-md);
+        font-family: 'Inter', sans-serif;
+        font-size: 15px;
+        background: var(--bg-color);
+        color: var(--text-main);
+        transition: all var(--transition-fast);
     }
 
     .form-control:focus {
-        border-color: var(--primary-green);
-        box-shadow: 0 0 0 4px rgba(22, 163, 74, 0.1);
+        outline: none;
+        border-color: var(--primary);
+        background: var(--surface-color);
+        box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+    }
+
+    .form-control:disabled {
+        background: #f1f5f9;
+        cursor: not-allowed;
+        color: var(--text-muted);
     }
 
     .btn-save {
-        background: linear-gradient(135deg, var(--primary-green) 0%, var(--dark-green) 100%);
+        padding: 16px 32px;
+        background: linear-gradient(135deg, var(--primary) 0%, #6366f1 100%);
         color: white;
         border: none;
-        padding: 0.75rem 2rem;
-        border-radius: 10px;
-        font-weight: 600;
-        transition: all 0.3s;
+        border-radius: var(--radius-md);
+        font-family: 'Outfit', sans-serif;
+        font-size: 16px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all var(--transition-bounce);
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        box-shadow: var(--shadow-glow);
     }
 
     .btn-save:hover {
         transform: translateY(-2px);
-        box-shadow: 0 8px 20px rgba(22, 163, 74, 0.3);
-        color: white;
+        box-shadow: 0 12px 24px rgba(79, 70, 229, 0.3);
+    }
+
+    .btn-location {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 16px;
+        background: var(--surface-color);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-sm);
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--text-main);
+        cursor: pointer;
+        transition: all var(--transition-fast);
+        float: right;
+        margin-top: -30px;
+    }
+
+    .btn-location:hover {
+        background: var(--bg-color);
+        border-color: var(--primary);
+        color: var(--primary);
+    }
+
+    /* Picture Upload Preview */
+    .upload-group {
+        display: flex;
+        align-items: center;
+        gap: 24px;
+        padding: 24px;
+        background: var(--bg-color);
+        border-radius: var(--radius-md);
+        border: 1px solid var(--border-color);
     }
 
     .picture-preview {
-        width: 100px;
-        height: 100px;
-        border-radius: 12px;
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
         object-fit: cover;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        box-shadow: var(--shadow-sm);
     }
 
-    .location-btn {
-        background: transparent;
-        border: 2px solid var(--primary-green);
-        color: var(--primary-green);
-        border-radius: 8px;
-        padding: 0.5rem 1rem;
-        font-size: 0.875rem;
-        transition: all 0.3s;
-    }
-
-    .location-btn:hover {
-        background: var(--primary-green);
-        color: white;
-    }
-
-    .section-divider {
-        height: 2px;
-        background: linear-gradient(90deg, transparent, #e5e7eb, transparent);
-        margin: 2rem 0;
-    }
-
-    .info-icon {
-        width: 40px;
-        height: 40px;
-        border-radius: 10px;
-        background: var(--light-green);
-        color: var(--primary-green);
-        display: flex;
-        align-items: center;
-        justify-content: center;
+    @media (max-width: 991px) {
+        .profile-layout { grid-template-columns: 1fr; }
+        .sidebar-card { position: static; }
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="container py-5">
-    <div class="row g-4">
-        <!-- Profile Sidebar -->
-        <div class="col-lg-3">
+<div class="shop-header">
+    <div class="container">
+        <h1 class="shop-title"><i class="bi bi-person-badge"></i> Account Settings</h1>
+        <p style="color: #94a3b8; font-size: 16px;">Manage your premium profile and preferences.</p>
+    </div>
+</div>
+
+<div class="container">
+    <div class="profile-layout">
+        <!-- Sidebar -->
+        <aside>
             <div class="sidebar-card">
-                <div class="profile-header text-center">
-                    <div class="avatar-wrapper mx-auto position-relative">
+                <div class="profile-summary">
+                    <div class="avatar-wrapper">
                         {% if customer.profile_picture %}
                         <img src="{{ customer.profile_picture.url }}" alt="Profile Picture" class="avatar-circle">
                         {% else %}
@@ -244,177 +289,127 @@
                         </div>
                         {% endif %}
                     </div>
-                    <h4 class="mt-3 mb-1 fw-bold">{{ user.username }}</h4>
-                    <small class="opacity-75">{{ user.email }}</small>
+                    <div class="profile-name">{{ user.username }}</div>
+                    <div class="profile-email">{{ user.email }}</div>
                 </div>
+                
                 <ul class="sidebar-menu">
                     <li>
-                        <a href="#profile-info" class="active" data-bs-toggle="pill">
-                            <i class="bi bi-person"></i>Profile Info
+                        <a href="#profile-info" class="active">
+                            <i class="bi bi-person-lines-fill"></i> Profile Info
                         </a>
                     </li>
                     <li>
                         <a href="{% url 'orders:order_history' %}">
-                            <i class="bi bi-bag"></i>My Orders
+                            <i class="bi bi-bag-check-fill"></i> My Orders
                         </a>
                     </li>
                     <li>
                         <a href="{% url 'wishlist:wishlist_view' %}">
-                            <i class="bi bi-heart"></i>Wishlist
+                            <i class="bi bi-heart-fill"></i> Wishlist
                         </a>
                     </li>
                     {% if user.is_staff %}
                     <li>
-                        <a href="{% url 'admin_dashboard:dashboard' %}" class="text-success">
-                            <i class="bi bi-speedometer2"></i>Dashboard
+                        <a href="{% url 'admin_dashboard:dashboard' %}" style="color: var(--accent);">
+                            <i class="bi bi-speedometer2"></i> Admin Dashboard
                         </a>
                     </li>
                     {% endif %}
                     <li>
-                        <a href="{% url 'logout' %}" class="text-danger">
-                            <i class="bi bi-box-arrow-right"></i>Logout
+                        <a href="{% url 'logout' %}" style="color: var(--danger);">
+                            <i class="bi bi-box-arrow-right"></i> Sign Out
                         </a>
                     </li>
                 </ul>
             </div>
-        </div>
+        </aside>
 
-        <!-- Profile Content -->
-        <div class="col-lg-9">
-            <div class="tab-content">
-                <!-- Profile Info -->
-                <div class="tab-pane fade show active" id="profile-info">
-                    <div class="content-card">
-                        <div class="card-header">
-                            <h4 class="mb-0 fw-bold"><i class="bi bi-person-circle me-2 text-success"></i>Profile Information</h4>
-                        </div>
-                        <div class="card-body">
-                            <form method="post" enctype="multipart/form-data">
-                                {% csrf_token %}
+        <!-- Content -->
+        <main>
+            <div class="content-card">
+                <div class="content-header">
+                    <h2 class="content-title"><i class="bi bi-gear-fill text-primary"></i> Personal Details</h2>
+                </div>
 
-                                <!-- Profile Picture Section -->
-                                <div class="row mb-4">
-                                    <div class="col-12">
-                                        <label class="form-label d-flex align-items-center">
-                                            <span class="info-icon me-3">
-                                                <i class="bi bi-camera"></i>
-                                            </span>
-                                            Profile Picture
-                                        </label>
-                                        <div class="d-flex align-items-center gap-4">
-                                            {% if customer.profile_picture %}
-                                            <img src="{{ customer.profile_picture.url }}" alt="Current Profile Picture"
-                                                class="picture-preview" id="picturePreview">
-                                            {% else %}
-                                            <div class="avatar-letter"
-                                                style="width: 80px; height: 80px; font-size: 2rem; background: linear-gradient(135deg, #16a34a, #15803d);"
-                                                id="picturePreview">
-                                                {{ user.username|make_list|first|upper }}
-                                            </div>
-                                            {% endif %}
-                                            <div>
-                                                <input type="file" class="form-control" id="profile_picture"
-                                                    name="profile_picture" accept="image/*"
-                                                    onchange="previewImage(this)"
-                                                    style="max-width: 300px;">
-                                                <small class="text-muted">JPG, PNG or GIF. Max 2MB.</small>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
 
-                                <div class="section-divider"></div>
-
-                                <!-- Account Info -->
-                                <div class="row mb-4">
-                                    <div class="col-md-6">
-                                        <label class="form-label">
-                                            <i class="bi bi-person-badge me-2 text-success"></i>Username
-                                        </label>
-                                        <input type="text" class="form-control" value="{{ user.username }}" disabled>
-                                        <small class="text-muted">Username cannot be changed</small>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label class="form-label">
-                                            <i class="bi bi-envelope me-2 text-success"></i>Email
-                                        </label>
-                                        <input type="email" class="form-control" value="{{ user.email }}" disabled>
-                                        <small class="text-muted">Contact support to change email</small>
-                                    </div>
-                                </div>
-
-                                <div class="section-divider"></div>
-
-                                <!-- Shipping Information -->
-                                <h5 class="mb-4 fw-bold">
-                                    <i class="bi bi-truck me-2 text-success"></i>Shipping Information
-                                </h5>
-
-                                <div class="row">
-                                    <div class="col-12 mb-3">
-                                        <label for="phone" class="form-label">
-                                            <i class="bi bi-phone me-2 text-success"></i>Phone Number
-                                        </label>
-                                        <input type="tel" class="form-control" id="phone" name="phone"
-                                            value="{{ customer.phone|default:'' }}"
-                                            placeholder="Enter your phone number">
-                                    </div>
-
-                                    <div class="col-12 mb-3">
-                                        <div class="d-flex justify-content-between align-items-center">
-                                            <label for="address" class="form-label mb-0">
-                                                <i class="bi bi-house me-2 text-success"></i>Address
-                                            </label>
-                                            <button type="button" class="location-btn"
-                                                onclick="getLocation()">
-                                                <i class="bi bi-geo-alt me-1"></i> Use My Location
-                                            </button>
-                                        </div>
-                                        <textarea class="form-control mt-2" id="address" name="address" rows="2"
-                                            placeholder="Enter your street address">{{ customer.address|default:'' }}</textarea>
-                                    </div>
-
-                                    <div class="col-md-6 mb-3">
-                                        <label for="city" class="form-label">
-                                            <i class="bi bi-building me-2 text-success"></i>City
-                                        </label>
-                                        <input type="text" class="form-control" id="city" name="city"
-                                            value="{{ customer.city|default:'' }}" placeholder="Enter city">
-                                    </div>
-
-                                    <div class="col-md-6 mb-3">
-                                        <label for="state" class="form-label">
-                                            <i class="bi bi-map me-2 text-success"></i>State/Province
-                                        </label>
-                                        <input type="text" class="form-control" id="state" name="state"
-                                            value="{{ customer.state|default:'' }}" placeholder="Enter state">
-                                    </div>
-
-                                    <div class="col-md-6 mb-3">
-                                        <label for="zip_code" class="form-label">
-                                            <i class="bi bi-postcard me-2 text-success"></i>ZIP/Postal Code
-                                        </label>
-                                        <input type="text" class="form-control" id="zip_code" name="zip_code"
-                                            value="{{ customer.zip_code|default:'' }}" placeholder="Enter ZIP code">
-                                    </div>
-                                </div>
-
-                                <div class="mt-4">
-                                    <button type="submit" class="btn-save">
-                                        <i class="bi bi-check-circle me-2"></i>Save Changes
-                                    </button>
-                                </div>
-                            </form>
+                    <div class="form-group">
+                        <label class="form-label">Profile Avatar</label>
+                        <div class="upload-group">
+                            {% if customer.profile_picture %}
+                            <img src="{{ customer.profile_picture.url }}" alt="Avatar" class="picture-preview" id="picturePreview">
+                            {% else %}
+                            <div class="avatar-letter" style="width:80px; height:80px; font-size:32px;" id="picturePreview">
+                                {{ user.username|make_list|first|upper }}
+                            </div>
+                            {% endif %}
+                            
+                            <div style="flex: 1;">
+                                <input type="file" class="form-control" style="margin-bottom: 8px;" id="profile_picture" name="profile_picture" accept="image/*" onchange="previewImage(this)">
+                                <span style="font-size: 13px; color: var(--text-muted);">Recommended: Square JPG or PNG, max 2MB.</span>
+                            </div>
                         </div>
                     </div>
-                </div>
+
+                    <div class="row">
+                        <div class="col-md-6 form-group">
+                            <label class="form-label">Username</label>
+                            <input type="text" class="form-control" value="{{ user.username }}" disabled>
+                            <span style="font-size: 12px; color: var(--text-muted);">Username cannot be changed.</span>
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label class="form-label">Email Address</label>
+                            <input type="email" class="form-control" value="{{ user.email }}" disabled>
+                        </div>
+                    </div>
+
+                    <div class="content-header" style="margin-top: 24px;">
+                        <h2 class="content-title" style="font-size: 20px;"><i class="bi bi-truck text-primary"></i> Shipping Information</h2>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-12 form-group">
+                            <label class="form-label">Phone Number</label>
+                            <input type="tel" class="form-control" id="phone" name="phone" value="{{ customer.phone|default:'' }}" placeholder="+1 (555) 000-0000">
+                        </div>
+
+                        <div class="col-12 form-group">
+                            <label class="form-label">Street Address</label>
+                            <button type="button" class="btn-location" onclick="getLocation()">
+                                <i class="bi bi-geo-alt"></i> Use My Location
+                            </button>
+                            <textarea class="form-control" id="address" name="address" rows="3" placeholder="123 Tech Avenue, Suite 456">{{ customer.address|default:'' }}</textarea>
+                        </div>
+
+                        <div class="col-md-4 form-group">
+                            <label class="form-label">City</label>
+                            <input type="text" class="form-control" id="city" name="city" value="{{ customer.city|default:'' }}" placeholder="Metropolis">
+                        </div>
+
+                        <div class="col-md-4 form-group">
+                            <label class="form-label">State / Province</label>
+                            <input type="text" class="form-control" id="state" name="state" value="{{ customer.state|default:'' }}" placeholder="NY">
+                        </div>
+
+                        <div class="col-md-4 form-group">
+                            <label class="form-label">ZIP Code</label>
+                            <input type="text" class="form-control" id="zip_code" name="zip_code" value="{{ customer.zip_code|default:'' }}" placeholder="10001">
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 32px;">
+                        <button type="submit" class="btn-save">
+                            <i class="bi bi-check2-circle"></i> Save Preferences
+                        </button>
+                    </div>
+                </form>
             </div>
-        </div>
+        </main>
     </div>
 </div>
-{% endblock %}
 
-{% block extra_js %}
 <script>
     function previewImage(input) {
         if (input.files && input.files[0]) {
@@ -431,8 +426,7 @@
             reader.readAsDataURL(input.files[0]);
         }
     }
-</script>
-<script>
+
     function getLocation() {
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(showPosition, showError);
@@ -446,7 +440,7 @@
         var lon = position.coords.longitude;
         var btn = event.target;
         var originalText = btn.innerHTML;
-        btn.innerHTML = '<i class="bi bi-hourglass-split me-1"></i> Getting location...';
+        btn.innerHTML = '<i class="bi bi-hourglass-split me-1"></i> Locating...';
         btn.disabled = true;
 
         fetch('https://nominatim.openstreetmap.org/reverse?format=json&lat=' + lat + '&lon=' + lon)
@@ -471,7 +465,7 @@
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('Unable to get address from location. Please enter manually.');
+                alert('Unable to get address from location.');
                 btn.innerHTML = originalText;
                 btn.disabled = false;
             });
@@ -480,13 +474,13 @@
     function showError(error) {
         switch (error.code) {
             case error.PERMISSION_DENIED:
-                alert("User denied the request for Geolocation.");
+                alert("Permission denied for Geolocation.");
                 break;
             case error.POSITION_UNAVAILABLE:
                 alert("Location information is unavailable.");
                 break;
             case error.TIMEOUT:
-                alert("The request to get user location timed out.");
+                alert("The request timed out.");
                 break;
             default:
                 alert("An unknown error occurred.");

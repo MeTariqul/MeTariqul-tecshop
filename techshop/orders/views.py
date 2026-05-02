@@ -1,27 +1,20 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from django.urls import reverse_lazy
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth import login, authenticate
-from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
-from django.contrib.auth import authenticate
 from django.contrib import messages
-from django.db.models import Q
 from django.db import transaction
 from django.http import HttpResponse
 from decimal import Decimal
-import uuid
 import io
-import qrcode
-from reportlab.lib.pagesizes import A4, A5
+
+from reportlab.lib.pagesizes import A4
 from reportlab.lib import colors
-from reportlab.lib.units import mm, cm
-from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, Image as RLImage
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-from reportlab.lib.enums import TA_CENTER, TA_RIGHT, TA_LEFT
+from reportlab.lib.enums import TA_CENTER, TA_RIGHT
+
 from .fraud_detection import check_order_security
 from store.models import Product, Inventory
 from .models import WebCustomer, WebOrder, OrderItem, PaymentTransaction
-from cart.models import ShoppingCart, CartItem
 from admin_dashboard.models import SiteConfiguration
 
 # ====================

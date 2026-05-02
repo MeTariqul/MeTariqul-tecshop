@@ -1,330 +1,451 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Checkout - Tech Shop{% endblock %}
+{% block title %}Secure Checkout | Premium Collection{% endblock %}
 
 {% block extra_css %}
 <style>
-    /* Hide store navbar on checkout page */
-    .navbar.navbar-expand-lg.navbar-light.bg-white.border-top {
-        display: none !important;
+    .shop-header {
+        background: linear-gradient(135deg, #0b0f19 0%, #1e1b4b 100%);
+        padding: 60px 0;
+        margin-bottom: 48px;
+        border-radius: 0 0 40px 40px;
+        color: white;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .shop-title {
+        font-size: 40px;
+        font-weight: 800;
+        margin-bottom: 12px;
+        background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        position: relative;
+        z-index: 10;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+
+    /* Progress Indicator */
+    .checkout-progress {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        max-width: 600px;
+        margin: 0 auto 48px;
+        position: relative;
+    }
+
+    .checkout-progress::before {
+        content: '';
+        position: absolute;
+        top: 24px;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: var(--border-color);
+        z-index: 1;
+    }
+
+    .progress-step {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        position: relative;
+        z-index: 2;
+        gap: 12px;
+    }
+
+    .step-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        background: var(--surface-color);
+        border: 2px solid var(--border-color);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+        color: var(--text-muted);
+        transition: all var(--transition-fast);
+    }
+
+    .progress-step.completed .step-icon {
+        background: rgba(16, 185, 129, 0.1);
+        border-color: var(--success);
+        color: var(--success);
+    }
+
+    .progress-step.active .step-icon {
+        background: linear-gradient(135deg, var(--primary) 0%, #6366f1 100%);
+        border-color: transparent;
+        color: white;
+        box-shadow: var(--shadow-glow);
+    }
+
+    .step-label {
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .progress-step.active .step-label { color: var(--primary); }
+
+    /* Layout */
+    .checkout-layout {
+        display: grid;
+        grid-template-columns: 1fr 400px;
+        gap: 40px;
+        margin-bottom: 80px;
+    }
+
+    /* Form Cards */
+    .form-card {
+        background: var(--surface-color);
+        border-radius: var(--radius-lg);
+        padding: 32px;
+        border: 1px solid var(--border-color);
+        margin-bottom: 24px;
+        box-shadow: var(--shadow-sm);
+    }
+
+    .form-card-header {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        margin-bottom: 32px;
+        padding-bottom: 24px;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .form-icon-wrap {
+        width: 48px;
+        height: 48px;
+        border-radius: var(--radius-md);
+        background: rgba(79, 70, 229, 0.1);
+        color: var(--primary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+    }
+
+    .form-card-title {
+        font-family: 'Outfit', sans-serif;
+        font-size: 24px;
+        font-weight: 700;
+        color: var(--text-main);
+    }
+
+    .form-label {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--text-main);
+        margin-bottom: 8px;
+        display: block;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 14px 16px;
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-sm);
+        font-family: 'Inter', sans-serif;
+        font-size: 15px;
+        background: var(--bg-color);
+        color: var(--text-main);
+        transition: all var(--transition-fast);
+        margin-bottom: 20px;
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: var(--primary);
+        background: var(--surface-color);
+        box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+    }
+
+    /* Order Summary Small */
+    .order-items-preview {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .preview-item {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        padding: 16px;
+        background: var(--bg-color);
+        border-radius: var(--radius-md);
+    }
+
+    .preview-img {
+        width: 60px;
+        height: 60px;
+        border-radius: var(--radius-sm);
+        object-fit: contain;
+        background: white;
+        padding: 4px;
+    }
+
+    .preview-info { flex: 1; }
+    
+    .preview-name {
+        font-weight: 600;
+        color: var(--text-main);
+        margin-bottom: 4px;
+    }
+
+    .preview-sku {
+        font-size: 12px;
+        color: var(--text-muted);
+    }
+
+    .preview-price {
+        text-align: right;
+    }
+
+    .preview-total {
+        font-weight: 700;
+        color: var(--text-main);
+    }
+
+    /* Summary Card Sticky */
+    .summary-card {
+        background: var(--surface-color);
+        border-radius: var(--radius-lg);
+        padding: 32px;
+        border: 1px solid var(--border-color);
+        position: sticky;
+        top: 100px;
+        box-shadow: var(--shadow-sm);
+    }
+
+    .summary-title {
+        font-family: 'Outfit', sans-serif;
+        font-size: 24px;
+        font-weight: 800;
+        margin-bottom: 24px;
+        color: var(--text-main);
+    }
+
+    .summary-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 16px 0;
+        border-bottom: 1px solid var(--border-color);
+        font-size: 15px;
+        color: var(--text-muted);
+    }
+
+    .summary-row.total {
+        border-top: 2px solid var(--text-main);
+        border-bottom: none;
+        padding-top: 24px;
+        margin-top: 8px;
+    }
+
+    .summary-row.total span:first-child {
+        font-size: 18px;
+        font-weight: 700;
+        color: var(--text-main);
+    }
+
+    .summary-row.total span:last-child {
+        font-size: 28px;
+        font-family: 'Outfit', sans-serif;
+        font-weight: 800;
+        color: var(--primary);
+    }
+
+    .btn-place-order {
+        width: 100%;
+        padding: 16px;
+        background: linear-gradient(135deg, var(--primary) 0%, #6366f1 100%);
+        color: white;
+        border: none;
+        border-radius: var(--radius-md);
+        font-family: 'Outfit', sans-serif;
+        font-size: 16px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all var(--transition-bounce);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        margin-top: 32px;
+        box-shadow: var(--shadow-glow);
+    }
+
+    .btn-place-order:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 24px rgba(79, 70, 229, 0.3);
+    }
+
+    .trust-badge {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        margin-top: 24px;
+        font-size: 13px;
+        color: var(--text-muted);
+        font-weight: 500;
+    }
+
+    .trust-badge i {
+        color: var(--success);
+        font-size: 16px;
+    }
+
+    @media (max-width: 1024px) {
+        .checkout-layout { grid-template-columns: 1fr; }
+        .summary-card { position: static; }
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="container my-5">
-    <!-- Checkout Progress Bar -->
-    <div class="checkout-progress mb-4">
-        <div class="progress-step active">
-            <div class="step-circle"><i class="bi bi-cart-check"></i></div>
-            <span>Cart</span>
+<div class="shop-header">
+    <div class="container">
+        <h1 class="shop-title"><i class="bi bi-shield-lock-fill text-success"></i> Secure Checkout</h1>
+        <p style="color: #94a3b8; font-size: 16px;">Complete your purchase securely.</p>
+    </div>
+</div>
+
+<div class="container">
+    <div class="checkout-progress">
+        <div class="progress-step completed">
+            <div class="step-icon"><i class="bi bi-check-lg"></i></div>
+            <span class="step-label">Cart</span>
         </div>
         <div class="progress-step active">
-            <div class="step-circle"><i class="bi bi-truck"></i></div>
-            <span>Shipping</span>
+            <div class="step-icon"><i class="bi bi-truck"></i></div>
+            <span class="step-label">Shipping</span>
         </div>
         <div class="progress-step">
-            <div class="step-circle"><i class="bi bi-credit-card"></i></div>
-            <span>Payment</span>
+            <div class="step-icon"><i class="bi bi-credit-card"></i></div>
+            <span class="step-label">Payment</span>
         </div>
         <div class="progress-step">
-            <div class="step-circle"><i class="bi bi-check-circle"></i></div>
-            <span>Confirm</span>
+            <div class="step-icon"><i class="bi bi-flag"></i></div>
+            <span class="step-label">Confirm</span>
         </div>
     </div>
 
-    <style>
-        .checkout-progress {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 0;
-            max-width: 600px;
-            margin: 0 auto 30px;
-        }
-        
-        .progress-step {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            position: relative;
-            flex: 1;
-        }
-        
-        .progress-step:not(:last-child)::after {
-            content: '';
-            position: absolute;
-            top: 20px;
-            left: 50%;
-            width: 100%;
-            height: 3px;
-            background: #dee2e6;
-            z-index: 0;
-        }
-        
-        .progress-step.active:not(:last-child)::after {
-            background: #16a34a;
-        }
-        
-        .step-circle {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: #dee2e6;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 1;
-            transition: all 0.3s ease;
-        }
-        
-        .progress-step.active .step-circle {
-            background: #16a34a;
-            color: white;
-        }
-        
-        .progress-step span {
-            margin-top: 8px;
-            font-size: 0.85rem;
-            color: #6c757d;
-            font-weight: 500;
-        }
-        
-        .progress-step.active span {
-            color: #16a34a;
-        }
-        
-        @media (max-width: 576px) {
-            .progress-step span {
-                font-size: 0.7rem;
-            }
-            
-            .step-circle {
-                width: 32px;
-                height: 32px;
-            }
-        }
-    </style>
-
-    <h2 class="mb-4 fw-bold"><i class="bi bi-shield-lock me-2 text-primary"></i> Secure Checkout</h2>
-
     {% if cart_items %}
-    <div class="row g-4">
-        <!-- Left Column: Shipping & Order Details -->
-        <div class="col-lg-8">
-            <!-- Shipping Information -->
-            <div class="card border-0 shadow-sm mb-4">
-                <div class="card-header bg-white border-bottom py-3">
-                    <h5 class="mb-0 fw-bold">Shipping Information</h5>
-                </div>
-                <div class="card-body p-4">
-                    <form method="post" id="checkout-form">
-                        {% csrf_token %}
-                        <div class="row g-3">
-                            <div class="col-12">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <label for="shipping_address" class="form-label fw-bold">Address</label>
-                                    <button type="button" class="btn btn-sm btn-outline-primary mb-2"
-                                        onclick="getLocation()">
-                                        <i class="bi bi-geo-alt me-1"></i> Use My Location
-                                    </button>
-                                </div>
-                                <input type="text" class="form-control" id="shipping_address" name="shipping_address"
-                                    placeholder="123 Main St" required>
-                            </div>
-                            <div class="col-md-6">
-                                <label for="shipping_city" class="form-label fw-bold">City</label>
-                                <input type="text" class="form-control" id="shipping_city" name="shipping_city"
-                                    required>
-                            </div>
-                            <div class="col-md-3">
-                                <label for="shipping_state" class="form-label fw-bold">State</label>
-                                <input type="text" class="form-control" id="shipping_state" name="shipping_state"
-                                    required>
-                            </div>
-                            <div class="col-md-3">
-                                <label for="shipping_zip" class="form-label fw-bold">ZIP Code</label>
-                                <input type="text" class="form-control" id="shipping_zip" name="shipping_zip" required>
-                            </div>
+    <div class="checkout-layout">
+        <div>
+            <form method="post" id="checkout-form">
+                {% csrf_token %}
+                
+                <div class="form-card">
+                    <div class="form-card-header">
+                        <div class="form-icon-wrap"><i class="bi bi-geo-alt-fill"></i></div>
+                        <h3 class="form-card-title">Shipping Details</h3>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-12">
+                            <label class="form-label">Full Address</label>
+                            <input type="text" class="form-control" name="shipping_address" placeholder="e.g. 123 Tech Boulevard, Suite 100" required>
                         </div>
-                    </form>
-                </div>
-            </div>
-
-            <!-- Order Items -->
-            <div class="card border-0 shadow-sm">
-                <div class="card-header bg-white border-bottom py-3">
-                    <h5 class="mb-0 fw-bold">Review Items</h5>
-                </div>
-                <div class="card-body p-4">
-                    {% for item in cart_items %}
-                    <div class="d-flex align-items-center mb-3 pb-3 {{ forloop.last|yesno:',border-bottom' }}">
-                        <div class="flex-shrink-0">
-                            {% if item.product.featured_image %}
-                            <img src="{{ item.product.featured_image.url }}" class="img-fluid rounded border"
-                                alt="{{ item.product.name }}" style="width: 80px; height: 80px; object-fit: cover;">
-                            {% else %}
-                            <div class="bg-light d-flex align-items-center justify-content-center rounded border"
-                                style="width: 80px; height: 80px;">
-                                <i class="bi bi-laptop text-muted"></i>
-                            </div>
-                            {% endif %}
+                        <div class="col-md-6">
+                            <label class="form-label">City</label>
+                            <input type="text" class="form-control" name="shipping_city" required>
                         </div>
-                        <div class="flex-grow-1 ms-3">
-                            <h6 class="mb-1 text-dark fw-bold">{{ item.product.name }}</h6>
-                            <p class="text-muted small mb-0">SKU: {{ item.product.SKU }}</p>
-                            <p class="text-muted small mb-0">Qty: {{ item.quantity }} x {{ currency_short_form }} {{ item.product.selling_price }}</p>
+                        <div class="col-md-3">
+                            <label class="form-label">State</label>
+                            <input type="text" class="form-control" name="shipping_state" required>
                         </div>
-                        <div class="text-end">
-                            <span class="fw-bold text-primary">{{ currency_short_form }} {{ item.item_total }}</span>
+                        <div class="col-md-3">
+                            <label class="form-label">ZIP / Postal Code</label>
+                            <input type="text" class="form-control" name="shipping_zip" required>
                         </div>
                     </div>
-                    {% endfor %}
                 </div>
-            </div>
+
+                <div class="form-card">
+                    <div class="form-card-header">
+                        <div class="form-icon-wrap"><i class="bi bi-box-seam-fill"></i></div>
+                        <h3 class="form-card-title">Order Items</h3>
+                    </div>
+                    
+                    <div class="order-items-preview">
+                        {% for item in cart_items %}
+                        <div class="preview-item">
+                            {% if item.product.featured_image %}
+                            <img src="{{ item.product.featured_image.url }}" class="preview-img" alt="{{ item.product.name }}">
+                            {% else %}
+                            <div class="preview-img" style="display:flex; align-items:center; justify-content:center; background:var(--surface-color);">
+                                <i class="bi bi-image" style="color:var(--border-color);"></i>
+                            </div>
+                            {% endif %}
+                            <div class="preview-info">
+                                <div class="preview-name">{{ item.product.name }}</div>
+                                <div class="preview-sku">SKU: {{ item.product.SKU }}</div>
+                            </div>
+                            <div class="preview-price">
+                                <div class="preview-total">{{ currency_short_form }} {{ item.item_total }}</div>
+                                <div class="preview-sku">Qty: {{ item.quantity }}</div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </form>
         </div>
 
-        <!-- Right Column: Order Summary -->
-        <div class="col-lg-4">
-            <div class="card border-0 shadow-sm mb-4">
-                <div class="card-header bg-white border-bottom py-3">
-                    <h5 class="mb-0 fw-bold">Order Summary</h5>
+        <div>
+            <div class="summary-card">
+                <h3 class="summary-title">Order Summary</h3>
+                
+                <div class="summary-row">
+                    <span>Subtotal ({{ cart_item_count }} items)</span>
+                    <span style="font-weight: 600; color: var(--text-main);">{{ currency_short_form }} {{ subtotal }}</span>
                 </div>
-                <div class="card-body p-4">
-                    <div class="d-flex justify-content-between mb-2">
-                        <span>Subtotal:</span>
-                        <span class="fw-bold">{{ currency_short_form }} {{ subtotal }}</span>
-                    </div>
-                    <div class="d-flex justify-content-between mb-2">
-                        <span>Shipping:</span>
-                        <span>
-                            {% if shipping_cost == 0 %}
-                            <span class="text-success fw-bold">FREE</span>
-                            {% else %}
-                            <span>{{ currency_short_form }} {{ shipping_cost }}</span>
-                            {% endif %}
-                        </span>
-                    </div>
-                    <div class="d-flex justify-content-between mb-3">
-                        <span>Tax ({{ tax_rate }}%):</span>
-                        <span>{{ currency_short_form }} {{ tax_amount|floatformat:2 }}</span>
-                    </div>
-                    <hr>
-                    <div class="d-flex justify-content-between mb-4">
-                        <span class="h5 fw-bold">Total:</span>
-                        <span class="h5 fw-bold text-primary">{{ currency_short_form }} {{ total_amount|floatformat:2 }}</span>
-                    </div>
-
-                    <div class="d-grid">
-                        <button type="submit" form="checkout-form" class="btn btn-tech py-3 text-uppercase fw-bold">
-                            <i class="bi bi-check-lg me-2"></i> Place Order
-                        </button>
-                    </div>
+                
+                <div class="summary-row">
+                    <span>Shipping</span>
+                    <span>{% if shipping_cost == 0 %}<span style="color: var(--success); font-weight: 600;">FREE</span>{% else %}{{ currency_short_form }} {{ shipping_cost }}{% endif %}</span>
                 </div>
-            </div>
-
-            <!-- Security Badge -->
-            <div class="card border-0 shadow-sm bg-light">
-                <div class="card-body p-4 text-center">
-                    <i class="bi bi-lock-fill display-4 text-secondary mb-2"></i>
-                    <h6 class="fw-bold">100% Secure Payment</h6>
-                    <p class="small text-muted mb-0">
-                        Your data is protected with 256-bit SSL encryption.
-                    </p>
-                    <div class="mt-3 text-muted fs-4">
-                        <i class="bi bi-credit-card mx-1"></i>
-                        <i class="bi bi-paypal mx-1"></i>
-                        <i class="bi bi-bank mx-1"></i>
-                    </div>
+                
+                <div class="summary-row">
+                    <span>Tax ({{ tax_rate }}%)</span>
+                    <span style="font-weight: 600; color: var(--text-main);">{{ currency_short_form }} {{ tax_amount|floatformat:2 }}</span>
+                </div>
+                
+                <div class="summary-row total">
+                    <span>Total</span>
+                    <span>{{ currency_short_form }} {{ total_amount|floatformat:2 }}</span>
+                </div>
+                
+                <button type="submit" form="checkout-form" class="btn-place-order">
+                    <i class="bi bi-check2-circle"></i> Place Secure Order
+                </button>
+                
+                <div class="trust-badge">
+                    <i class="bi bi-shield-check"></i>
+                    100% Secure Payment with 256-bit SSL
                 </div>
             </div>
         </div>
     </div>
     {% else %}
-    <div class="text-center py-5 bg-white rounded shadow-sm border">
-        <i class="bi bi-cart-x display-1 text-muted mb-3"></i>
-        <h3>Your cart is empty</h3>
-        <p class="text-muted">Add items to your cart before checking out.</p>
-        <a href="{% url 'store:product_list' %}" class="btn btn-primary mt-3">
-            <i class="bi bi-shop me-2"></i> Continue Shopping
-        </a>
+    <div style="text-align: center; padding: 80px 40px; background: var(--surface-color); border-radius: var(--radius-lg); border: 1px dashed var(--border-color); margin-bottom: 80px;">
+        <i class="bi bi-cart-x" style="font-size: 64px; color: var(--border-color); margin-bottom: 24px; display: block;"></i>
+        <h3 style="font-size: 24px; font-weight: 700; margin-bottom: 12px;">Your Cart is Empty</h3>
+        <p style="color: var(--text-muted); font-size: 16px; margin-bottom: 32px;">Add items to your cart before proceeding to checkout.</p>
+        <a href="{% url 'store:product_list' %}" class="btn btn-primary" style="padding: 14px 32px;">Continue Shopping</a>
     </div>
     {% endif %}
 </div>
-
-<script>
-    function getLocation() {
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(showPosition, showError);
-        } else {
-            alert("Geolocation is not supported by this browser.");
-        }
-    }
-
-    function showPosition(position) {
-        var lat = position.coords.latitude;
-        var lon = position.coords.longitude;
-
-        // Show loading
-        var btn = event.target;
-        var originalText = btn.innerHTML;
-        btn.innerHTML = '<i class="bi bi-hourglass-split me-1"></i> Getting location...';
-        btn.disabled = true;
-
-        // Use Nominatim for reverse geocoding (free OpenStreetMap service)
-        fetch('https://nominatim.openstreetmap.org/reverse?format=json&lat=' + lat + '&lon=' + lon)
-            .then(response => response.json())
-            .then(data => {
-                if (data.address) {
-                    // Fill in address
-                    var addressParts = [];
-                    if (data.address.house_number) addressParts.push(data.address.house_number);
-                    if (data.address.road) addressParts.push(data.address.road);
-                    if (data.address.neighbourhood) addressParts.push(data.address.neighbourhood);
-                    if (data.address.suburb) addressParts.push(data.address.suburb);
-
-                    document.getElementById('shipping_address').value = addressParts.join(', ') || data.display_name.split(',').slice(0, 2).join(',');
-
-                    // Fill in city
-                    var city = data.address.city || data.address.town || data.address.village || data.address.county;
-                    document.getElementById('shipping_city').value = city || '';
-
-                    // Fill in state (for Bangladesh, this would be the division)
-                    var state = data.address.state || data.address.division;
-                    document.getElementById('shipping_state').value = state || '';
-
-                    // Fill in zip
-                    document.getElementById('shipping_zip').value = data.address.postcode || '';
-                }
-
-                // Reset button
-                btn.innerHTML = originalText;
-                btn.disabled = false;
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('Unable to get address from location. Please enter manually.');
-                btn.innerHTML = originalText;
-                btn.disabled = false;
-            });
-    }
-
-    function showError(error) {
-        switch (error.code) {
-            case error.PERMISSION_DENIED:
-                alert("User denied the request for Geolocation.");
-                break;
-            case error.POSITION_UNAVAILABLE:
-                alert("Location information is unavailable.");
-                break;
-            case error.TIMEOUT:
-                alert("The request to get user location timed out.");
-                break;
-            default:
-                alert("An unknown error occurred.");
-                break;
-        }
-    }
-</script>
 {% endblock %}

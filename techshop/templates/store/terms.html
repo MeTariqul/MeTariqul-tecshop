@@ -1,41 +1,103 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Terms & Conditions - TechShop{% endblock %}
+{% block title %}Terms & Conditions | Premium Collection{% endblock %}
+
+{% block extra_css %}
+<style>
+    .static-hero {
+        background: linear-gradient(135deg, #0b0f19 0%, #1e1b4b 100%);
+        padding: 80px 0;
+        color: white;
+        text-align: center;
+        border-radius: 0 0 40px 40px;
+        margin-bottom: 60px;
+    }
+
+    .hero-title {
+        font-family: 'Outfit', sans-serif;
+        font-size: 40px;
+        font-weight: 800;
+        margin-bottom: 16px;
+    }
+
+    .hero-subtitle {
+        color: #94a3b8;
+        font-size: 16px;
+    }
+
+    .document-container {
+        max-width: 800px;
+        margin: 0 auto 80px;
+        background: var(--surface-color);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-lg);
+        padding: 48px;
+        box-shadow: var(--shadow-sm);
+    }
+
+    .doc-content h2 {
+        font-family: 'Outfit', sans-serif;
+        font-size: 20px;
+        font-weight: 700;
+        color: var(--text-main);
+        margin-top: 40px;
+        margin-bottom: 12px;
+    }
+    
+    .doc-content h2:first-child { margin-top: 0; }
+
+    .doc-content p {
+        color: var(--text-muted);
+        line-height: 1.7;
+        font-size: 15px;
+        margin-bottom: 16px;
+    }
+
+    .doc-content strong {
+        color: var(--text-main);
+        font-weight: 600;
+    }
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="container my-5">
-    <div class="row">
-        <div class="col-lg-8 mx-auto">
-            <h1 class="mb-4">Terms & Conditions</h1>
-            <p class="text-muted">Last updated: February 2026</p>
+<div class="static-hero">
+    <div class="container">
+        <h1 class="hero-title">Terms & Conditions</h1>
+        <p class="hero-subtitle">Last updated: {% now "F Y" %}</p>
+    </div>
+</div>
+
+<div class="container">
+    <div class="document-container">
+        <div class="doc-content">
+            <h2>1. Acceptance of Terms</h2>
+            <p>By accessing and using our premium storefront, you accept and agree to be bound by the terms and provision of this agreement.</p>
             
-            <h4 class="mt-4">1. Acceptance of Terms</h4>
-            <p>By accessing and using the TechShop website, you accept and agree to be bound by the terms and provision of this agreement.</p>
+            <h2>2. Use License</h2>
+            <p>Permission is granted to temporarily use our platform for personal, non-commercial transitory viewing only.</p>
             
-            <h4 class="mt-4">2. Use License</h4>
-            <p>Permission is granted to temporarily use TechShop for personal, non-commercial transitory viewing only.</p>
+            <h2>3. Product Information</h2>
+            <p>We strive to provide highly accurate product descriptions and pricing. However, we do not warrant that product descriptions or pricing are perfectly accurate, complete, or current at all times.</p>
             
-            <h4 class="mt-4">3. Product Information</h4>
-            <p>We strive to provide accurate product descriptions and pricing. However, we do not warrant that product descriptions or pricing are accurate, complete, or current.</p>
+            <h2>4. Orders and Payment</h2>
+            <p>By placing an order, you agree to purchase the product at the price indicated. Payment is processed securely through our verified payment partners.</p>
             
-            <h4 class="mt-4">4. Orders and Payment</h4>
-            <p>By placing an order, you agree to purchase the product at the price indicated. Payment is processed securely through our payment partners.</p>
+            <h2>5. Shipping & Delivery</h2>
+            <p>Delivery times may vary based on location and product availability. Our white-glove delivery service ensures safe transport, though we are not responsible for severe delays caused by carrier disruptions.</p>
             
-            <h4 class="mt-4">5. Shipping & Delivery</h4>
-            <p>Delivery times may vary based on location and product availability. We are not responsible for delays caused by shipping carriers.</p>
+            <h2>6. Returns & Refunds</h2>
+            <p>Please refer to our Return & Refund policy for detailed information about our 30-day premium return policy.</p>
             
-            <h4 class="mt-4">6. Returns & Refunds</h4>
-            <p>Please refer to our Return & Refund policy for detailed information about returns and refunds.</p>
+            <h2>7. User Accounts</h2>
+            <p>You are responsible for maintaining the confidentiality of your account and password. We reserve the right to suspend accounts that violate our terms.</p>
             
-            <h4 class="mt-4">7. User Accounts</h4>
-            <p>You are responsible for maintaining the confidentiality of your account and password.</p>
+            <h2>8. Limitation of Liability</h2>
+            <p>We shall not be liable for any indirect, incidental, or consequential damages arising from the use of our products or platform.</p>
             
-            <h4 class="mt-4">8. Limitation of Liability</h4>
-            <p>TechShop shall not be liable for any indirect, incidental, or consequential damages.</p>
-            
-            <h4 class="mt-4">9. Contact Information</h4>
-            <p>If you have any questions about these Terms & Conditions, please contact us at <strong>info@techshop.com</strong></p>
+            <h2>9. Contact Information</h2>
+            <p>If you have any questions about these Terms & Conditions, please contact us at <strong>legal@premiumtech.com</strong></p>
         </div>
     </div>
 </div>

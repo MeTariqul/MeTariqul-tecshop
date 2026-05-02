@@ -1,60 +1,129 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Return & Refund Policy - TechShop{% endblock %}
+{% block title %}Returns & Refunds | Premium Collection{% endblock %}
+
+{% block extra_css %}
+<style>
+    .static-hero {
+        background: linear-gradient(135deg, #0b0f19 0%, #1e1b4b 100%);
+        padding: 80px 0;
+        color: white;
+        text-align: center;
+        border-radius: 0 0 40px 40px;
+        margin-bottom: 60px;
+    }
+
+    .hero-title {
+        font-family: 'Outfit', sans-serif;
+        font-size: 40px;
+        font-weight: 800;
+        margin-bottom: 16px;
+    }
+
+    .hero-subtitle {
+        color: #94a3b8;
+        font-size: 16px;
+    }
+
+    .document-container {
+        max-width: 800px;
+        margin: 0 auto 80px;
+        background: var(--surface-color);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-lg);
+        padding: 48px;
+        box-shadow: var(--shadow-sm);
+    }
+
+    .doc-content h2 {
+        font-family: 'Outfit', sans-serif;
+        font-size: 20px;
+        font-weight: 700;
+        color: var(--text-main);
+        margin-top: 40px;
+        margin-bottom: 12px;
+    }
+    
+    .doc-content h2:first-child { margin-top: 0; }
+
+    .doc-content p {
+        color: var(--text-muted);
+        line-height: 1.7;
+        font-size: 15px;
+        margin-bottom: 16px;
+    }
+
+    .doc-content ul, .doc-content ol {
+        margin-bottom: 24px;
+        padding-left: 20px;
+    }
+    
+    .doc-content li {
+        color: var(--text-muted);
+        line-height: 1.7;
+        font-size: 15px;
+        margin-bottom: 8px;
+    }
+
+    .doc-content strong {
+        color: var(--text-main);
+        font-weight: 600;
+    }
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="container my-5">
-    <div class="row">
-        <div class="col-lg-8 mx-auto">
-            <h1 class="mb-4">Return & Refund Policy</h1>
-            <p class="text-muted">Last updated: February 2026</p>
+<div class="static-hero">
+    <div class="container">
+        <h1 class="hero-title">Returns & Refunds</h1>
+        <p class="hero-subtitle">Our commitment to your complete satisfaction.</p>
+    </div>
+</div>
+
+<div class="container">
+    <div class="document-container">
+        <div class="doc-content">
+            <h2>1. The Premium Guarantee</h2>
+            <p>We want you to be completely satisfied with your premium purchase. If an item does not meet your expectations, we accept returns within 30 days of delivery.</p>
             
-            <h4 class="mt-4">1. Return Policy Overview</h4>
-            <p>We want you to be completely satisfied with your purchase. If you're not happy with your order, we accept returns within 30 days of delivery.</p>
-            
-            <h4 class="mt-4">2. Eligibility for Returns</h4>
-            <p>To be eligible for a return, your item must be:</p>
+            <h2>2. Eligibility for Returns</h2>
+            <p>To ensure the integrity of our collection, returned items must be:</p>
             <ul>
-                <li>Unused and in the same condition that you received it</li>
-                <li>In the original packaging</li>
-                <li>Accompanied by the receipt or proof of purchase</li>
+                <li>Unused and in the exact condition you received them</li>
+                <li>In the original, undamaged premium packaging</li>
+                <li>Accompanied by the original receipt or proof of purchase</li>
             </ul>
             
-            <h4 class="mt-4">3. Non-Returnable Items</h4>
-            <p>The following items cannot be returned:</p>
+            <h2>3. Non-Returnable Items</h2>
+            <p>To maintain our standards, the following items cannot be returned:</p>
             <ul>
                 <li>Software products that have been downloaded or activated</li>
-                <li>Customized or personalized products</li>
-                <li>Products marked as final sale</li>
-                <li>Health and personal care items that have been opened</li>
+                <li>Customized, engraved, or personalized bespoke products</li>
+                <li>Products marked explicitly as final sale</li>
             </ul>
             
-            <h4 class="mt-4">4. Refund Process</h4>
-            <p>Once we receive your returned item, we will inspect it and notify you of the status of your refund.</p>
+            <h2>4. Refund Process</h2>
+            <p>Once we receive and authenticate your returned item, we will process your refund.</p>
             <ul>
-                <li><strong>Approved refunds:</strong> Processed within 5-7 business days</li>
-                <li><strong>Refund method:</strong> Same as your original payment method</li>
-                <li><strong>Shipping costs:</strong> Original shipping fees are non-refundable</li>
+                <li><strong>Approved refunds:</strong> Processed within 3-5 business days of inspection</li>
+                <li><strong>Refund method:</strong> Credited back to your original payment method</li>
+                <li><strong>Shipping costs:</strong> Original premium shipping fees are non-refundable</li>
             </ul>
             
-            <h4 class="mt-4">5. Exchanges</h4>
-            <p>We only replace items if they are defective or damaged. If you need to exchange for the same item, contact us first.</p>
+            <h2>5. Exchanges</h2>
+            <p>If you wish to exchange an item for a different variant, we recommend returning the original item for a refund and placing a new order to ensure availability.</p>
             
-            <h4 class="mt-4">6. Return Shipping</h4>
-            <p>You will be responsible for paying for your own shipping costs for returning your item. Shipping costs are non-refundable.</p>
+            <h2>6. Return Shipping</h2>
+            <p>For standard returns, you are responsible for secure return shipping. We strongly advise using an insured, trackable service. If the return is due to a defect on our part, we will provide a complimentary prepaid label.</p>
             
-            <h4 class="mt-4">7. How to Initiate a Return</h4>
-            <p>To initiate a return:</p>
+            <h2>7. How to Initiate a Return</h2>
             <ol>
-                <li>Contact our customer support at <strong>support@techshop.com</strong></li>
+                <li>Contact our concierge team at <strong>concierge@premiumtech.com</strong></li>
                 <li>Provide your order number and reason for return</li>
-                <li>Receive return instructions via email</li>
-                <li>Ship the item back to us</li>
+                <li>Receive your personalized Return Authorization (RMA) and instructions</li>
+                <li>Carefully package and ship the item back to our facility</li>
             </ol>
-            
-            <h4 class="mt-4">8. Contact Information</h4>
-            <p>If you have questions about our Return & Refund Policy, please contact us at <strong>support@techshop.com</strong></p>
         </div>
     </div>
 </div>

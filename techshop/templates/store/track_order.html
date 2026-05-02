@@ -1,209 +1,356 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Track Order - TechShop{% endblock %}
+{% block title %}Track Order | Premium Collection{% endblock %}
 
 {% block extra_css %}
 <style>
-    .track-order-card {
-        max-width: 600px;
-        margin: 0 auto;
-    }
-    .order-status {
-        padding: 20px;
-        border-radius: 10px;
-        background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+    .shop-header {
+        background: linear-gradient(135deg, #0b0f19 0%, #1e1b4b 100%);
+        padding: 60px 0;
+        margin-bottom: 48px;
+        border-radius: 0 0 40px 40px;
         color: white;
-    }
-    .tracking-timeline {
         position: relative;
-        padding-left: 30px;
+        overflow: hidden;
     }
-    .tracking-timeline::before {
+
+    .shop-title {
+        font-family: 'Outfit', sans-serif;
+        font-size: 40px;
+        font-weight: 800;
+        margin-bottom: 12px;
+        background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    /* Tracking Form Card */
+    .tracking-card {
+        max-width: 600px;
+        margin: 0 auto 40px;
+        background: var(--surface-color);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-lg);
+        padding: 40px;
+        box-shadow: var(--shadow-sm);
+    }
+
+    .form-group { margin-bottom: 24px; }
+
+    .form-label {
+        display: block;
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--text-main);
+        margin-bottom: 8px;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 14px 16px;
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-md);
+        font-family: 'Inter', sans-serif;
+        font-size: 15px;
+        background: var(--bg-color);
+        color: var(--text-main);
+        transition: all var(--transition-fast);
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: var(--primary);
+        background: var(--surface-color);
+        box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+    }
+
+    .btn-track {
+        width: 100%;
+        padding: 16px;
+        background: linear-gradient(135deg, var(--primary) 0%, #6366f1 100%);
+        color: white;
+        border: none;
+        border-radius: var(--radius-md);
+        font-family: 'Outfit', sans-serif;
+        font-size: 16px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all var(--transition-bounce);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        box-shadow: var(--shadow-glow);
+    }
+
+    .btn-track:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 24px rgba(79, 70, 229, 0.3);
+    }
+
+    /* Tracking Results */
+    .result-card {
+        max-width: 800px;
+        margin: 0 auto 80px;
+        background: var(--surface-color);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-lg);
+        overflow: hidden;
+        box-shadow: var(--shadow-md);
+    }
+
+    .result-header {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        padding: 32px;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .result-header h3 {
+        font-family: 'Outfit', sans-serif;
+        font-size: 24px;
+        font-weight: 800;
+        margin: 0;
+    }
+
+    .result-body {
+        padding: 40px;
+    }
+
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 24px;
+        margin-bottom: 40px;
+        padding-bottom: 32px;
+        border-bottom: 1px dashed var(--border-color);
+    }
+
+    .info-block label {
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-bottom: 4px;
+        display: block;
+    }
+
+    .info-block .value {
+        font-size: 16px;
+        font-weight: 600;
+        color: var(--text-main);
+    }
+
+    /* Timeline */
+    .timeline {
+        position: relative;
+        padding-left: 32px;
+    }
+
+    .timeline::before {
         content: '';
         position: absolute;
-        left: 8px;
         top: 0;
         bottom: 0;
+        left: 11px;
         width: 2px;
-        background: #e2e8f0;
+        background: var(--border-color);
     }
+
     .timeline-item {
         position: relative;
-        padding-bottom: 25px;
+        padding-bottom: 32px;
     }
-    .timeline-item:last-child {
-        padding-bottom: 0;
-    }
+
+    .timeline-item:last-child { padding-bottom: 0; }
+
     .timeline-dot {
         position: absolute;
-        left: -26px;
         top: 0;
-        width: 16px;
-        height: 16px;
+        left: -32px;
+        width: 24px;
+        height: 24px;
         border-radius: 50%;
-        background: #e2e8f0;
-        border: 3px solid white;
-        box-shadow: 0 0 0 2px #e2e8f0;
+        background: var(--bg-color);
+        border: 4px solid var(--border-color);
+        z-index: 2;
+        transition: all 0.3s;
     }
+
     .timeline-item.active .timeline-dot {
-        background: #16a34a;
-        box-shadow: 0 0 0 2px #16a34a;
+        border-color: var(--primary);
+        background: white;
+        box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.2);
     }
-    .timeline-item.active .timeline-content {
-        color: #16a34a;
+
+    .timeline-content h5 {
+        font-family: 'Outfit', sans-serif;
+        font-size: 18px;
+        font-weight: 700;
+        color: var(--text-muted);
+        margin-bottom: 4px;
+        transition: color 0.3s;
+    }
+
+    .timeline-item.active .timeline-content h5 {
+        color: var(--primary);
+    }
+
+    .timeline-content p {
+        font-size: 14px;
+        color: var(--text-muted);
+        margin: 0;
+    }
+
+    .alert-error {
+        max-width: 600px;
+        margin: 0 auto 40px;
+        background: #fef2f2;
+        border: 1px solid var(--danger);
+        color: var(--danger);
+        padding: 16px;
+        border-radius: var(--radius-md);
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-weight: 500;
+    }
+
+    .help-card {
+        max-width: 600px;
+        margin: 0 auto 80px;
+        background: var(--bg-color);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-lg);
+        padding: 32px;
+        text-align: center;
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="container my-5">
-    <div class="row">
-        <div class="col-lg-8 mx-auto">
-            <h1 class="mb-4 text-center">Track Your Order</h1>
-            
-            <!-- Order Lookup Form -->
-            <div class="card track-order-card mb-4">
-                <div class="card-body">
-                    <form method="get" action="{% url 'store:track_order' %}">
-                        <div class="mb-3">
-                            <label for="order_number" class="form-label">Order Number</label>
-                            <input type="text" class="form-control" id="order_number" name="order_number" 
-                                   placeholder="e.g., ORD-ABC12345" value="{{ order_number|default:'' }}" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="email" class="form-label">Email Address</label>
-                            <input type="email" class="form-control" id="email" name="email" 
-                                   placeholder="Enter your email" value="{{ email|default:'' }}" required>
-                        </div>
-                        <button type="submit" class="btn btn-success w-100">
-                            <i class="bi bi-search me-2"></i>Track Order
-                        </button>
-                    </form>
-                </div>
+<div class="shop-header text-center">
+    <div class="container">
+        <h1 class="shop-title"><i class="bi bi-box-seam me-2"></i> Track Your Order</h1>
+        <p style="color: #94a3b8; font-size: 16px; max-width: 500px; margin: 0 auto;">Enter your order number and email address to see the latest premium delivery status.</p>
+    </div>
+</div>
+
+<div class="container">
+    
+    <div class="tracking-card">
+        <form method="get" action="{% url 'store:track_order' %}">
+            <div class="form-group">
+                <label for="order_number" class="form-label">Order Number</label>
+                <input type="text" class="form-control" id="order_number" name="order_number" placeholder="e.g. ORD-12345" value="{{ order_number|default:'' }}" required>
             </div>
-            
-            {% if order %}
-            <!-- Order Found -->
-            <div class="card mb-4">
-                <div class="card-body">
-                    <div class="order-status mb-4">
-                        <h5 class="mb-1">Order Status</h5>
-                        <h3 class="mb-0">{{ order.get_status_display }}</h3>
-                    </div>
-                    
-                    <div class="row mb-4">
-                        <div class="col-6">
-                            <p class="text-muted mb-1">Order Number</p>
-                            <strong>{{ order.order_number }}</strong>
-                        </div>
-                        <div class="col-6">
-                            <p class="text-muted mb-1">Order Date</p>
-                            <strong>{{ order.created_at|date:"F d, Y" }}</strong>
-                        </div>
-                    </div>
-                    
-                    <!-- Order Items -->
-                    <h5 class="mb-3">Order Items</h5>
-                    <div class="table-responsive mb-4">
-                        <table class="table table-sm">
-                            <thead>
-                                <tr>
-                                    <th>Product</th>
-                                    <th>Qty</th>
-                                    <th class="text-end">Price</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for item in order.items.all %}
-                                <tr>
-                                    <td>{{ item.product.name }}</td>
-                                    <td>{{ item.quantity }}</td>
-                                    <td class="text-end">${{ item.subtotal }}</td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                            <tfoot>
-                                <tr>
-                                    <td colspan="2"><strong>Total</strong></td>
-                                    <td class="text-end"><strong>${{ order.total_amount }}</strong></td>
-                                </tr>
-                            </tfoot>
-                        </table>
-                    </div>
-                    
-                    <!-- Shipping Address -->
-                    <div class="row mb-4">
-                        <div class="col-md-6">
-                            <h5 class="mb-2">Shipping Address</h5>
-                            <p class="text-muted mb-0">{{ order.customer.user.get_full_name }}</p>
-                            <p class="text-muted mb-0">{{ order.shipping_address }}</p>
-                            <p class="text-muted mb-0">{{ order.shipping_city }}, {{ order.shipping_state }} {{ order.shipping_zip }}</p>
-                        </div>
-                    </div>
-                    
-                    <h5 class="mb-3">Tracking Timeline</h5>
-                    <div class="tracking-timeline">
-                        <div class="timeline-item {% if order.status == 'pending' or order.status == 'confirmed' or order.status == 'processing' or order.status == 'shipped' or order.status == 'delivered' %}active{% endif %}">
-                            <div class="timeline-dot"></div>
-                            <div class="timeline-content">
-                                <strong>Order Placed</strong>
-                                <p class="text-muted mb-0 small">{{ order.created_at|date:"F d, Y, g:i A" }}</p>
-                            </div>
-                        </div>
-                        
-                        <div class="timeline-item {% if order.status == 'confirmed' or order.status == 'processing' or order.status == 'shipped' or order.status == 'delivered' %}active{% endif %}">
-                            <div class="timeline-dot"></div>
-                            <div class="timeline-content">
-                                <strong>Order Confirmed</strong>
-                                <p class="text-muted mb-0 small">Your order has been confirmed</p>
-                            </div>
-                        </div>
-                        
-                        <div class="timeline-item {% if order.status == 'processing' or order.status == 'shipped' or order.status == 'delivered' %}active{% endif %}">
-                            <div class="timeline-dot"></div>
-                            <div class="timeline-content">
-                                <strong>Processing</strong>
-                                <p class="text-muted mb-0 small">Your order is being prepared</p>
-                            </div>
-                        </div>
-                        
-                        <div class="timeline-item {% if order.status == 'shipped' or order.status == 'delivered' %}active{% endif %}">
-                            <div class="timeline-dot"></div>
-                            <div class="timeline-content">
-                                <strong>Shipped</strong>
-                                <p class="text-muted mb-0 small">{% if order.shipped_at %}{{ order.shipped_at|date:"F d, Y" }}{% else %}Your order has been shipped{% endif %}</p>
-                            </div>
-                        </div>
-                        
-                        <div class="timeline-item {% if order.status == 'delivered' %}active{% endif %}">
-                            <div class="timeline-dot"></div>
-                            <div class="timeline-content">
-                                <strong>Delivered</strong>
-                                <p class="text-muted mb-0 small">{% if order.delivered_at %}{{ order.delivered_at|date:"F d, Y" }}{% else %}Your order has been delivered{% endif %}</p>
-                            </div>
-                        </div>
+            <div class="form-group">
+                <label for="email" class="form-label">Email Address</label>
+                <input type="email" class="form-control" id="email" name="email" placeholder="you@example.com" value="{{ email|default:'' }}" required>
+            </div>
+            <button type="submit" class="btn-track">
+                <i class="bi bi-search"></i> Track Order
+            </button>
+        </form>
+    </div>
+
+    {% if searched and not order %}
+    <div class="alert-error">
+        <i class="bi bi-exclamation-triangle-fill"></i>
+        <span>No order found matching those details. Please double check and try again.</span>
+    </div>
+    {% endif %}
+
+    {% if order %}
+    <div class="result-card">
+        <div class="result-header">
+            <div>
+                <h3 style="color: rgba(255,255,255,0.8); font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px;">Current Status</h3>
+                <h3>{{ order.get_status_display }}</h3>
+            </div>
+            <i class="bi bi-box-seam" style="font-size: 40px; opacity: 0.5;"></i>
+        </div>
+        
+        <div class="result-body">
+            <div class="info-grid">
+                <div class="info-block">
+                    <label>Order Number</label>
+                    <div class="value">{{ order.order_number }}</div>
+                </div>
+                <div class="info-block">
+                    <label>Order Date</label>
+                    <div class="value">{{ order.created_at|date:"M d, Y" }}</div>
+                </div>
+                <div class="info-block">
+                    <label>Shipping To</label>
+                    <div class="value" style="font-weight: 400;">
+                        {{ order.shipping_address }}<br>
+                        {{ order.shipping_city }}, {{ order.shipping_state }} {{ order.shipping_zip }}
                     </div>
                 </div>
+                <div class="info-block">
+                    <label>Total Value</label>
+                    <div class="value" style="color: var(--primary); font-size: 20px;">{{ currency_short_form }} {{ order.total_amount }}</div>
+                </div>
             </div>
+
+            <h4 style="font-family: 'Outfit', sans-serif; font-size: 20px; font-weight: 800; margin-bottom: 24px;">Delivery Timeline</h4>
             
-            {% elif searched %}
-            <!-- Order Not Found -->
-            <div class="alert alert-warning">
-                <i class="bi bi-exclamation-triangle me-2"></i>
-                No order found with this order number and email. Please check and try again.
-            </div>
-            {% endif %}
-            
-            <!-- Help Section -->
-            <div class="card mt-4">
-                <div class="card-body">
-                    <h5>Need Help?</h5>
-                    <p class="text-muted">If you're having trouble tracking your order, please contact our customer support.</p>
-                    <a href="{% url 'store:contact' %}" class="btn btn-outline-success">Contact Us</a>
+            <div class="timeline">
+                <div class="timeline-item {% if order.status in 'pending confirmed processing shipped delivered' %}active{% endif %}">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <h5>Order Placed</h5>
+                        <p>{{ order.created_at|date:"M d, Y, g:i A" }}</p>
+                    </div>
+                </div>
+                
+                <div class="timeline-item {% if order.status in 'confirmed processing shipped delivered' %}active{% endif %}">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <h5>Order Confirmed</h5>
+                        <p>Your premium selection has been verified</p>
+                    </div>
+                </div>
+                
+                <div class="timeline-item {% if order.status in 'processing shipped delivered' %}active{% endif %}">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <h5>Processing</h5>
+                        <p>We are preparing your items for dispatch</p>
+                    </div>
+                </div>
+                
+                <div class="timeline-item {% if order.status in 'shipped delivered' %}active{% endif %}">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <h5>Shipped</h5>
+                        <p>Your order is on the way{% if order.shipped_at %} ({{ order.shipped_at|date:"M d, Y" }}){% endif %}</p>
+                    </div>
+                </div>
+                
+                <div class="timeline-item {% if order.status == 'delivered' %}active{% endif %}">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <h5>Delivered</h5>
+                        <p>{% if order.delivered_at %}Delivered on {{ order.delivered_at|date:"M d, Y" }}{% else %}Awaiting delivery{% endif %}</p>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
+    {% endif %}
+
+    <div class="help-card">
+        <i class="bi bi-question-circle" style="font-size: 32px; color: var(--primary); margin-bottom: 16px; display: block;"></i>
+        <h4 style="font-family: 'Outfit', sans-serif; font-size: 20px; font-weight: 700; margin-bottom: 8px;">Need Assistance?</h4>
+        <p style="color: var(--text-muted); margin-bottom: 24px;">If you're having trouble locating your order or need more details, our premium support team is here to help.</p>
+        <a href="{% url 'store:contact' %}" class="btn" style="padding: 12px 24px; border: 1px solid var(--border-color); border-radius: var(--radius-md); font-weight: 600;">Contact Support</a>
+    </div>
+
 </div>
 {% endblock %}

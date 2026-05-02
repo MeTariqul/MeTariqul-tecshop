@@ -3,144 +3,124 @@
 {% block admin_title %}Activity Logs{% endblock %}
 
 {% block admin_content %}
-<div class="table-card mb-4">
-    <div class="card-header">
-        <h5 class="mb-0"><i class="bi bi-funnel me-2"></i>Filter Activities</h5>
-    </div>
-    <div class="card-body">
-        <form method="get" class="row g-3">
-            <div class="col-md-3">
-                <label class="form-label">User</label>
-                <select name="user" class="form-select">
-                    <option value="">All Users</option>
-                    {% for u in users %}
-                    <option value="{{ u.id }}">{{ u.username }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-            <div class="col-md-3">
-                <label class="form-label">Action</label>
-                <select name="action" class="form-select">
-                    <option value="">All Actions</option>
-                    <option value="create">Create</option>
-                    <option value="update">Update</option>
-                    <option value="delete">Delete</option>
-                    <option value="login">Login</option>
-                    <option value="logout">Logout</option>
-                    <option value="view">View</option>
-                </select>
-            </div>
-            <div class="col-md-3">
-                <label class="form-label">From Date</label>
-                <input type="date" name="date_from" class="form-control">
-            </div>
-            <div class="col-md-3">
-                <label class="form-label">To Date</label>
-                <input type="date" name="date_to" class="form-control">
-            </div>
-            <div class="col-12">
-                <button type="submit" class="btn btn-primary">
-                    <i class="bi bi-filter me-2"></i>Apply Filters
-                </button>
-                <a href="{% url 'admin_dashboard:activity_logs' %}" class="btn btn-secondary">
-                    <i class="bi bi-x-circle me-2"></i>Clear
-                </a>
-                {% if is_super_admin %}
-                <button type="button" class="btn btn-danger float-end" data-bs-toggle="modal"
-                    data-bs-target="#clearLogsModal">
-                    <i class="bi bi-trash me-2"></i>Clear All Logs
-                </button>
-                {% endif %}
-            </div>
-        </form>
-    </div>
+<div class="page-header">
+    <h4><i class="bi bi-clock-history me-2" style="color:#4f46e5;"></i>Activity Logs</h4>
+    {% if is_super_admin %}
+    <button type="button" class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#clearLogsModal">
+        <i class="bi bi-trash"></i> Clear All Logs
+    </button>
+    {% endif %}
 </div>
 
-<div class="table-card">
-    <div class="card-header d-flex justify-content-between align-items-center">
-        <h5 class="mb-0"><i class="bi bi-activity me-2"></i>Activity Log</h5>
-        <span class="badge bg-secondary">{{ logs|length }} records</span>
-    </div>
-    <div class="card-body p-0">
-        <div class="table-responsive">
-            <table class="table table-hover mb-0">
-                <thead class="table-light">
-                    <tr>
-                        <th>Timestamp</th>
-                        <th>User</th>
-                        <th>Action</th>
-                        <th>Model</th>
-                        <th>Description</th>
-                        {% if is_super_admin %}
-                        <th>Actions</th>
-                        {% endif %}
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for log in logs %}
-                    <tr>
-                        <td>
-                            <small>{{ log.timestamp|date:"M d, Y H:i" }}</small>
-                        </td>
-                        <td>
-                            {% if log.user %}
-                            <strong>{{ log.user.username }}</strong>
-                            {% else %}
-                            <span class="text-muted">System</span>
-                            {% endif %}
-                        </td>
-                        <td>
-                            <span
-                                class="badge bg-{% if log.action == 'create' %}success{% elif log.action == 'update' %}primary{% elif log.action == 'delete' %}danger{% elif log.action == 'login' %}info{% else %}secondary{% endif %}">
-                                {{ log.get_action_display }}
-                            </span>
-                        </td>
-                        <td>
-                            <code>{{ log.model_name }}</code>
-                        </td>
-                        <td>
-                            <small>{{ log.description|default:"-" }}</small>
-                        </td>
-                        {% if is_super_admin %}
-                        <td>
-                            <a href="{% url 'admin_dashboard:delete_activity_log' log.id %}"
-                                class="btn btn-sm btn-outline-danger" title="Delete"
-                                onclick="return confirm('Are you sure you want to delete this log entry?')">
-                                <i class="bi bi-trash"></i>
-                            </a>
-                        </td>
-                        {% endif %}
-                    </tr>
-                    {% empty %}
-                    <tr>
-                        <td colspan="{% if is_super_admin %}6{% else %}5{% endif %}"
-                            class="text-center py-4 text-muted">No activity logs found</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+<!-- Filters -->
+<div class="filter-card">
+    <form method="get" class="row g-3 align-items-end">
+        <div class="col-md-3">
+            <label class="form-label">User</label>
+            <select name="user" class="form-select">
+                <option value="">All Users</option>
+                {% for u in users %}
+                <option value="{{ u.id }}" {% if request.GET.user == u.id|stringformat:'s' %}selected{% endif %}>{{ u.username }}</option>
+                {% endfor %}
+            </select>
         </div>
+        <div class="col-md-2">
+            <label class="form-label">Action</label>
+            <select name="action" class="form-select">
+                <option value="">All Actions</option>
+                <option value="create" {% if request.GET.action == 'create' %}selected{% endif %}>Create</option>
+                <option value="update" {% if request.GET.action == 'update' %}selected{% endif %}>Update</option>
+                <option value="delete" {% if request.GET.action == 'delete' %}selected{% endif %}>Delete</option>
+                <option value="login" {% if request.GET.action == 'login' %}selected{% endif %}>Login</option>
+                <option value="logout" {% if request.GET.action == 'logout' %}selected{% endif %}>Logout</option>
+            </select>
+        </div>
+        <div class="col-md-2">
+            <label class="form-label">From</label>
+            <input type="date" name="date_from" class="form-control" value="{{ request.GET.date_from|default:'' }}">
+        </div>
+        <div class="col-md-2">
+            <label class="form-label">To</label>
+            <input type="date" name="date_to" class="form-control" value="{{ request.GET.date_to|default:'' }}">
+        </div>
+        <div class="col-md-3">
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary flex-fill"><i class="bi bi-funnel"></i> Filter</button>
+                <a href="{% url 'admin_dashboard:activity_logs' %}" class="btn btn-outline-secondary">Clear</a>
+            </div>
+        </div>
+    </form>
+</div>
+
+<!-- Log Table -->
+<div class="table-card">
+    <div class="table-responsive">
+        <table class="table table-hover mb-0">
+            <thead>
+                <tr>
+                    <th>Timestamp</th>
+                    <th>User</th>
+                    <th>Action</th>
+                    <th>Model</th>
+                    <th>Description</th>
+                    {% if is_super_admin %}<th></th>{% endif %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for log in logs %}
+                <tr>
+                    <td style="white-space:nowrap;"><small style="color:#64748b;">{{ log.timestamp|date:"M d, Y H:i" }}</small></td>
+                    <td>
+                        {% if log.user %}
+                        <strong style="color:#0f172a;">{{ log.user.username }}</strong>
+                        {% else %}
+                        <span style="color:#94a3b8;">System</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <span class="badge"
+                            style="{% if log.action == 'create' %}background:#d1fae5;color:#065f46;{% elif log.action == 'update' %}background:#e0e7ff;color:#3730a3;{% elif log.action == 'delete' %}background:#fecaca;color:#991b1b;{% elif log.action == 'login' %}background:#dbeafe;color:#1e40af;{% else %}background:#f1f5f9;color:#64748b;{% endif %}">
+                            {{ log.get_action_display }}
+                        </span>
+                    </td>
+                    <td><code style="background:#f1f5f9;padding:3px 8px;border-radius:6px;color:#4f46e5;font-size:12px;">{{ log.model_name }}</code></td>
+                    <td><small style="color:#475569;">{{ log.description|default:"-" }}</small></td>
+                    {% if is_super_admin %}
+                    <td>
+                        <a href="{% url 'admin_dashboard:delete_activity_log' log.id %}"
+                            class="btn btn-sm btn-outline-danger"
+                            onclick="return confirm('Delete this log entry?')">
+                            <i class="bi bi-trash"></i>
+                        </a>
+                    </td>
+                    {% endif %}
+                </tr>
+                {% empty %}
+                <tr><td colspan="{% if is_super_admin %}6{% else %}5{% endif %}" class="empty-state"><i class="bi bi-inbox"></i><br>No activity logs found</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
 </div>
 
 {% if is_super_admin %}
-<!-- Clear All Logs Modal -->
-<div class="modal fade" id="clearLogsModal" tabindex="-1" aria-labelledby="clearLogsModalLabel" aria-hidden="true">
+<!-- Clear Modal -->
+<div class="modal fade" id="clearLogsModal" tabindex="-1">
     <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="clearLogsModalLabel">Clear All Activity Logs</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <div class="modal-content" style="border-radius:16px;border:none;">
+            <div class="modal-header" style="border-bottom:1px solid #f1f5f9;padding:20px 24px;">
+                <h5 style="font-family:'Outfit',sans-serif;font-weight:700;margin:0;">Clear All Activity Logs</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-            <div class="modal-body">
-                <p class="text-danger">Warning: This action cannot be undone!</p>
-                <p>All activity logs will be permanently deleted. Are you sure you want to continue?</p>
+            <div class="modal-body" style="padding:24px;">
+                <p style="color:#ef4444;font-weight:600;">⚠ Warning: This action cannot be undone!</p>
+                <p style="color:#475569;">All activity logs will be permanently deleted.</p>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <div class="modal-footer" style="border-top:1px solid #f1f5f9;padding:16px 24px;">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
                 <form method="post" action="{% url 'admin_dashboard:clear_activity_logs' %}">
                     {% csrf_token %}
-                    <button type="submit" class="btn btn-danger">Yes, Clear All Logs</button>
+                    <button type="submit" class="btn btn-danger"><i class="bi bi-trash"></i> Clear All</button>
                 </form>
             </div>
         </div>

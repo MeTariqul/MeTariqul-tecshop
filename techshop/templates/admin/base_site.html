@@ -2,24 +2,19 @@
 {% load static %}
 
 {% block title %}
-{{ title }} | {{ site_title|default:_('Tech Shop Admin') }}
-{% endblock %}
-
-{% block extrastyle %}
-{{ block.super }}
-<link rel="stylesheet" type="text/css" href="{% static 'admin/css/custom_admin.css' %}">
+{{ title }} | {{ site_title|default:_('TechShop Admin') }}
 {% endblock %}
 
 {% block branding %}
 <h1 id="site-name">
-    <a href="{% url 'admin:index' %}">
-        > SYSTEM_ADMIN
+    <a href="{% url 'admin:index' %}" style="color:#4f46e5;font-family:'Outfit',sans-serif;font-weight:700;text-decoration:none;">
+        TechShop Admin
     </a>
 </h1>
 {% endblock %}
 
 {% block welcome-msg %}
-<p class="welcome">
-    <span style="font-family: 'Courier New', monospace;">USER: {{ user.username }}</span>
+<p class="welcome" style="font-family:'Inter',sans-serif;">
+    <span style="color:#475569;">Logged in as <strong style="color:#0f172a;">{{ user.username }}</strong></span>
 </p>
 {% endblock %}

@@ -820,8 +820,6 @@ def order_detail(request, order_id):
 
 @login_required
 @admin_required
-@login_required
-@admin_required
 def customers(request):
     """Customer management"""
     customers_list = WebCustomer.objects.select_related('user').annotate(
