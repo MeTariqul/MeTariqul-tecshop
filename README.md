@@ -40,8 +40,8 @@ TechShop is a comprehensive, feature-rich E-Commerce platform built with Django.
 
 5. **Run the development server:**
    ```bash
-   # Using the provided batch scripts (Windows)
-   ..\run_dev_server.bat
+   # Using the unified batch script (Windows)
+   run.bat
    # Or directly
    python manage.py runserver
    ```
