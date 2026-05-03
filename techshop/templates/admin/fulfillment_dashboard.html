@@ -1,0 +1,101 @@
+{% extends 'admin/base.html' %}
+
+{% block admin_title %}Fulfillment{% endblock %}
+
+{% block admin_content %}
+<div class="page-header">
+    <div>
+        <h4><i class="bi bi-truck me-2" style="color:#4f46e5;"></i>Fulfillment Dashboard</h4>
+        <p style="color:#94a3b8;margin:4px 0 0;font-size:14px;">Picking Lists & Shipping</p>
+    </div>
+    <a href="{% url 'admin_dashboard:scan_item' %}" class="btn btn-outline-primary btn-sm"><i class="bi bi-upc-scan"></i> Scan</a>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-4"><div class="stat-card"><div class="stat-icon amber"><i class="bi bi-clock"></i></div><div class="stat-value">{{ pending_count|default:"0" }}</div><div class="stat-label">Pending</div></div></div>
+    <div class="col-md-4"><div class="stat-card"><div class="stat-icon indigo"><i class="bi bi-gear"></i></div><div class="stat-value">{{ processing_count|default:"0" }}</div><div class="stat-label">Processing</div></div></div>
+    <div class="col-md-4"><div class="stat-card"><div class="stat-icon emerald"><i class="bi bi-check-circle"></i></div><div class="stat-value">{{ ready_to_ship_count|default:"0" }}</div><div class="stat-label">Ready to Ship</div></div></div>
+</div>
+
+<!-- Pending -->
+<div class="table-card mb-4">
+    <div class="card-header-custom" style="padding:20px 24px;border-bottom:1px solid #e2e8f0;font-family:'Outfit',sans-serif;font-size:16px;font-weight:700;color:#0f172a;display:flex;align-items:center;gap:10px;"><i class="bi bi-clock" style="color:#f59e0b;"></i> Pending - Ready for Picking</div>
+    <div class="table-responsive">
+        {% if pending_orders %}
+        <table class="table table-hover mb-0">
+            <thead><tr><th>Order #</th><th>Customer</th><th>Items</th><th>Total</th><th>Date</th><th>Action</th></tr></thead>
+            <tbody>
+                {% for order in pending_orders %}
+                <tr>
+                    <td><strong style="color:#0f172a;">{{ order.order_number }}</strong></td>
+                    <td>{{ order.customer.user.first_name|default:order.customer.user.username }}</td>
+                    <td>{% for item in order.items.all %}<small>{{ item.product.name }} ×{{ item.quantity }}</small><br>{% endfor %}</td>
+                    <td><strong>৳{{ order.total_amount }}</strong></td>
+                    <td style="white-space:nowrap;"><small style="color:#94a3b8;">{{ order.created_at|date:"M j, g:i A" }}</small></td>
+                    <td><a href="{% url 'admin_dashboard:start_picking' order.id %}" class="btn btn-primary btn-sm"><i class="bi bi-play-fill"></i> Pick</a></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}<div class="empty-state"><i class="bi bi-check-circle" style="color:#10b981;"></i><br>No pending orders</div>{% endif %}
+    </div>
+</div>
+
+<!-- Processing -->
+<div class="table-card mb-4">
+    <div class="card-header-custom" style="padding:20px 24px;border-bottom:1px solid #e2e8f0;font-family:'Outfit',sans-serif;font-size:16px;font-weight:700;color:#0f172a;display:flex;align-items:center;gap:10px;"><i class="bi bi-gear" style="color:#4f46e5;"></i> Processing - Picking in Progress</div>
+    <div class="table-responsive">
+        {% if processing_orders %}
+        <table class="table table-hover mb-0">
+            <thead><tr><th>Order #</th><th>Customer</th><th>Items</th><th>Total</th><th>Action</th></tr></thead>
+            <tbody>
+                {% for order in processing_orders %}
+                <tr>
+                    <td><strong style="color:#0f172a;">{{ order.order_number }}</strong></td>
+                    <td>{{ order.customer.user.first_name|default:order.customer.user.username }}</td>
+                    <td>{% for item in order.items.all %}<small>{{ item.product.name }} ×{{ item.quantity }}</small><br>{% endfor %}</td>
+                    <td><strong>৳{{ order.total_amount }}</strong></td>
+                    <td><a href="{% url 'admin_dashboard:ready_to_ship' order.id %}" class="btn btn-success btn-sm"><i class="bi bi-check2"></i> Ready</a></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}<div class="empty-state"><i class="bi bi-inbox"></i><br>No orders being picked</div>{% endif %}
+    </div>
+</div>
+
+<!-- Ready to Ship -->
+<div class="table-card">
+    <div class="card-header-custom" style="padding:20px 24px;border-bottom:1px solid #e2e8f0;font-family:'Outfit',sans-serif;font-size:16px;font-weight:700;color:#0f172a;display:flex;align-items:center;gap:10px;"><i class="bi bi-truck" style="color:#10b981;"></i> Ready to Ship</div>
+    <div class="table-responsive">
+        {% if ready_to_ship %}
+        <table class="table table-hover mb-0">
+            <thead><tr><th>Order #</th><th>Customer</th><th>Address</th><th>Total</th><th>Action</th></tr></thead>
+            <tbody>
+                {% for order in ready_to_ship %}
+                <tr>
+                    <td><strong style="color:#0f172a;">{{ order.order_number }}</strong></td>
+                    <td>{{ order.customer.user.first_name|default:order.customer.user.username }}</td>
+                    <td><small style="color:#475569;">{{ order.shipping_address|default:"No address" }}</small></td>
+                    <td><strong>৳{{ order.total_amount }}</strong></td>
+                    <td>
+                        <a href="{% url 'admin_dashboard:packing_slip' order.id %}" class="btn btn-outline-primary btn-sm" target="_blank"><i class="bi bi-printer"></i></a>
+                        <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#shipModal{{ order.id }}"><i class="bi bi-truck"></i> Ship</button>
+                    </td>
+                </tr>
+                <div class="modal fade" id="shipModal{{ order.id }}" tabindex="-1">
+                    <div class="modal-dialog"><div class="modal-content" style="border-radius:16px;border:none;">
+                        <div class="modal-header" style="padding:20px 24px;border-bottom:1px solid #f1f5f9;"><h5 style="font-family:'Outfit',sans-serif;font-weight:700;margin:0;">Ship Order {{ order.order_number }}</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+                        <form method="post" action="{% url 'admin_dashboard:ship_order' order.id %}">{% csrf_token %}
+                            <div class="modal-body" style="padding:24px;"><div class="mb-3"><label class="form-label">Tracking Number (Optional)</label><input type="text" name="tracking_number" class="form-control" placeholder="Enter tracking number"></div><p style="color:#94a3b8;font-size:14px;">This will deduct inventory and mark order as shipped.</p></div>
+                            <div class="modal-footer" style="padding:16px 24px;border-top:1px solid #f1f5f9;"><button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button><button type="submit" class="btn btn-success"><i class="bi bi-truck"></i> Confirm Ship</button></div>
+                        </form>
+                    </div></div>
+                </div>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}<div class="empty-state"><i class="bi bi-inbox"></i><br>No orders ready to ship</div>{% endif %}
+    </div>
+</div>
+{% endblock %}

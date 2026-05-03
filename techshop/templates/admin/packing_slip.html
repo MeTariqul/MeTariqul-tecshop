@@ -1,0 +1,103 @@
+{% extends 'admin/base.html' %}
+
+{% block admin_title %}Packing Slip - {{ order.order_number }}{% endblock %}
+
+{% block admin_content %}
+<div class="page-header no-print">
+    <h4><i class="bi bi-receipt me-2" style="color:#4f46e5;"></i>Packing Slip</h4>
+    <div class="d-flex gap-2">
+        <button onclick="window.print()" class="btn btn-primary btn-sm"><i class="bi bi-printer"></i> Print</button>
+        <a href="{% url 'admin_dashboard:fulfillment_dashboard' %}" class="btn btn-outline-secondary btn-sm"><i class="bi bi-arrow-left"></i> Back</a>
+    </div>
+</div>
+
+<div class="admin-card" id="printableArea">
+    <div class="card-body-custom" style="padding:32px;">
+        <div class="row mb-4">
+            <div class="col-6">
+                <h4 style="font-family:'Outfit',sans-serif;font-weight:800;color:#0f172a;margin:0 0 12px;">PACKING SLIP</h4>
+                <p style="margin:0 0 4px;color:#475569;"><strong style="color:#0f172a;">Order #:</strong> {{ order.order_number }}</p>
+                <p style="margin:0;color:#475569;"><strong style="color:#0f172a;">Date:</strong> {{ order.created_at|date:"F d, Y" }}</p>
+            </div>
+            <div class="col-6 text-end">
+                <h5 style="font-family:'Outfit',sans-serif;font-weight:700;color:#4f46e5;">TechShop</h5>
+                <p style="margin:0;color:#94a3b8;">Your Online Store</p>
+            </div>
+        </div>
+        <hr style="border-color:#e2e8f0;">
+        <div class="row mb-4">
+            <div class="col-6">
+                <h6 style="color:#94a3b8;font-size:12px;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px;">SHIP TO:</h6>
+                <p style="margin:0 0 4px;font-weight:700;color:#0f172a;">{{ order.customer.user.first_name }} {{ order.customer.user.last_name }}</p>
+                <p style="margin:0 0 4px;color:#475569;">{{ order.shipping_address }}</p>
+                <p style="margin:0;color:#475569;">{{ order.shipping_city }}, {{ order.shipping_state }} {{ order.shipping_zip }}</p>
+            </div>
+            <div class="col-6 text-end">
+                <h6 style="color:#94a3b8;font-size:12px;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px;">STATUS:</h6>
+                <span class="status-badge {{ order.status }}">{{ order.get_status_display }}</span>
+            </div>
+        </div>
+        <table class="table" style="font-size:14px;">
+            <thead><tr>
+                <th style="background:#f8fafc;padding:12px 16px;font-size:12px;font-weight:700;color:#475569;text-transform:uppercase;">Item</th>
+                <th style="background:#f8fafc;padding:12px 16px;font-size:12px;font-weight:700;color:#475569;text-transform:uppercase;text-align:center;">SKU</th>
+                <th style="background:#f8fafc;padding:12px 16px;font-size:12px;font-weight:700;color:#475569;text-transform:uppercase;text-align:center;">Qty</th>
+            </tr></thead>
+            <tbody>
+                {% for item in items %}
+                <tr>
+                    <td style="padding:12px 16px;"><strong style="color:#0f172a;">{{ item.product.name }}</strong></td>
+                    <td style="padding:12px 16px;text-align:center;"><code style="background:#f1f5f9;padding:3px 8px;border-radius:6px;color:#4f46e5;font-size:12px;">{{ item.product.SKU }}</code></td>
+                    <td style="padding:12px 16px;text-align:center;font-weight:700;">{{ item.quantity }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+            <tfoot><tr>
+                <td colspan="2" style="text-align:right;padding:12px 16px;"><strong style="color:#0f172a;">Total Items:</strong></td>
+                <td style="text-align:center;padding:12px 16px;"><strong style="color:#4f46e5;">{{ items.count }}</strong></td>
+            </tr></tfoot>
+        </table>
+        <div style="text-align:center;margin-top:32px;color:#94a3b8;">
+            <p style="margin:0 0 4px;">Thank you for your order!</p>
+            <small>Questions? Contact us at support@techshop.com</small>
+        </div>
+    </div>
+</div>
+
+<!-- Shipping Label -->
+<div class="admin-card mt-4 no-print">
+    <div class="card-header-custom"><i class="bi bi-truck"></i> Shipping Label</div>
+    <div class="card-body-custom">
+        <div class="row g-3">
+            <div class="col-md-6">
+                <div style="background:#f8fafc;padding:20px;border-radius:12px;border:1px dashed #e2e8f0;">
+                    <p style="margin:0 0 4px;font-weight:700;color:#0f172a;">TO:</p>
+                    <p style="margin:0 0 4px;color:#475569;">{{ order.customer.user.first_name }} {{ order.customer.user.last_name }}</p>
+                    <p style="margin:0 0 4px;color:#475569;">{{ order.shipping_address }}</p>
+                    <p style="margin:0;color:#475569;">{{ order.shipping_city }}, {{ order.shipping_state }} {{ order.shipping_zip }}</p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div style="background:#f8fafc;padding:20px;border-radius:12px;border:1px dashed #e2e8f0;">
+                    <p style="margin:0 0 4px;font-weight:700;color:#0f172a;">FROM:</p>
+                    <p style="margin:0 0 4px;color:#475569;">TechShop Warehouse</p>
+                    <p style="margin:0 0 4px;color:#475569;">123 Commerce Street</p>
+                    <p style="margin:0;color:#475569;">Dhaka, Bangladesh</p>
+                </div>
+            </div>
+        </div>
+        <div style="text-align:center;margin-top:16px;">
+            <p style="margin:0;color:#475569;"><strong style="color:#0f172a;">Tracking #:</strong> {{ order.tracking_number|default:"Not assigned" }}</p>
+        </div>
+    </div>
+</div>
+
+<style>
+@media print {
+    .no-print, .admin-sidebar, .admin-topbar { display: none !important; }
+    .admin-main { margin-left: 0 !important; padding: 0 !important; }
+    body { background: white !important; }
+    .admin-card { box-shadow: none !important; border: 1px solid #ddd !important; }
+}
+</style>
+{% endblock %}

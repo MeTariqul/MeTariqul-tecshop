@@ -1,0 +1,319 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Create Account | Premium Collection{% endblock %}
+
+{% block extra_css %}
+<style>
+    .auth-page {
+        min-height: 80vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--bg-color);
+        padding: 80px 20px;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .auth-page::before {
+        content: '';
+        position: absolute;
+        top: -20%;
+        left: -10%;
+        width: 600px;
+        height: 600px;
+        background: radial-gradient(circle, rgba(79, 70, 229, 0.1) 0%, transparent 70%);
+        border-radius: 50%;
+        z-index: 0;
+    }
+
+    .auth-page::after {
+        content: '';
+        position: absolute;
+        bottom: -20%;
+        right: -10%;
+        width: 500px;
+        height: 500px;
+        background: radial-gradient(circle, rgba(236, 72, 153, 0.05) 0%, transparent 70%);
+        border-radius: 50%;
+        z-index: 0;
+    }
+
+    .auth-card {
+        width: 100%;
+        max-width: 600px;
+        background: var(--surface-color);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-lg);
+        position: relative;
+        z-index: 10;
+        overflow: hidden;
+    }
+
+    .auth-header {
+        background: linear-gradient(135deg, #0b0f19 0%, #1e1b4b 100%);
+        padding: 40px;
+        text-align: center;
+        color: white;
+    }
+
+    .auth-icon {
+        width: 64px;
+        height: 64px;
+        background: rgba(255,255,255,0.1);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 28px;
+        margin: 0 auto 16px;
+        backdrop-filter: blur(10px);
+    }
+
+    .auth-title {
+        font-family: 'Outfit', sans-serif;
+        font-size: 28px;
+        font-weight: 800;
+        margin-bottom: 8px;
+    }
+
+    .auth-subtitle {
+        color: #94a3b8;
+        font-size: 15px;
+    }
+
+    .auth-body {
+        padding: 40px;
+    }
+
+    .form-group {
+        margin-bottom: 24px;
+    }
+
+    .form-label {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--text-main);
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .required-star {
+        color: var(--danger);
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 14px 16px;
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-md);
+        font-family: 'Inter', sans-serif;
+        font-size: 15px;
+        background: var(--bg-color);
+        color: var(--text-main);
+        transition: all var(--transition-fast);
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: var(--primary);
+        background: var(--surface-color);
+        box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+    }
+
+    .form-control.is-invalid {
+        border-color: var(--danger);
+        background: #fef2f2;
+    }
+
+    .invalid-feedback {
+        color: var(--danger);
+        font-size: 13px;
+        margin-top: 6px;
+        font-weight: 500;
+    }
+
+    .form-hint {
+        color: var(--text-muted);
+        font-size: 13px;
+        margin-top: 6px;
+    }
+
+    .section-divider {
+        display: flex;
+        align-items: center;
+        text-align: center;
+        margin: 32px 0;
+        color: var(--text-muted);
+        font-size: 14px;
+        font-weight: 600;
+    }
+
+    .section-divider::before,
+    .section-divider::after {
+        content: '';
+        flex: 1;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .section-divider:not(:empty)::before { margin-right: .25em; }
+    .section-divider:not(:empty)::after { margin-left: .25em; }
+
+    .btn-submit {
+        width: 100%;
+        padding: 16px;
+        background: linear-gradient(135deg, var(--primary) 0%, #6366f1 100%);
+        color: white;
+        border: none;
+        border-radius: var(--radius-md);
+        font-family: 'Outfit', sans-serif;
+        font-size: 16px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all var(--transition-bounce);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        box-shadow: var(--shadow-glow);
+        margin-top: 16px;
+    }
+
+    .btn-submit:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 24px rgba(79, 70, 229, 0.3);
+    }
+
+    .auth-footer {
+        text-align: center;
+        margin-top: 32px;
+        padding-top: 24px;
+        border-top: 1px solid var(--border-color);
+        font-size: 15px;
+        color: var(--text-muted);
+    }
+
+    .auth-footer a {
+        color: var(--primary);
+        font-weight: 600;
+        transition: color var(--transition-fast);
+    }
+
+    .auth-footer a:hover {
+        color: var(--text-main);
+        text-decoration: underline;
+    }
+
+    .alert-box {
+        background: #fef2f2;
+        border-left: 4px solid var(--danger);
+        padding: 16px;
+        border-radius: var(--radius-md);
+        color: var(--danger);
+        font-size: 14px;
+        margin-bottom: 24px;
+        font-weight: 500;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="auth-page">
+    <div class="auth-card">
+        <div class="auth-header">
+            <div class="auth-icon"><i class="bi bi-person-plus-fill"></i></div>
+            <h1 class="auth-title">Create Account</h1>
+            <p class="auth-subtitle">Join the premium tech community.</p>
+        </div>
+        
+        <div class="auth-body">
+            <form method="post">
+                {% csrf_token %}
+
+                {% if form.non_field_errors %}
+                <div class="alert-box">
+                    <i class="bi bi-exclamation-octagon-fill me-2"></i>
+                    {{ form.non_field_errors }}
+                </div>
+                {% endif %}
+
+                <div class="form-group">
+                    <label for="{{ form.username.id_for_label }}" class="form-label">
+                        <i class="bi bi-person"></i> Username <span class="required-star">*</span>
+                    </label>
+                    <input type="text" 
+                        class="form-control {% if form.username.errors %}is-invalid{% endif %}"
+                        id="{{ form.username.id_for_label }}" 
+                        name="{{ form.username.name }}"
+                        value="{{ form.username.value|default:'' }}" 
+                        placeholder="Choose a unique username">
+                    {% if form.username.errors %}
+                    <div class="invalid-feedback">{{ form.username.errors }}</div>
+                    {% endif %}
+                    <div class="form-hint">Only letters, numbers, and @/./+/-/_ are allowed.</div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 form-group">
+                        <label for="{{ form.password1.id_for_label }}" class="form-label">
+                            <i class="bi bi-shield-lock"></i> Password <span class="required-star">*</span>
+                        </label>
+                        <input type="password"
+                            class="form-control {% if form.password1.errors %}is-invalid{% endif %}"
+                            id="{{ form.password1.id_for_label }}" 
+                            name="{{ form.password1.name }}"
+                            placeholder="Create password">
+                        {% if form.password1.errors %}
+                        <div class="invalid-feedback">{{ form.password1.errors }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="col-md-6 form-group">
+                        <label for="{{ form.password2.id_for_label }}" class="form-label">
+                            <i class="bi bi-shield-check"></i> Confirm <span class="required-star">*</span>
+                        </label>
+                        <input type="password"
+                            class="form-control {% if form.password2.errors %}is-invalid{% endif %}"
+                            id="{{ form.password2.id_for_label }}" 
+                            name="{{ form.password2.name }}"
+                            placeholder="Repeat password">
+                        {% if form.password2.errors %}
+                        <div class="invalid-feedback">{{ form.password2.errors }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="section-divider">Optional Shipping Details</div>
+                
+                <div class="form-group">
+                    <label for="address" class="form-label"><i class="bi bi-geo-alt"></i> Street Address</label>
+                    <input type="text" class="form-control" id="address" name="address" placeholder="123 Main St">
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6 form-group">
+                        <label for="city" class="form-label">City</label>
+                        <input type="text" class="form-control" id="city" name="city" placeholder="City">
+                    </div>
+                    <div class="col-md-6 form-group">
+                        <label for="zip_code" class="form-label">ZIP Code</label>
+                        <input type="text" class="form-control" id="zip_code" name="zip_code" placeholder="Postal Code">
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-submit">
+                    <i class="bi bi-person-plus"></i> Register Now
+                </button>
+            </form>
+
+            <div class="auth-footer">
+                Already have an account? <a href="{% url 'login' %}">Sign In</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

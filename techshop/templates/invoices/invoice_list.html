@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Invoices - TechShop{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row">
+        <div class="col-md-12">
+            <h1 class="mb-4">Invoice Management</h1>
+            
+            <!-- Search and Filter -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <form method="get" class="row g-3">
+                        <div class="col-md-6">
+                            <input type="text" name="search" class="form-control" placeholder="Search by invoice number or customer..." value="{{ search_query }}">
+                        </div>
+                        <div class="col-md-3">
+                            <select name="status" class="form-select">
+                                <option value="">All Status</option>
+                                <option value="paid" {% if status_filter == 'paid' %}selected{% endif %}>Paid</option>
+                                <option value="pending" {% if status_filter == 'pending' %}selected{% endif %}>Pending</option>
+                                <option value="partial" {% if status_filter == 'partial' %}selected{% endif %}>Partial</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <button type="submit" class="btn btn-primary w-100">Search</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Actions -->
+            <div class="mb-3">
+                <a href="{% url 'invoices:create_invoice' %}" class="btn btn-success">
+                    <i class="bi bi-plus-circle me-2"></i>Create New Invoice
+                </a>
+            </div>
+            
+            <!-- Invoice Table -->
+            <div class="card">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Invoice #</th>
+                                    <th>Customer</th>
+                                    <th>Date</th>
+                                    <th>Payment Method</th>
+                                    <th>Status</th>
+                                    <th>Total</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for invoice in invoices %}
+                                <tr>
+                                    <td><strong>{{ invoice.invoice_number }}</strong></td>
+                                    <td>{{ invoice.customer_name }}<br><small class="text-muted">{{ invoice.customer_phone }}</small></td>
+                                    <td>{{ invoice.invoice_date|date:"d M Y" }}</td>
+                                    <td>{{ invoice.get_payment_method_display }}</td>
+                                    <td>
+                                        {% if invoice.payment_status == 'paid' %}
+                                        <span class="badge bg-success">Paid</span>
+                                        {% elif invoice.payment_status == 'partial' %}
+                                        <span class="badge bg-warning">Partial</span>
+                                        {% else %}
+                                        <span class="badge bg-danger">Pending</span>
+                                        {% endif %}
+                                    </td>
+                                    <td><strong>৳{{ invoice.grand_total|floatformat:2 }}</strong></td>
+                                    <td>
+                                        <a href="{% url 'invoices:invoice_detail' invoice.id %}" class="btn btn-sm btn-primary">View</a>
+                                        <a href="{% url 'invoices:view_invoice' invoice.id %}" class="btn btn-sm btn-info">Web View</a>
+                                        <a href="{% url 'invoices:download_pdf' invoice.id %}" class="btn btn-sm btn-secondary">PDF</a>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="7" class="text-center py-4">No invoices found.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,49 @@
+{% extends 'admin/base.html' %}
+
+{% block admin_title %}Scan Item{% endblock %}
+
+{% block admin_content %}
+<div class="page-header">
+    <div>
+        <h4><i class="bi bi-upc-scan me-2" style="color:#4f46e5;"></i>Scan Item</h4>
+        <p style="color:#94a3b8;margin:4px 0 0;font-size:14px;">Scan barcode to verify product or confirm picking</p>
+    </div>
+    <a href="{% url 'admin_dashboard:fulfillment_dashboard' %}" class="btn btn-outline-secondary btn-sm"><i class="bi bi-arrow-left"></i> Fulfillment</a>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-lg-6">
+        <div class="admin-card">
+            <div class="card-body-custom text-center" style="padding:40px;">
+                <div style="width:80px;height:80px;border-radius:20px;background:rgba(79,70,229,0.1);color:#4f46e5;display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 24px;">
+                    <i class="bi bi-upc"></i>
+                </div>
+                <form id="scanForm" method="post">
+                    {% csrf_token %}
+                    <div class="mb-3"><input type="text" id="barcodeInput" name="barcode" class="form-control form-control-lg" style="text-align:center;font-size:18px;" placeholder="Scan or type barcode..." autofocus autocomplete="off"></div>
+                    <div class="mb-3"><label class="form-label">Order ID (optional)</label><input type="number" name="order_id" class="form-control" placeholder="Enter order ID for picking confirmation"></div>
+                    <button type="submit" class="btn btn-primary btn-lg w-100"><i class="bi bi-search"></i> Look Up</button>
+                </form>
+                <div id="scanResult" class="mt-4" style="display:none;"><div class="alert" role="alert" id="resultAlert" style="border-radius:12px;"><h5 id="resultTitle"></h5><p id="resultMessage" class="mb-0"></p></div></div>
+            </div>
+        </div>
+
+        <div class="admin-card mt-4">
+            <div class="card-header-custom"><i class="bi bi-info-circle"></i> Instructions</div>
+            <div class="card-body-custom">
+                <ol style="margin:0;padding-left:18px;color:#475569;font-size:14px;line-height:1.8;">
+                    <li>Connect barcode scanner or use keyboard</li>
+                    <li>Scan the product barcode or type SKU</li>
+                    <li>For picking, enter the Order ID</li>
+                    <li>System verifies product exists in the order</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('barcodeInput').focus();
+document.getElementById('barcodeInput').addEventListener('keypress', function(e) { if (e.key === 'Enter') { e.preventDefault(); this.form.submit(); } });
+</script>
+{% endblock %}

@@ -1,0 +1,106 @@
+{% extends 'admin/base.html' %}
+
+{% block admin_title %}Customer Support{% endblock %}
+
+{% block admin_content %}
+<div class="page-header">
+    <div>
+        <h4><i class="bi bi-headset me-2" style="color:#4f46e5;"></i>Customer Support</h4>
+        <p style="color:#94a3b8;margin:4px 0 0;font-size:14px;">Manage customer inquiries and messages</p>
+    </div>
+</div>
+
+<!-- Stats -->
+<div class="row g-3 mb-4">
+    <div class="col-md-3 col-6"><div class="stat-card"><div class="stat-icon indigo"><i class="bi bi-envelope"></i></div><div class="stat-value">{{ total_messages|default:"0" }}</div><div class="stat-label">Total</div></div></div>
+    <div class="col-md-3 col-6"><div class="stat-card"><div class="stat-icon sky"><i class="bi bi-envelope-plus"></i></div><div class="stat-value">{{ new_messages|default:"0" }}</div><div class="stat-label">New</div></div></div>
+    <div class="col-md-3 col-6"><div class="stat-card"><div class="stat-icon amber"><i class="bi bi-clock-history"></i></div><div class="stat-value">{{ pending_messages|default:"0" }}</div><div class="stat-label">In Progress</div></div></div>
+    <div class="col-md-3 col-6"><div class="stat-card"><div class="stat-icon emerald"><i class="bi bi-check-circle"></i></div><div class="stat-value">{{ resolved_messages|default:"0" }}</div><div class="stat-label">Resolved</div></div></div>
+</div>
+
+<!-- Filter Tabs -->
+<div class="filter-card" style="padding:12px 20px;">
+    <div class="d-flex gap-2 flex-wrap">
+        <a href="{% url 'admin_dashboard:customer_support' %}" class="btn btn-sm {% if not status_filter %}btn-primary{% else %}btn-outline-secondary{% endif %}">All</a>
+        <a href="?status=new" class="btn btn-sm {% if status_filter == 'new' %}btn-primary{% else %}btn-outline-secondary{% endif %}">New</a>
+        <a href="?status=read" class="btn btn-sm {% if status_filter == 'read' %}btn-primary{% else %}btn-outline-secondary{% endif %}">Read</a>
+        <a href="?status=in_progress" class="btn btn-sm {% if status_filter == 'in_progress' %}btn-primary{% else %}btn-outline-secondary{% endif %}">In Progress</a>
+        <a href="?status=resolved" class="btn btn-sm {% if status_filter == 'resolved' %}btn-primary{% else %}btn-outline-secondary{% endif %}">Resolved</a>
+    </div>
+</div>
+
+<!-- Messages -->
+<div class="table-card">
+    <div class="table-responsive">
+        {% if messages %}
+        <table class="table table-hover mb-0">
+            <thead><tr><th>Status</th><th>Customer</th><th>Subject</th><th>Date</th><th></th></tr></thead>
+            <tbody>
+                {% for msg in messages %}
+                <tr>
+                    <td><span class="badge" style="{% if msg.status == 'new' %}background:#e0e7ff;color:#3730a3;{% elif msg.status == 'read' %}background:#dbeafe;color:#1e40af;{% elif msg.status == 'in_progress' %}background:#fef3c7;color:#92400e;{% elif msg.status == 'resolved' %}background:#d1fae5;color:#065f46;{% else %}background:#f1f5f9;color:#64748b;{% endif %}">{{ msg.get_status_display }}</span></td>
+                    <td>
+                        <div class="d-flex align-items-center gap-2">
+                            <div style="width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,#4f46e5,#818cf8);color:white;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;flex-shrink:0;">{{ msg.name|make_list|first|upper }}</div>
+                            <div><strong style="color:#0f172a;font-size:14px;">{{ msg.name }}</strong><br><small style="color:#94a3b8;">{{ msg.email }}</small></div>
+                        </div>
+                    </td>
+                    <td><div style="color:#0f172a;font-weight:500;">{{ msg.subject }}</div><small style="color:#94a3b8;">{{ msg.message|truncatechars:60 }}</small></td>
+                    <td style="white-space:nowrap;"><small style="color:#64748b;">{{ msg.created_at|date:"M j, Y" }}</small><br><small style="color:#94a3b8;">{{ msg.created_at|time:"H:i" }}</small></td>
+                    <td><button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#viewModal{{ msg.id }}"><i class="bi bi-eye"></i></button></td>
+                </tr>
+
+                <!-- Modal -->
+                <div class="modal fade" id="viewModal{{ msg.id }}" tabindex="-1">
+                    <div class="modal-dialog modal-lg"><div class="modal-content" style="border-radius:16px;border:none;">
+                        <div class="modal-header" style="padding:20px 24px;border-bottom:1px solid #f1f5f9;">
+                            <h5 style="font-family:'Outfit',sans-serif;font-weight:700;margin:0;">Message Details</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body" style="padding:24px;">
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <p style="margin:0 0 6px;color:#475569;"><strong style="color:#0f172a;">Name:</strong> {{ msg.name }}</p>
+                                    <p style="margin:0 0 6px;color:#475569;"><strong style="color:#0f172a;">Email:</strong> <a href="mailto:{{ msg.email }}" style="color:#4f46e5;">{{ msg.email }}</a></p>
+                                    {% if msg.phone %}<p style="margin:0;color:#475569;"><strong style="color:#0f172a;">Phone:</strong> {{ msg.phone }}</p>{% endif %}
+                                </div>
+                                <div class="col-md-6">
+                                    <p style="margin:0 0 6px;color:#475569;"><strong style="color:#0f172a;">Subject:</strong> {{ msg.subject }}</p>
+                                    <p style="margin:0 0 6px;color:#475569;"><strong style="color:#0f172a;">Date:</strong> {{ msg.created_at|date:"F j, Y, g:i a" }}</p>
+                                </div>
+                            </div>
+                            <div style="background:#f8fafc;padding:16px 20px;border-radius:12px;margin-bottom:20px;">
+                                <strong style="color:#0f172a;display:block;margin-bottom:8px;">Message:</strong>
+                                <div style="color:#475569;">{{ msg.message|linebreaks }}</div>
+                            </div>
+                            {% if msg.admin_response %}
+                            <div style="background:#f0fdf4;padding:16px 20px;border-radius:12px;border-left:3px solid #10b981;margin-bottom:20px;">
+                                <div style="color:#94a3b8;font-size:12px;margin-bottom:6px;">{% if msg.admin_response_by %}{{ msg.admin_response_by.get_full_name|default:msg.admin_response_by.username }}{% endif %} — {{ msg.admin_response_at|date:"F j, Y, g:i a" }}</div>
+                                <div style="color:#065f46;">{{ msg.admin_response|linebreaks }}</div>
+                            </div>
+                            {% endif %}
+                            <form method="POST" action="{% url 'admin_dashboard:respond_contact' msg.id %}">
+                                {% csrf_token %}
+                                <div class="mb-3"><label class="form-label" style="font-weight:700;color:#0f172a;">Your Response</label><textarea class="form-control" name="response_text" rows="4" style="resize:vertical;" placeholder="Write your response...">{% if msg.admin_response %}{{ msg.admin_response }}{% endif %}</textarea></div>
+                                <div class="mb-3"><label class="form-label" style="font-weight:700;color:#0f172a;">Update Status</label>
+                                    <select class="form-select" name="status">
+                                        <option value="read" {% if msg.status == 'read' %}selected{% endif %}>Read</option>
+                                        <option value="in_progress" {% if msg.status == 'in_progress' %}selected{% endif %}>In Progress</option>
+                                        <option value="resolved" {% if msg.status == 'resolved' %}selected{% endif %}>Resolved</option>
+                                        <option value="closed" {% if msg.status == 'closed' %}selected{% endif %}>Closed</option>
+                                    </select>
+                                </div>
+                                <button type="submit" class="btn btn-primary"><i class="bi bi-send"></i> Send Response</button>
+                            </form>
+                        </div>
+                    </div></div>
+                </div>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="empty-state"><i class="bi bi-inbox"></i><br>No messages found</div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

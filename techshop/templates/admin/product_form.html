@@ -1,0 +1,93 @@
+{% extends 'admin/base.html' %}
+
+{% block admin_title %}Edit Product{% endblock %}
+
+{% block admin_content %}
+<div class="page-header">
+    <h4><i class="bi bi-pencil-square me-2" style="color:#4f46e5;"></i>Edit: {{ product.name }}</h4>
+    <a href="{% url 'admin_dashboard:products' %}" class="btn btn-outline-secondary btn-sm"><i class="bi bi-arrow-left"></i> Products</a>
+</div>
+
+<div class="admin-card">
+    <div class="card-body-custom">
+        <form method="post">
+            {% csrf_token %}
+            <div class="row g-4 mb-4">
+                <div class="col-md-6">
+                    <h6 style="font-family:'Outfit',sans-serif;font-weight:700;color:#0f172a;margin-bottom:20px;"><i class="bi bi-info-circle me-2" style="color:#4f46e5;"></i>Product Information</h6>
+                    <div class="mb-3">
+                        <label class="form-label">Product Name</label>
+                        <input type="text" name="name" class="form-control" value="{{ product.name }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Description</label>
+                        <textarea name="description" class="form-control" rows="4" style="resize:vertical;">{{ product.description }}</textarea>
+                    </div>
+                    <div class="form-check" style="margin-top:12px;">
+                        <input type="checkbox" name="is_available_online" class="form-check-input" id="is_available" {% if product.is_available_online %}checked{% endif %} style="border-color:#c7d2fe;">
+                        <label class="form-check-label" for="is_available" style="font-weight:500;color:#475569;">Available for Online Purchase</label>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <h6 style="font-family:'Outfit',sans-serif;font-weight:700;color:#0f172a;margin-bottom:20px;"><i class="bi bi-currency-dollar me-2" style="color:#4f46e5;"></i>Pricing</h6>
+                    <div class="mb-3">
+                        <label class="form-label">Cost Price (৳)</label>
+                        <input type="number" name="cost_price" class="form-control" value="{{ product.cost_price }}" step="0.01" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Selling Price (৳)</label>
+                        <input type="number" name="selling_price" class="form-control" value="{{ product.selling_price }}" step="0.01" required>
+                    </div>
+
+                    <h6 style="font-family:'Outfit',sans-serif;font-weight:700;color:#0f172a;margin:28px 0 20px;"><i class="bi bi-tag me-2" style="color:#4f46e5;"></i>Offers & Discounts</h6>
+                    <div class="mb-3">
+                        <label class="form-label">Discount (%)</label>
+                        <input type="number" name="discount_percentage" class="form-control" value="{{ product.discount_percentage|default:'0' }}" step="0.01" min="0" max="100">
+                        <small style="color:#94a3b8;">Set to 0 for no discount</small>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Offer Label</label>
+                        <input type="text" name="discount_label" class="form-control" value="{{ product.discount_label|default:'' }}" placeholder="e.g. Summer Sale, Flash Deal">
+                    </div>
+                    {% if product.has_offer %}
+                    <div style="background:#f0fdf4;border:1px solid #bbf7d0;padding:12px 16px;border-radius:10px;">
+                        <small style="color:#166534;"><i class="bi bi-check-circle me-1"></i>Active: <strong>{{ product.discount_percentage }}% off</strong> — ৳{{ product.selling_price }} → <strong>৳{{ product.discounted_price }}</strong></small>
+                    </div>
+                    {% endif %}
+
+                    <h6 style="font-family:'Outfit',sans-serif;font-weight:700;color:#0f172a;margin:28px 0 20px;"><i class="bi bi-percent me-2" style="color:#4f46e5;"></i>Tax Settings</h6>
+                    <div class="mb-3">
+                        <label class="form-label">Product Tax Rate (%)</label>
+                        <input type="number" name="tax_rate" class="form-control" value="{{ product.tax_rate|default:'' }}" step="0.01" min="0" max="100">
+                        <small style="color:#94a3b8;">Leave empty to use global tax rate</small>
+                    </div>
+                    <div class="form-check">
+                        <input type="checkbox" name="tax_exempt" class="form-check-input" id="tax_exempt" {% if product.tax_exempt %}checked{% endif %} style="border-color:#c7d2fe;">
+                        <label class="form-check-label" for="tax_exempt" style="font-weight:500;color:#475569;">Tax Exempt</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-4">
+                <div class="col-md-6">
+                    <h6 style="font-family:'Outfit',sans-serif;font-weight:700;color:#0f172a;margin-bottom:20px;"><i class="bi bi-boxes me-2" style="color:#4f46e5;"></i>Inventory</h6>
+                    <div class="mb-3">
+                        <label class="form-label">Quantity on Hand</label>
+                        <input type="number" name="quantity_on_hand" class="form-control" value="{{ inventory.quantity_on_hand|default:0 }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Reorder Level</label>
+                        <input type="number" name="reorder_level" class="form-control" value="{{ inventory.reorder_level|default:10 }}" required>
+                    </div>
+                </div>
+            </div>
+
+            <div style="border-top:1px solid #e2e8f0;padding-top:24px;margin-top:32px;display:flex;gap:12px;">
+                <button type="submit" class="btn btn-primary"><i class="bi bi-check-circle"></i> Save Changes</button>
+                <a href="{% url 'admin_dashboard:products' %}" class="btn btn-outline-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

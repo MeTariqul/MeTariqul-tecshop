@@ -1,0 +1,207 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}FAQ | Premium Collection{% endblock %}
+
+{% block extra_css %}
+<style>
+    .static-hero {
+        background: linear-gradient(135deg, #0b0f19 0%, #1e1b4b 100%);
+        padding: 80px 0;
+        color: white;
+        text-align: center;
+        border-radius: 0 0 40px 40px;
+        margin-bottom: 60px;
+    }
+
+    .hero-title {
+        font-family: 'Outfit', sans-serif;
+        font-size: 40px;
+        font-weight: 800;
+        margin-bottom: 16px;
+    }
+
+    .hero-subtitle {
+        color: #94a3b8;
+        font-size: 16px;
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    .faq-container {
+        max-width: 800px;
+        margin: 0 auto 80px;
+    }
+
+    .faq-item {
+        background: var(--surface-color);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-md);
+        margin-bottom: 16px;
+        overflow: hidden;
+        transition: all var(--transition-fast);
+    }
+
+    .faq-item.active {
+        border-color: var(--primary);
+        box-shadow: 0 4px 12px rgba(79, 70, 229, 0.1);
+    }
+
+    .faq-question {
+        padding: 24px;
+        font-family: 'Outfit', sans-serif;
+        font-size: 18px;
+        font-weight: 700;
+        color: var(--text-main);
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: var(--surface-color);
+    }
+
+    .faq-icon {
+        color: var(--primary);
+        transition: transform var(--transition-fast);
+    }
+
+    .faq-item.active .faq-icon {
+        transform: rotate(180deg);
+    }
+
+    .faq-answer {
+        padding: 0 24px;
+        max-height: 0;
+        overflow: hidden;
+        transition: all 0.3s ease-out;
+        color: var(--text-muted);
+        line-height: 1.6;
+    }
+
+    .faq-item.active .faq-answer {
+        padding: 0 24px 24px;
+        max-height: 500px;
+    }
+
+    .search-wrap {
+        position: relative;
+        max-width: 500px;
+        margin: 0 auto 40px;
+    }
+
+    .search-input {
+        width: 100%;
+        padding: 16px 24px 16px 48px;
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-full);
+        background: var(--surface-color);
+        font-size: 16px;
+        color: var(--text-main);
+        transition: all var(--transition-fast);
+    }
+
+    .search-input:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+    }
+
+    .search-icon {
+        position: absolute;
+        left: 20px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--text-muted);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="static-hero">
+    <div class="container">
+        <h1 class="hero-title">Frequently Asked Questions</h1>
+        <p class="hero-subtitle">Find answers to common questions about our premium products and services.</p>
+    </div>
+</div>
+
+<div class="container">
+    <div class="search-wrap">
+        <i class="bi bi-search search-icon"></i>
+        <input type="text" class="search-input" id="faqSearch" placeholder="Search questions...">
+    </div>
+
+    <div class="faq-container">
+        {% for faq in faqs %}
+        <div class="faq-item" data-question="{{ faq.question|lower }}">
+            <div class="faq-question" onclick="toggleFaq(this)">
+                {{ faq.question }}
+                <i class="bi bi-chevron-down faq-icon"></i>
+            </div>
+            <div class="faq-answer">
+                <p style="margin:0;">{{ faq.answer }}</p>
+            </div>
+        </div>
+        {% empty %}
+        <!-- Dummy FAQs for visual presentation since DB might be empty -->
+        <div class="faq-item">
+            <div class="faq-question" onclick="toggleFaq(this)">
+                Are all your products authentic?
+                <i class="bi bi-chevron-down faq-icon"></i>
+            </div>
+            <div class="faq-answer">
+                <p style="margin:0;">Yes, absolutely. We source our products directly from manufacturers or authorized elite distributors. Every item is guaranteed 100% authentic.</p>
+            </div>
+        </div>
+        <div class="faq-item">
+            <div class="faq-question" onclick="toggleFaq(this)">
+                What is your return policy?
+                <i class="bi bi-chevron-down faq-icon"></i>
+            </div>
+            <div class="faq-answer">
+                <p style="margin:0;">We offer a 30-day premium return policy for all items in original condition. Please review our Returns & Refunds page for full details.</p>
+            </div>
+        </div>
+        <div class="faq-item">
+            <div class="faq-question" onclick="toggleFaq(this)">
+                How long does shipping take?
+                <i class="bi bi-chevron-down faq-icon"></i>
+            </div>
+            <div class="faq-answer">
+                <p style="margin:0;">Our white-glove delivery service typically takes 2-5 business days for domestic orders, depending on your selected shipping tier at checkout.</p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div style="text-align: center; margin-bottom: 80px;">
+        <h3 style="font-family: 'Outfit', sans-serif; font-size: 24px; font-weight: 700; margin-bottom: 16px;">Still have questions?</h3>
+        <p style="color: var(--text-muted); margin-bottom: 24px;">Our premium support team is available to assist you.</p>
+        <a href="{% url 'store:contact' %}" class="btn" style="padding: 12px 32px; background: var(--text-main); color: white; border-radius: var(--radius-md); font-weight: 600;">Contact Support</a>
+    </div>
+</div>
+
+<script>
+    function toggleFaq(element) {
+        const item = element.parentElement;
+        const isActive = item.classList.contains('active');
+        
+        document.querySelectorAll('.faq-item').forEach(faq => faq.classList.remove('active'));
+        
+        if (!isActive) {
+            item.classList.add('active');
+        }
+    }
+
+    document.getElementById('faqSearch').addEventListener('input', function(e) {
+        const term = e.target.value.toLowerCase();
+        document.querySelectorAll('.faq-item').forEach(item => {
+            const question = item.dataset.question || item.querySelector('.faq-question').textContent.toLowerCase();
+            if (question.includes(term) || term === '') {
+                item.style.display = 'block';
+            } else {
+                item.style.display = 'none';
+            }
+        });
+    });
+</script>
+{% endblock %}

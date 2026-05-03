@@ -1,0 +1,16 @@
+{% extends 'admin/base.html' %}
+
+{% block admin_title %}New Product{% endblock %}
+
+{% block admin_content %}
+<div class="page-header">
+    <h4><i class="bi bi-plus-circle me-2" style="color:#4f46e5;"></i>Add New Product</h4>
+    <a href="{% url 'admin_dashboard:products' %}" class="btn btn-outline-secondary btn-sm"><i class="bi bi-arrow-left"></i> Products</a>
+</div>
+
+<div class="admin-card">
+    <div class="card-body-custom">
+        <p style="color:#94a3b8;text-align:center;padding:40px;">This form is served by the standard product form. <a href="{% url 'admin_dashboard:product_create' %}" style="color:#4f46e5;font-weight:600;">Go to Product Form</a></p>
+    </div>
+</div>
+{% endblock %}

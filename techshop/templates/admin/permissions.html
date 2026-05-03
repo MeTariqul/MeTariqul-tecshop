@@ -1,0 +1,94 @@
+{% extends 'admin/base.html' %}
+
+{% block admin_title %}Manage Permissions{% endblock %}
+
+{% block admin_content %}
+<div class="page-header">
+    <h4><i class="bi bi-shield-lock me-2" style="color:#4f46e5;"></i>Permissions: {{ staff.user.username }}</h4>
+    <a href="{% url 'admin_dashboard:staff_list' %}" class="btn btn-outline-secondary btn-sm"><i class="bi bi-arrow-left"></i> Staff List</a>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-6">
+        <div class="admin-card">
+            <div class="card-header-custom"><i class="bi bi-shield-check"></i> Current Role: {{ staff.get_role_display }}</div>
+            <div class="card-body-custom">
+                <form method="post">
+                    {% csrf_token %}
+                    <h6 style="font-family:'Outfit',sans-serif;font-weight:700;color:#0f172a;margin-bottom:16px;">Management Permissions</h6>
+                    <div class="form-check form-switch mb-2"><input class="form-check-input" type="checkbox" name="can_manage_products" id="can_manage_products" {% if staff.can_manage_products %}checked{% endif %}><label class="form-check-label" for="can_manage_products" style="color:#475569;">Manage Products</label></div>
+                    <div class="form-check form-switch mb-2"><input class="form-check-input" type="checkbox" name="can_manage_orders" id="can_manage_orders" {% if staff.can_manage_orders %}checked{% endif %}><label class="form-check-label" for="can_manage_orders" style="color:#475569;">Manage Orders</label></div>
+                    <div class="form-check form-switch mb-2"><input class="form-check-input" type="checkbox" name="can_manage_inventory" id="can_manage_inventory" {% if staff.can_manage_inventory %}checked{% endif %}><label class="form-check-label" for="can_manage_inventory" style="color:#475569;">Manage Inventory</label></div>
+                    <div class="form-check form-switch mb-2"><input class="form-check-input" type="checkbox" name="can_manage_customers" id="can_manage_customers" {% if staff.can_manage_customers %}checked{% endif %}><label class="form-check-label" for="can_manage_customers" style="color:#475569;">Manage Customers</label></div>
+                    <div class="form-check form-switch mb-2"><input class="form-check-input" type="checkbox" name="can_manage_staff" id="can_manage_staff" {% if staff.can_manage_staff %}checked{% endif %}><label class="form-check-label" for="can_manage_staff" style="color:#475569;">Manage Staff</label></div>
+                    <div class="form-check form-switch mb-2"><input class="form-check-input" type="checkbox" name="can_manage_sellers" id="can_manage_sellers" {% if staff.can_manage_sellers %}checked{% endif %}><label class="form-check-label" for="can_manage_sellers" style="color:#475569;">Manage Sellers</label></div>
+
+                    <div style="border-top:1px solid #f1f5f9;margin:20px 0;padding-top:20px;">
+                        <h6 style="font-family:'Outfit',sans-serif;font-weight:700;color:#0f172a;margin-bottom:16px;">Finance & Reports</h6>
+                        <div class="form-check form-switch mb-2"><input class="form-check-input" type="checkbox" name="can_view_reports" id="can_view_reports" {% if staff.can_view_reports %}checked{% endif %}><label class="form-check-label" for="can_view_reports" style="color:#475569;">View Reports</label></div>
+                        <div class="form-check form-switch mb-2"><input class="form-check-input" type="checkbox" name="can_manage_finance" id="can_manage_finance" {% if staff.can_manage_finance %}checked{% endif %}><label class="form-check-label" for="can_manage_finance" style="color:#475569;">Manage Finance</label></div>
+                        <div class="form-check form-switch mb-2"><input class="form-check-input" type="checkbox" name="can_manage_settings" id="can_manage_settings" {% if staff.can_manage_settings %}checked{% endif %}><label class="form-check-label" for="can_manage_settings" style="color:#475569;">Manage Settings</label></div>
+                    </div>
+
+                    <div style="border-top:1px solid #f1f5f9;margin:20px 0;padding-top:20px;">
+                        <h6 style="font-family:'Outfit',sans-serif;font-weight:700;color:#0f172a;margin-bottom:16px;">Order Access</h6>
+                        <div class="form-check form-switch mb-2"><input class="form-check-input" type="checkbox" name="can_view_all_orders" id="can_view_all_orders" {% if staff.can_view_all_orders %}checked{% endif %}><label class="form-check-label" for="can_view_all_orders" style="color:#475569;">View All Orders</label></div>
+                        <div class="form-check form-switch mb-2"><input class="form-check-input" type="checkbox" name="can_view_own_orders" id="can_view_own_orders" {% if staff.can_view_own_orders %}checked{% endif %}><label class="form-check-label" for="can_view_own_orders" style="color:#475569;">View Own Orders</label></div>
+                        <div class="form-check form-switch mb-2"><input class="form-check-input" type="checkbox" name="can_manage_delivery" id="can_manage_delivery" {% if staff.can_manage_delivery %}checked{% endif %}><label class="form-check-label" for="can_manage_delivery" style="color:#475569;">Manage Delivery</label></div>
+                    </div>
+
+                    <div style="border-top:1px solid #e2e8f0;padding-top:20px;display:flex;justify-content:space-between;">
+                        <a href="{% url 'admin_dashboard:staff_edit' staff.id %}" class="btn btn-outline-primary"><i class="bi bi-person"></i> Change Role</a>
+                        <button type="submit" class="btn btn-primary"><i class="bi bi-check-circle"></i> Save Permissions</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-6">
+        <div class="admin-card mb-4">
+            <div class="card-header-custom"><i class="bi bi-lightning"></i> Quick Role Templates</div>
+            <div class="card-body-custom">
+                <p style="color:#94a3b8;font-size:14px;margin-bottom:16px;">Click a role to apply standard permissions:</p>
+                <div class="d-flex flex-wrap gap-2">
+                    <a href="#" onclick="applyRole('super_admin')" class="btn btn-sm btn-outline-primary">Super Admin</a>
+                    <a href="#" onclick="applyRole('manager')" class="btn btn-sm btn-outline-primary">Manager</a>
+                    <a href="#" onclick="applyRole('inventory_manager')" class="btn btn-sm btn-outline-primary">Inventory</a>
+                    <a href="#" onclick="applyRole('order_manager')" class="btn btn-sm btn-outline-primary">Order Mgr</a>
+                    <a href="#" onclick="applyRole('support')" class="btn btn-sm btn-outline-primary">Support</a>
+                    <a href="#" onclick="applyRole('viewer')" class="btn btn-sm btn-outline-primary">Viewer</a>
+                </div>
+            </div>
+        </div>
+        <div class="admin-card">
+            <div class="card-header-custom"><i class="bi bi-person"></i> Staff Information</div>
+            <div class="card-body-custom">
+                <p style="margin:0 0 10px;color:#475569;"><strong style="color:#0f172a;">Name:</strong> {{ staff.user.first_name }} {{ staff.user.last_name }}</p>
+                <p style="margin:0 0 10px;color:#475569;"><strong style="color:#0f172a;">Email:</strong> {{ staff.user.email }}</p>
+                <p style="margin:0 0 10px;color:#475569;"><strong style="color:#0f172a;">Employee ID:</strong> {{ staff.employee_id }}</p>
+                <p style="margin:0 0 10px;color:#475569;"><strong style="color:#0f172a;">Department:</strong> {{ staff.department|default:"-" }}</p>
+                <p style="margin:0;color:#475569;"><strong style="color:#0f172a;">Status:</strong>
+                    {% if staff.is_active %}<span class="badge" style="background:#d1fae5;color:#065f46;">Active</span>
+                    {% else %}<span class="badge" style="background:#fecaca;color:#991b1b;">Inactive</span>{% endif %}
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function applyRole(role) {
+    const p = {
+        'super_admin': {can_manage_products:1,can_manage_orders:1,can_manage_inventory:1,can_manage_customers:1,can_manage_staff:1,can_manage_sellers:1,can_view_reports:1,can_manage_finance:1,can_manage_settings:1,can_view_all_orders:1,can_view_own_orders:1,can_manage_delivery:1},
+        'manager': {can_manage_products:1,can_manage_orders:1,can_manage_inventory:1,can_manage_customers:1,can_manage_staff:0,can_manage_sellers:0,can_view_reports:1,can_manage_finance:1,can_manage_settings:1,can_view_all_orders:1,can_view_own_orders:1,can_manage_delivery:1},
+        'inventory_manager': {can_manage_products:1,can_manage_orders:0,can_manage_inventory:1,can_manage_customers:0,can_manage_staff:0,can_manage_sellers:0,can_view_reports:1,can_manage_finance:0,can_manage_settings:0,can_view_all_orders:0,can_view_own_orders:0,can_manage_delivery:0},
+        'order_manager': {can_manage_products:0,can_manage_orders:1,can_manage_inventory:0,can_manage_customers:1,can_manage_staff:0,can_manage_sellers:0,can_view_reports:1,can_manage_finance:0,can_manage_settings:0,can_view_all_orders:1,can_view_own_orders:1,can_manage_delivery:1},
+        'support': {can_manage_products:0,can_manage_orders:1,can_manage_inventory:0,can_manage_customers:1,can_manage_staff:0,can_manage_sellers:0,can_view_reports:0,can_manage_finance:0,can_manage_settings:0,can_view_all_orders:1,can_view_own_orders:1,can_manage_delivery:0},
+        'viewer': {can_manage_products:0,can_manage_orders:0,can_manage_inventory:0,can_manage_customers:0,can_manage_staff:0,can_manage_sellers:0,can_view_reports:1,can_manage_finance:0,can_manage_settings:0,can_view_all_orders:0,can_view_own_orders:1,can_manage_delivery:0}
+    };
+    const perms = p[role];
+    for (const [k,v] of Object.entries(perms)) { const c=document.querySelector(`[name="${k}"]`); if(c) c.checked=!!v; }
+}
+</script>
+{% endblock %}

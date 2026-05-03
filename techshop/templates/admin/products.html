@@ -1,0 +1,103 @@
+{% extends 'admin/base.html' %}
+
+{% block admin_title %}Products{% endblock %}
+
+{% block admin_content %}
+<div class="page-header">
+    <h4><i class="bi bi-box-seam me-2" style="color:#4f46e5;"></i>Products Management</h4>
+    <a href="{% url 'admin_dashboard:dashboard' %}" class="btn btn-outline-secondary btn-sm"><i class="bi bi-arrow-left"></i> Dashboard</a>
+</div>
+
+<!-- Filters -->
+<div class="filter-card">
+    <form method="get" class="row g-3 align-items-end">
+        <div class="col-md-3">
+            <label class="form-label">Search</label>
+            <input type="text" name="search" class="form-control" placeholder="Search products..." value="{{ request.GET.search|default:'' }}">
+        </div>
+        <div class="col-md-3">
+            <label class="form-label">Category</label>
+            <select name="category" class="form-select">
+                <option value="">All Categories</option>
+                {% for cat in categories %}
+                <option value="{{ cat.id }}" {% if request.GET.category == cat.id|stringformat:'s' %}selected{% endif %}>{{ cat.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-2">
+            <label class="form-label">Stock</label>
+            <select name="stock" class="form-select">
+                <option value="">All Stock</option>
+                <option value="in" {% if request.GET.stock == 'in' %}selected{% endif %}>In Stock</option>
+                <option value="low" {% if request.GET.stock == 'low' %}selected{% endif %}>Low Stock</option>
+                <option value="out" {% if request.GET.stock == 'out' %}selected{% endif %}>Out of Stock</option>
+            </select>
+        </div>
+        <div class="col-md-2">
+            <button type="submit" class="btn btn-primary w-100"><i class="bi bi-funnel"></i> Filter</button>
+        </div>
+        <div class="col-md-2">
+            <a href="{% url 'admin_dashboard:products' %}" class="btn btn-outline-secondary w-100">Clear</a>
+        </div>
+    </form>
+</div>
+
+<!-- Products Table -->
+<div class="table-card">
+    <div class="table-responsive">
+        <table class="table table-hover mb-0">
+            <thead>
+                <tr>
+                    <th>SKU</th>
+                    <th>Product</th>
+                    <th>Category</th>
+                    <th>Cost</th>
+                    <th>Price</th>
+                    <th>Stock</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for product in products %}
+                <tr>
+                    <td><code style="background:#f1f5f9; padding:4px 8px; border-radius:6px; color:#4f46e5; font-weight:600;">{{ product.SKU }}</code></td>
+                    <td>
+                        <strong style="color:#0f172a;">{{ product.name }}</strong>
+                        {% if product.supplier %}<br><small style="color:#94a3b8;">{{ product.supplier.name }}</small>{% endif %}
+                    </td>
+                    <td>{{ product.category.name|default:"-" }}</td>
+                    <td>৳{{ product.cost_price }}</td>
+                    <td><strong>৳{{ product.selling_price }}</strong></td>
+                    <td>
+                        {% if product.inventory %}
+                            {% if product.inventory.quantity_on_hand == 0 %}
+                            <span class="badge" style="background:#fef2f2; color:#ef4444;">Out of Stock</span>
+                            {% elif product.inventory.quantity_on_hand <= 10 %}
+                            <span class="badge" style="background:#fef3c7; color:#92400e;">{{ product.inventory.quantity_on_hand }} left</span>
+                            {% else %}
+                            <span class="badge" style="background:#d1fae5; color:#065f46;">{{ product.inventory.quantity_on_hand }}</span>
+                            {% endif %}
+                        {% else %}
+                        <span style="color:#94a3b8;">-</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if product.is_available_online %}
+                        <span class="badge" style="background:#d1fae5; color:#065f46;">Active</span>
+                        {% else %}
+                        <span class="badge" style="background:#f1f5f9; color:#64748b;">Inactive</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <a href="{% url 'admin_dashboard:product_edit' product.id %}" class="btn btn-sm btn-outline-primary"><i class="bi bi-pencil"></i> Edit</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="8" class="empty-state"><i class="bi bi-inbox"></i><br>No products found</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

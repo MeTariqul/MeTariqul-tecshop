@@ -1,0 +1,449 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Invoice {{ invoice.invoice_number }} | Premium Collection{% endblock %}
+
+{% block extra_css %}
+<style>
+    body {
+        background: var(--bg-color);
+    }
+    .invoice-wrapper {
+        max-width: 850px;
+        margin: 60px auto;
+        background: var(--surface-color);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-lg);
+        border: 1px solid var(--border-color);
+        overflow: hidden;
+    }
+    
+    .invoice-header {
+        background: linear-gradient(135deg, #0b0f19 0%, #1e1b4b 100%);
+        padding: 48px;
+        color: white;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+    }
+    
+    .brand-section h2 {
+        font-family: 'Outfit', sans-serif;
+        font-size: 32px;
+        font-weight: 800;
+        margin-bottom: 8px;
+        background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .brand-section p {
+        color: #94a3b8;
+        font-size: 14px;
+        line-height: 1.6;
+        margin-bottom: 0;
+    }
+
+    .invoice-meta {
+        text-align: right;
+    }
+    
+    .invoice-meta h4 {
+        font-family: 'Outfit', sans-serif;
+        font-size: 24px;
+        font-weight: 700;
+        margin-bottom: 16px;
+    }
+
+    .meta-grid {
+        display: grid;
+        grid-template-columns: auto auto;
+        gap: 8px 24px;
+        text-align: right;
+        font-size: 14px;
+        color: #cbd5e1;
+    }
+
+    .status-badge {
+        display: inline-block;
+        padding: 6px 16px;
+        border-radius: var(--radius-full);
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-top: 16px;
+    }
+
+    .status-paid { background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.5); }
+    .status-partial { background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.5); }
+    .status-pending { background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.5); }
+
+    .invoice-body {
+        padding: 48px;
+    }
+
+    .address-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 40px;
+        margin-bottom: 48px;
+    }
+
+    .address-block h5 {
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-bottom: 12px;
+        border-bottom: 1px solid var(--border-color);
+        padding-bottom: 8px;
+    }
+
+    .address-block p {
+        font-size: 15px;
+        color: var(--text-main);
+        line-height: 1.6;
+        margin: 0;
+    }
+
+    .invoice-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 40px;
+    }
+
+    .invoice-table th {
+        text-align: left;
+        padding: 16px;
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        border-bottom: 2px solid var(--border-color);
+    }
+
+    .invoice-table td {
+        padding: 24px 16px;
+        font-size: 15px;
+        color: var(--text-main);
+        border-bottom: 1px solid var(--border-color);
+        vertical-align: middle;
+    }
+
+    .item-name {
+        font-weight: 600;
+        margin-bottom: 4px;
+    }
+
+    .item-sku {
+        font-size: 13px;
+        color: var(--text-muted);
+    }
+
+    .totals-section {
+        display: flex;
+        justify-content: flex-end;
+        margin-bottom: 48px;
+    }
+
+    .totals-grid {
+        width: 350px;
+    }
+
+    .total-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 12px 0;
+        font-size: 15px;
+        color: var(--text-muted);
+    }
+
+    .total-row.grand-total {
+        border-top: 2px solid var(--text-main);
+        margin-top: 8px;
+        padding-top: 16px;
+        font-family: 'Outfit', sans-serif;
+        font-size: 24px;
+        font-weight: 800;
+        color: var(--text-main);
+    }
+
+    .payment-info {
+        background: var(--bg-color);
+        border-radius: var(--radius-md);
+        padding: 24px;
+        margin-bottom: 48px;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 24px;
+        text-align: center;
+    }
+
+    .payment-info-item label {
+        display: block;
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-bottom: 8px;
+    }
+
+    .payment-info-item .value {
+        font-family: 'Outfit', sans-serif;
+        font-size: 18px;
+        font-weight: 700;
+        color: var(--text-main);
+    }
+
+    .invoice-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        border-top: 1px solid var(--border-color);
+        padding-top: 32px;
+    }
+
+    .footer-terms p {
+        font-size: 13px;
+        color: var(--text-muted);
+        margin-bottom: 8px;
+        max-width: 400px;
+    }
+
+    .signature-box {
+        text-align: center;
+    }
+
+    .signature-line {
+        width: 200px;
+        border-bottom: 1px solid var(--text-main);
+        margin-bottom: 8px;
+        height: 40px;
+    }
+
+    .signature-label {
+        font-size: 12px;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .action-bar {
+        display: flex;
+        justify-content: center;
+        gap: 16px;
+        margin-bottom: 60px;
+    }
+
+    .btn-action {
+        padding: 12px 24px;
+        border-radius: var(--radius-md);
+        font-family: 'Outfit', sans-serif;
+        font-size: 15px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all var(--transition-fast);
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        text-decoration: none;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, var(--primary) 0%, #6366f1 100%);
+        color: white;
+        border: none;
+        box-shadow: var(--shadow-sm);
+    }
+    
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+    }
+
+    .btn-outline {
+        background: var(--surface-color);
+        color: var(--text-main);
+        border: 1px solid var(--border-color);
+    }
+
+    .btn-outline:hover {
+        border-color: var(--primary);
+        color: var(--primary);
+    }
+
+    @media print {
+        body { background: white; padding: 0; }
+        .invoice-wrapper { margin: 0; box-shadow: none; border: none; max-width: 100%; border-radius: 0; }
+        .invoice-header { background: transparent; color: black; border-bottom: 2px solid black; padding: 0 0 24px 0; }
+        .brand-section h2 { background: none; -webkit-text-fill-color: black; color: black; }
+        .brand-section p, .meta-grid { color: #333; }
+        .invoice-body { padding: 24px 0 0 0; }
+        .no-print { display: none !important; }
+        .status-paid { border: 2px solid #34d399; background: transparent; color: #34d399; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="invoice-wrapper">
+        <!-- Header -->
+        <div class="invoice-header">
+            <div class="brand-section">
+                <h2>{{ invoice.shop_name|default:"Premium Collection" }}</h2>
+                <p>
+                    {{ invoice.shop_address }}<br>
+                    {% if invoice.shop_phone %}P: {{ invoice.shop_phone }}<br>{% endif %}
+                    {% if invoice.shop_email %}E: {{ invoice.shop_email }}<br>{% endif %}
+                    {% if invoice.tax_number %}Tax ID: {{ invoice.tax_number }}{% endif %}
+                </p>
+            </div>
+            
+            <div class="invoice-meta">
+                <h4>INVOICE</h4>
+                <div class="meta-grid">
+                    <span>Invoice No:</span>
+                    <span style="font-weight: 600; color: white;">{{ invoice.invoice_number }}</span>
+                    <span>Date:</span>
+                    <span>{{ invoice.invoice_date|date:"M d, Y" }}</span>
+                </div>
+                
+                {% if invoice.payment_status == 'paid' %}
+                <div class="status-badge status-paid"><i class="bi bi-check-circle-fill me-1"></i> PAID</div>
+                {% elif invoice.payment_status == 'partial' %}
+                <div class="status-badge status-partial"><i class="bi bi-clock-fill me-1"></i> PARTIAL</div>
+                {% else %}
+                <div class="status-badge status-pending"><i class="bi bi-exclamation-circle-fill me-1"></i> PENDING</div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="invoice-body">
+            <!-- Addresses -->
+            <div class="address-grid">
+                <div class="address-block">
+                    <h5>Billed To</h5>
+                    <p>
+                        <strong>{{ invoice.customer_name }}</strong><br>
+                        {{ invoice.billing_address|linebreaksbr }}<br>
+                        {% if invoice.customer_phone %}{{ invoice.customer_phone }}<br>{% endif %}
+                        {% if invoice.customer_email %}{{ invoice.customer_email }}{% endif %}
+                    </p>
+                </div>
+                
+                {% if invoice.shipping_address %}
+                <div class="address-block">
+                    <h5>Shipped To</h5>
+                    <p>
+                        {{ invoice.shipping_address|linebreaksbr }}
+                    </p>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Items -->
+            <table class="invoice-table">
+                <thead>
+                    <tr>
+                        <th style="width: 50%;">Description</th>
+                        <th style="text-align: center;">Qty</th>
+                        <th style="text-align: right;">Unit Price</th>
+                        <th style="text-align: right;">Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in invoice.items.all %}
+                    <tr>
+                        <td>
+                            <div class="item-name">{{ item.product_name }}</div>
+                            <div class="item-sku">SKU: {{ item.product_sku }}</div>
+                        </td>
+                        <td style="text-align: center;">{{ item.quantity }}</td>
+                        <td style="text-align: right;">{{ currency }} {{ item.unit_price|floatformat:2 }}</td>
+                        <td style="text-align: right; font-weight: 600;">{{ currency }} {{ item.total|floatformat:2 }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <!-- Totals -->
+            <div class="totals-section">
+                <div class="totals-grid">
+                    <div class="total-row">
+                        <span>Subtotal</span>
+                        <span>{{ currency }} {{ invoice.subtotal|floatformat:2 }}</span>
+                    </div>
+                    
+                    {% if invoice.total_discount > 0 %}
+                    <div class="total-row">
+                        <span>Discount</span>
+                        <span style="color: var(--success);">-{{ currency }} {{ invoice.total_discount|floatformat:2 }}</span>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="total-row">
+                        <span>Tax</span>
+                        <span>{{ currency }} {{ invoice.tax_amount|floatformat:2 }}</span>
+                    </div>
+                    
+                    {% if invoice.shipping_cost > 0 %}
+                    <div class="total-row">
+                        <span>Shipping</span>
+                        <span>{{ currency }} {{ invoice.shipping_cost|floatformat:2 }}</span>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="total-row grand-total">
+                        <span>Total</span>
+                        <span>{{ currency }} {{ invoice.grand_total|floatformat:2 }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Payment Info Block -->
+            <div class="payment-info">
+                <div class="payment-info-item">
+                    <label>Payment Method</label>
+                    <div class="value">{{ invoice.get_payment_method_display|upper|default:"CREDIT CARD" }}</div>
+                </div>
+                <div class="payment-info-item">
+                    <label>Amount Paid</label>
+                    <div class="value" style="color: var(--success);">{{ currency }} {{ invoice.amount_paid|floatformat:2 }}</div>
+                </div>
+                <div class="payment-info-item">
+                    <label>Amount Due</label>
+                    <div class="value" style="color: var(--danger);">{{ currency }} {{ invoice.amount_due|floatformat:2 }}</div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="invoice-footer">
+                <div class="footer-terms">
+                    {% if invoice.return_policy %}<p><strong>Returns:</strong> {{ invoice.return_policy }}</p>{% endif %}
+                    {% if invoice.warranty_info %}<p><strong>Warranty:</strong> {{ invoice.warranty_info }}</p>{% endif %}
+                    <p style="margin-top: 16px; font-size: 12px;">Thank you for your premium purchase.</p>
+                </div>
+                <div class="signature-box">
+                    <div class="signature-line"></div>
+                    <div class="signature-label">Authorized Signature</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="action-bar no-print">
+        <a href="javascript:window.print()" class="btn-action btn-outline">
+            <i class="bi bi-printer"></i> Print
+        </a>
+        <a href="{% url 'invoices:download_pdf' invoice.id %}" class="btn-action btn-primary">
+            <i class="bi bi-file-earmark-pdf"></i> Save as PDF
+        </a>
+    </div>
+</div>
+{% endblock %}

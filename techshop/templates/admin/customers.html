@@ -1,0 +1,65 @@
+{% extends 'admin/base.html' %}
+
+{% block admin_title %}Customers{% endblock %}
+
+{% block admin_content %}
+<div class="page-header">
+    <h4><i class="bi bi-people me-2" style="color:#4f46e5;"></i>Customers Management</h4>
+    <a href="{% url 'admin_dashboard:dashboard' %}" class="btn btn-outline-secondary btn-sm"><i class="bi bi-arrow-left"></i> Dashboard</a>
+</div>
+
+<!-- Search -->
+<div class="filter-card">
+    <form method="get" class="row g-3 align-items-end">
+        <div class="col-md-10">
+            <label class="form-label">Search</label>
+            <input type="text" name="search" class="form-control" placeholder="Search by name, email or phone..." value="{{ request.GET.search|default:'' }}">
+        </div>
+        <div class="col-md-2">
+            <button type="submit" class="btn btn-primary w-100"><i class="bi bi-search"></i> Search</button>
+        </div>
+    </form>
+</div>
+
+<!-- Customers Table -->
+<div class="table-card">
+    <div class="table-responsive">
+        <table class="table table-hover mb-0">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Customer</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Orders</th>
+                    <th>Total Spent</th>
+                    <th>Joined</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for customer in customers %}
+                <tr>
+                    <td style="color:#94a3b8;">#{{ customer.id }}</td>
+                    <td><strong style="color:#0f172a;">{{ customer.user.first_name }} {{ customer.user.last_name }}</strong></td>
+                    <td>{{ customer.user.email }}</td>
+                    <td>{{ customer.phone|default:"-" }}</td>
+                    <td><span class="badge" style="background:#e0e7ff; color:#4338ca;">{{ customer.order_count }}</span></td>
+                    <td><strong>৳{{ customer.total_spent|default:"0.00" }}</strong></td>
+                    <td style="white-space:nowrap;">{{ customer.user.date_joined|date:"M d, Y" }}</td>
+                    <td>
+                        <a href="{% url 'admin_dashboard:delete_customer' customer.id %}"
+                            class="btn btn-sm btn-outline-danger"
+                            onclick="return confirm('Are you sure? This will permanently delete the customer and all their order history.')">
+                            <i class="bi bi-trash"></i>
+                        </a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="8" class="empty-state"><i class="bi bi-inbox"></i><br>No customers found</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

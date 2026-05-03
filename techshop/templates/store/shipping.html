@@ -1,0 +1,118 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Shipping Policy | Premium Collection{% endblock %}
+
+{% block extra_css %}
+<style>
+    .static-hero {
+        background: linear-gradient(135deg, #0b0f19 0%, #1e1b4b 100%);
+        padding: 80px 0;
+        color: white;
+        text-align: center;
+        border-radius: 0 0 40px 40px;
+        margin-bottom: 60px;
+    }
+
+    .hero-title {
+        font-family: 'Outfit', sans-serif;
+        font-size: 40px;
+        font-weight: 800;
+        margin-bottom: 16px;
+    }
+
+    .hero-subtitle {
+        color: #94a3b8;
+        font-size: 16px;
+    }
+
+    .document-container {
+        max-width: 800px;
+        margin: 0 auto 80px;
+        background: var(--surface-color);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-lg);
+        padding: 48px;
+        box-shadow: var(--shadow-sm);
+    }
+
+    .doc-content h2 {
+        font-family: 'Outfit', sans-serif;
+        font-size: 20px;
+        font-weight: 700;
+        color: var(--text-main);
+        margin-top: 40px;
+        margin-bottom: 12px;
+    }
+    
+    .doc-content h2:first-child { margin-top: 0; }
+
+    .doc-content p {
+        color: var(--text-muted);
+        line-height: 1.7;
+        font-size: 15px;
+        margin-bottom: 16px;
+    }
+
+    .doc-content ul {
+        margin-bottom: 24px;
+        padding-left: 20px;
+    }
+    
+    .doc-content li {
+        color: var(--text-muted);
+        line-height: 1.7;
+        font-size: 15px;
+        margin-bottom: 8px;
+    }
+
+    .doc-content strong {
+        color: var(--text-main);
+        font-weight: 600;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="static-hero">
+    <div class="container">
+        <h1 class="hero-title">Shipping Policy</h1>
+        <p class="hero-subtitle">Premium delivery for exceptional products.</p>
+    </div>
+</div>
+
+<div class="container">
+    <div class="document-container">
+        <div class="doc-content">
+            <h2>1. White-Glove Delivery Overview</h2>
+            <p>We treat the shipping of our premium products with the utmost care. Our delivery partners are selected for their reliability and security.</p>
+            
+            <h2>2. Processing Time</h2>
+            <p>Orders are typically processed within 1-2 business days after payment confirmation. Orders placed on weekends or holidays will be processed on the next business day.</p>
+            
+            <h2>3. Shipping Methods</h2>
+            <p>We offer the following premium shipping options:</p>
+            <ul>
+                <li><strong>Standard Insured Shipping:</strong> 3-5 business days - $15.00</li>
+                <li><strong>Expedited Priority:</strong> 1-2 business days - $35.00</li>
+                <li><strong>Complimentary Shipping:</strong> Available on orders over $500.00</li>
+            </ul>
+            
+            <h2>4. International Shipping</h2>
+            <p>For international orders, shipping costs and delivery times vary by destination. All international shipments include full customs handling and insurance. Please contact our concierge for specific quotes.</p>
+            
+            <h2>5. Order Tracking</h2>
+            <p>Once your order ships, you will receive a tracking link via email. You can also track your order status securely on our website using your order number.</p>
+            
+            <h2>6. Shipping Delays</h2>
+            <p>While we strive to deliver on time, shipping delays may occur due to severe weather conditions or customs clearance. We proactively monitor all shipments and will notify you of any expected delays.</p>
+            
+            <h2>7. Lost or Damaged Packages</h2>
+            <p>All our shipments are fully insured. If your package is lost or damaged during shipping, please contact us within 48 hours of delivery. We will immediately dispatch a replacement.</p>
+            
+            <h2>8. Contact Information</h2>
+            <p>For shipping inquiries, please contact our logistics team at <strong>logistics@premiumtech.com</strong></p>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,189 @@
+{% extends 'admin/base.html' %}
+{% load static %}
+
+{% block admin_title %}Order #{{ order.order_number }}{% endblock %}
+
+{% block admin_content %}
+{% block admin_extra_css %}
+<style>
+    .order-hero {
+        background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
+        color: white;
+        padding: 28px 32px;
+        border-radius: 16px;
+        margin-bottom: 28px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .order-hero h3 { margin:0; font-family:'Outfit',sans-serif; font-weight:800; }
+    .order-hero .order-number { font-size:14px; opacity:0.8; margin-bottom:6px; }
+
+    .info-card {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 16px;
+        margin-bottom: 20px;
+        overflow: hidden;
+    }
+    .info-card .card-header {
+        background: #f8fafc;
+        padding: 16px 24px;
+        font-weight: 700;
+        font-family: 'Outfit', sans-serif;
+        font-size: 15px;
+        color: #0f172a;
+        border-bottom: 1px solid #e2e8f0;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .info-card .card-header i { color: #4f46e5; }
+    .info-card .card-body { padding: 24px; }
+
+    .item-row { display:flex; align-items:center; padding:16px 0; border-bottom:1px solid #f1f5f9; }
+    .item-row:last-child { border-bottom:none; }
+    .item-image { width:56px;height:56px;object-fit:cover;border-radius:10px;background:#f1f5f9; display:flex;align-items:center;justify-content:center;flex-shrink:0; }
+    .item-details { flex:1;padding-left:16px; }
+    .item-details h6 { margin:0 0 4px;color:#0f172a;font-weight:700; }
+    .item-details small { color:#94a3b8; }
+    .item-price { text-align:right; }
+    .item-price .unit-price { color:#94a3b8;font-size:13px; }
+    .item-price .subtotal { font-weight:800;color:#4f46e5;font-size:16px; }
+
+    .total-summary {
+        background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
+        color: white; padding: 24px; border-radius: 14px; margin-top: 20px;
+    }
+    .total-summary .total-amount { font-size:1.8rem; font-weight:800; font-family:'Outfit',sans-serif; }
+
+    .customer-avatar {
+        width:56px;height:56px;border-radius:14px;
+        background:linear-gradient(135deg,#4f46e5,#818cf8);
+        color:white;display:flex;align-items:center;justify-content:center;
+        font-size:1.5rem;font-weight:700;flex-shrink:0;
+    }
+</style>
+{% endblock %}
+
+<div class="order-hero">
+    <div>
+        <div class="order-number">Order #{{ order.order_number }}</div>
+        <h3><i class="bi bi-bag-check me-2"></i>Order Details</h3>
+    </div>
+    <a href="{% url 'admin_dashboard:orders' %}" class="btn btn-light btn-sm"><i class="bi bi-arrow-left me-1"></i> Back to Orders</a>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <!-- Items -->
+        <div class="info-card">
+            <div class="card-header"><i class="bi bi-box-seam"></i> Order Items ({{ items|length }})</div>
+            <div class="card-body">
+                {% for item in items %}
+                <div class="item-row">
+                    {% if item.product.featured_image %}
+                    <img src="{{ item.product.featured_image.url }}" alt="{{ item.product.name }}" class="item-image">
+                    {% else %}
+                    <div class="item-image"><i class="bi bi-image" style="color:#cbd5e1;font-size:20px;"></i></div>
+                    {% endif %}
+                    <div class="item-details">
+                        <h6>{{ item.product.name }}</h6>
+                        <small>SKU: {{ item.product.SKU|default:"N/A" }} · ৳{{ item.unit_price }} each</small>
+                    </div>
+                    <div class="item-price">
+                        <div class="unit-price">× {{ item.quantity }}</div>
+                        <div class="subtotal">৳{{ item.subtotal }}</div>
+                    </div>
+                </div>
+                {% endfor %}
+
+                <div class="total-summary">
+                    <div class="d-flex justify-content-between mb-2"><span>Subtotal</span><span>৳{{ order.subtotal }}</span></div>
+                    <div class="d-flex justify-content-between mb-2"><span>Tax ({{ order.tax_rate|default:0 }}%)</span><span>৳{{ order.tax_amount }}</span></div>
+                    <div class="d-flex justify-content-between mb-2"><span>Shipping</span><span>৳{{ order.shipping_cost }}</span></div>
+                    {% if order.discount > 0 %}
+                    <div class="d-flex justify-content-between mb-2"><span>Discount</span><span>-৳{{ order.discount }}</span></div>
+                    {% endif %}
+                    <hr style="border-color:rgba(255,255,255,0.2);">
+                    <div class="d-flex justify-content-between"><span>Total</span><span class="total-amount">৳{{ order.total_amount }}</span></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Update Status -->
+        <div class="info-card">
+            <div class="card-header"><i class="bi bi-arrow-repeat"></i> Update Status</div>
+            <div class="card-body">
+                <form method="post" class="d-flex gap-3">
+                    {% csrf_token %}
+                    <select name="status" class="form-select" style="flex:1;">
+                        <option value="pending" {% if order.status == 'pending' %}selected{% endif %}>Pending</option>
+                        <option value="confirmed" {% if order.status == 'confirmed' %}selected{% endif %}>Confirmed</option>
+                        <option value="processing" {% if order.status == 'processing' %}selected{% endif %}>Processing</option>
+                        <option value="shipped" {% if order.status == 'shipped' %}selected{% endif %}>Shipped</option>
+                        <option value="delivered" {% if order.status == 'delivered' %}selected{% endif %}>Delivered</option>
+                        <option value="cancelled" {% if order.status == 'cancelled' %}selected{% endif %}>Cancelled</option>
+                    </select>
+                    <button type="submit" class="btn btn-primary"><i class="bi bi-check-circle"></i> Update</button>
+                </form>
+                <div class="mt-3">
+                    <a href="{% url 'orders:download_invoice' order.id %}?print=1" class="btn btn-outline-primary btn-sm" target="_blank">
+                        <i class="bi bi-printer"></i> Print / Download Invoice
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <!-- Order Info -->
+        <div class="info-card">
+            <div class="card-header"><i class="bi bi-info-circle"></i> Order Info</div>
+            <div class="card-body">
+                <div class="mb-3"><small style="color:#94a3b8;display:block;">Status</small><span class="status-badge {{ order.status }}">{{ order.get_status_display }}</span></div>
+                <div class="mb-3"><small style="color:#94a3b8;display:block;">Date</small><strong style="color:#0f172a;">{{ order.created_at|date:"F d, Y" }}</strong><br><small style="color:#94a3b8;">{{ order.created_at|time:"H:i" }}</small></div>
+                <div class="mb-3"><small style="color:#94a3b8;display:block;">Payment</small><strong style="color:#0f172a;">{{ order.payment_method|default:"Online"|title }}</strong></div>
+                <div><small style="color:#94a3b8;display:block;">Payment Status</small><span class="status-badge {% if order.payment_status == 'paid' %}delivered{% else %}pending{% endif %}">{{ order.payment_status|title }}</span></div>
+                {% if order.tracking_number %}
+                <div class="mt-3"><small style="color:#94a3b8;display:block;">Tracking</small><strong style="color:#4f46e5;">{{ order.tracking_number }}</strong></div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Customer -->
+        <div class="info-card">
+            <div class="card-header"><i class="bi bi-person"></i> Customer</div>
+            <div class="card-body">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="customer-avatar me-3">{{ order.customer.user.first_name|default:order.customer.user.username|make_list|first|upper }}</div>
+                    <div>
+                        <h6 style="margin:0;color:#0f172a;font-weight:700;">{{ order.customer.user.get_full_name|default:order.customer.user.username }}</h6>
+                        <small style="color:#94a3b8;">Customer</small>
+                    </div>
+                </div>
+                <div class="mb-2"><small style="color:#94a3b8;display:block;">Email</small><a href="mailto:{{ order.customer.user.email }}" style="color:#4f46e5;">{{ order.customer.user.email }}</a></div>
+                <div><small style="color:#94a3b8;display:block;">Phone</small><strong style="color:#0f172a;">{{ order.customer.phone|default:"Not provided" }}</strong></div>
+            </div>
+        </div>
+
+        <!-- Shipping -->
+        <div class="info-card">
+            <div class="card-header"><i class="bi bi-truck"></i> Shipping Address</div>
+            <div class="card-body">
+                <p style="margin:0 0 4px;font-weight:700;color:#0f172a;">{{ order.customer.user.get_full_name }}</p>
+                <p style="margin:0 0 4px;color:#475569;">{{ order.shipping_address }}</p>
+                <p style="margin:0 0 4px;color:#475569;">{{ order.shipping_city }}, {{ order.shipping_state }} {{ order.shipping_zip }}</p>
+                <p style="margin:0;color:#94a3b8;">{{ order.shipping_country|default:"Bangladesh" }}</p>
+            </div>
+        </div>
+
+        {% if order.notes %}
+        <div class="info-card">
+            <div class="card-header"><i class="bi bi-sticky"></i> Notes</div>
+            <div class="card-body"><p style="margin:0;color:#475569;">{{ order.notes }}</p></div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
