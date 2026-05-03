@@ -109,15 +109,15 @@ if not exist "db.sqlite3" (
     
     echo.
     echo [INFO] Creating superuser (if needed)...
-    python manage.py shell -c "
-from django.contrib.auth import get_user_model
-User = get_user_model()
-if not User.objects.filter(is_superuser=True).exists():
-    User.objects.create_superuser('admin', 'admin@example.com', 'admin123')
-    print('Superuser created: admin/admin123')
-else:
-    print('Superuser already exists')
-"
+    echo from django.contrib.auth import get_user_model > "%TEMP%\createsuperuser.py"
+    echo User = get_user_model() >> "%TEMP%\createsuperuser.py"
+    echo if not User.objects.filter^(is_superuser=True^).exists^(^): >> "%TEMP%\createsuperuser.py"
+    echo     User.objects.create_superuser^('admin', 'admin@example.com', 'admin123'^) >> "%TEMP%\createsuperuser.py"
+    echo     print^('Superuser created: admin/admin123'^) >> "%TEMP%\createsuperuser.py"
+    echo else: >> "%TEMP%\createsuperuser.py"
+    echo     print^('Superuser already exists'^) >> "%TEMP%\createsuperuser.py"
+    python manage.py shell ^< "%TEMP%\createsuperuser.py"
+    del "%TEMP%\createsuperuser.py"
 ) else (
     echo [INFO] Database already exists.
 )
