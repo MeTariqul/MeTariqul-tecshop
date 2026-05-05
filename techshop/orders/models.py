@@ -1,5 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
+from decimal import Decimal
+
 from store.models import Product
 
 # ====================
@@ -79,6 +81,8 @@ class OrderItem(models.Model):
     quantity = models.PositiveIntegerField()
     unit_price = models.DecimalField(max_digits=10, decimal_places=2)
     tax_rate = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True, help_text="Tax rate at time of purchase")
+    # Stores variant description at time of purchase (e.g. "Size: L, Color: Red")
+    variant_info = models.CharField(max_length=200, blank=True, default='')
     
     def __str__(self):
         return f"{self.quantity} x {self.product.name}"

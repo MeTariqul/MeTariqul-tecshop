@@ -20,7 +20,7 @@ wheels/
 .installed.cfg
 *.egg
 
-# Virtual Environment
+# Virtual Environments (both root and inner techshop/)
 venv/
 env/
 ENV/
@@ -31,7 +31,11 @@ techshop/venv/
 local_settings.py
 db.sqlite3
 db.sqlite3-journal
-/media/
+test_db.sqlite3
+staticfiles/
+
+# Media uploads — never commit user-uploaded files
+/techshop/media/
 
 # IDE
 .idea/
@@ -44,14 +48,18 @@ db.sqlite3-journal
 .DS_Store
 Thumbs.db
 
-# Environment variables
+# Environment variables — NEVER commit secrets
 .env
 .env.local
+.env.production
 
-# Testing
+# Testing & Coverage
 .coverage
 htmlcov/
 .pytest_cache/
+
+# Node (if any frontend tooling is added later)
+node_modules/
 
 # Celery
 celerybeat-schedule

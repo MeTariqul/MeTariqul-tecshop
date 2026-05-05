@@ -2,6 +2,9 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.db.models import Q, Avg
 from django.contrib import messages
 from django.core.paginator import Paginator
+from django.core.cache import cache
+from django.conf import settings
+
 from .models import Product, Category, Review
 
 # ====================
@@ -9,13 +12,24 @@ from .models import Product, Category, Review
 # ====================
 
 def home(request):
-    """Home page with featured products"""
-    featured_products = Product.objects.filter(
-        is_available_online=True,
-        inventory__quantity_on_hand__gt=0
-    ).select_related('inventory')[:8]
-    categories = Category.objects.all()[:6]
-    
+    """Home page with featured products (cached)."""
+    cache_ttl = getattr(settings, 'PRODUCT_CACHE_TTL', 300)
+
+    featured_products = cache.get('home_featured_products')
+    if featured_products is None:
+        featured_products = list(
+            Product.objects.filter(
+                is_available_online=True,
+                inventory__quantity_on_hand__gt=0
+            ).select_related('inventory', 'category')[:8]
+        )
+        cache.set('home_featured_products', featured_products, cache_ttl)
+
+    categories = cache.get('home_categories')
+    if categories is None:
+        categories = list(Category.objects.all()[:6])
+        cache.set('home_categories', categories, cache_ttl)
+
     context = {
         'featured_products': featured_products,
         'categories': categories,
@@ -194,7 +208,9 @@ def product_list(request):
         products = products.order_by('-selling_price')
     elif sort == 'name':
         products = products.order_by('name')
-    # Featured (default) - by newest/available
+    else:
+        # Default: newest first — ensures paginator gets an ordered queryset
+        products = products.order_by('-id')
     
     # Search functionality
     search_query = request.GET.get('search')

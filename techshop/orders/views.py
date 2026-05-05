@@ -1,10 +1,15 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
+from django.contrib.auth import authenticate, login
 from django.contrib import messages
-from django.db import transaction
 from django.http import HttpResponse
 from decimal import Decimal
 import io
+import uuid
+import logging
+
+logger = logging.getLogger(__name__)
 
 from reportlab.lib.pagesizes import A4
 from reportlab.lib import colors
@@ -12,9 +17,9 @@ from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, 
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.enums import TA_CENTER, TA_RIGHT
 
-from .fraud_detection import check_order_security
 from store.models import Product, Inventory
 from .models import WebCustomer, WebOrder, OrderItem, PaymentTransaction
+from .services import OrderService, InsufficientStockError
 from admin_dashboard.models import SiteConfiguration
 
 # ====================
@@ -23,223 +28,95 @@ from admin_dashboard.models import SiteConfiguration
 
 @login_required
 def checkout(request):
-    """Process checkout and create order with atomic stock deduction"""
-    # Get cart from session
+    """
+    Thin controller — all business logic lives in OrderService.
+    Handles HTTP concerns only: session, messages, redirects.
+    """
     cart = request.session.get('cart', {})
     
     if not cart:
         messages.error(request, 'Your cart is empty')
         return redirect('cart:cart_view')
-    
+
+    config = SiteConfiguration.objects.first()
+
     if request.method == 'POST':
+        shipping_data = {
+            'shipping_address': request.POST.get('shipping_address', '').strip(),
+            'shipping_city':    request.POST.get('shipping_city',    '').strip(),
+            'shipping_state':   request.POST.get('shipping_state',   '').strip(),
+            'shipping_zip':     request.POST.get('shipping_zip',     '').strip(),
+        }
         try:
-            with transaction.atomic():
-                # Get or create customer profile
-                customer, created = WebCustomer.objects.get_or_create(user=request.user)
-                
-                # Process order
-                shipping_address = request.POST.get('shipping_address')
-                shipping_city = request.POST.get('shipping_city')
-                shipping_state = request.POST.get('shipping_state')
-                shipping_zip = request.POST.get('shipping_zip')
-                
-                if not all([shipping_address, shipping_city, shipping_state, shipping_zip]):
-                    messages.error(request, 'Please fill in all shipping information')
-                    return render(request, 'orders/checkout.html')
-                
-                # Calculate totals
-                subtotal = Decimal('0')
-                for sku, item_data in cart.items():
-                    try:
-                        product = Product.objects.get(SKU=sku)
-                        quantity = item_data.get('quantity', 1)
-                        subtotal += product.discounted_price * Decimal(str(quantity))
-                    except Product.DoesNotExist:
-                        continue
-                
-                # Read tax & shipping config
-                config = SiteConfiguration.objects.first()
-                
-                # Calculate product-wise tax
-                tax_amount = Decimal('0.00')
-                if config and config.tax_enabled:
-                    global_tax_rate = config.tax_rate
-                    for sku, item_data in cart.items():
-                        try:
-                            product = Product.objects.get(SKU=sku)
-                            quantity = item_data.get('quantity', 1)
-                            item_total = product.discounted_price * Decimal(str(quantity))
-                            
-                            # Use product-specific tax rate if set, otherwise use global rate
-                            if product.tax_exempt:
-                                item_tax = Decimal('0.00')
-                            elif product.tax_rate is not None:
-                                item_tax = item_total * (product.tax_rate / Decimal('100'))
-                            else:
-                                item_tax = item_total * (global_tax_rate / Decimal('100'))
-                            
-                            tax_amount += item_tax
-                        except Product.DoesNotExist:
-                            continue
-                
-                if config:
-                    shipping_threshold = config.free_shipping_threshold
-                    default_shipping = config.default_shipping_cost
-                else:
-                    shipping_threshold = Decimal('50')
-                    default_shipping = Decimal('5.99')
-                shipping_cost = default_shipping if subtotal < shipping_threshold else Decimal('0.00')
-                total_amount = subtotal + tax_amount + shipping_cost
-                
-                # Create order record (for Web history)
-                order = WebOrder.objects.create(
-                    customer=customer,
-                    subtotal=subtotal,
-                    tax_amount=tax_amount,
-                    shipping_cost=shipping_cost,
-                    total_amount=total_amount,
-                    shipping_address=shipping_address,
-                    shipping_city=shipping_city,
-                    shipping_state=shipping_state,
-                    shipping_zip=shipping_zip,
-                )
-                
-                # Process each item in the cart and deduct stock
-                for sku, item_data in cart.items():
-                    quantity = item_data.get('quantity', 1)
-                    variant_id = item_data.get('variant_id')
-                    
-                    # Check if this is a variant product
-                    if variant_id:
-                        from store.models import ProductVariant
-                        variant = ProductVariant.objects.select_for_update().get(id=variant_id)
-                        product = variant.product
-                        
-                        if variant.stock_quantity < quantity:
-                            raise Exception(f"Product {product.name} ({variant}) is out of stock! Only {variant.stock_quantity} available.")
-                        
-                        # Deduct from variant stock
-                        variant.stock_quantity -= quantity
-                        variant.save()
-                        
-                        # Also update product inventory
-                        inventory = Inventory.objects.select_for_update().get(product=product)
-                        inventory.quantity_on_hand -= quantity
-                        inventory.save()
-                        
-                        # Add to Order Items with variant info
-                        tax_rate = product.tax_rate if product.tax_rate else config.tax_rate
-                        OrderItem.objects.create(
-                            order=order,
-                            product=product,
-                            quantity=quantity,
-                            unit_price=variant.variant_price,
-                            tax_rate=tax_rate,
-                            variant_info=f"Size: {variant.size}, Color: {variant.color}" if variant.size or variant.color else ""
-                        )
-                    else:
-                        # Original product-only logic
-                        product = Product.objects.select_for_update().get(SKU=sku)
-                        inventory = Inventory.objects.select_for_update().get(product=product)
-                        
-                        if inventory.quantity_on_hand < quantity:
-                            raise Exception(f"Product {product.name} is out of stock! Only {inventory.quantity_on_hand} available.")
-                        
-                        # Deduct Stock from Physical Shop DB
-                        inventory.quantity_on_hand -= quantity
-                        inventory.save()
-                        
-                        # Add to Order Items
-                        tax_rate = product.tax_rate if product.tax_rate else config.tax_rate
-                        OrderItem.objects.create(
-                            order=order,
-                            product=product,
-                            quantity=quantity,
-                            unit_price=product.discounted_price,
-                            tax_rate=tax_rate
-                        )
-                
-                # Create payment transaction (simulated)
-                PaymentTransaction.objects.create(
-                    order=order,
-                    transaction_id=f"TXN-{uuid.uuid4().hex[:12].upper()}",
-                    payment_method='Credit Card',
-                    amount=total_amount,
-                    status='completed'
-                )
-                
-                # 5. Clear Cart
-                del request.session['cart']
-                
-                messages.success(request, f'Order {order.order_number} placed successfully!')
-                return redirect('orders:order_confirmation', order_id=order.id)
-                
-        except Exception as e:
-            messages.error(request, f'Error processing order: {str(e)}')
+            service = OrderService(request.user, cart, config)
+            order   = service.create_order(shipping_data)
+            del request.session['cart']
+            messages.success(request, f'Order {order.order_number} placed successfully!')
+            return redirect('orders:order_confirmation', order_id=order.id)
+
+        except ValueError as exc:          # missing shipping fields
+            messages.error(request, str(exc))
+            return render(request, 'orders/checkout.html', _checkout_context(cart, config))
+
+        except InsufficientStockError as exc:   # stock ran out
+            messages.error(request, str(exc))
             return redirect('cart:cart_view')
-    
-    # For GET request, show cart items from session
+
+        except Exception as exc:
+            messages.error(request, f'Unexpected error processing order: {exc}')
+            return redirect('cart:cart_view')
+
+    # --- GET: preview totals ---
+    return render(request, 'orders/checkout.html', _checkout_context(cart, config))
+
+
+def _checkout_context(cart: dict, config) -> dict:
+    """Build the template context for the checkout GET preview."""
     cart_items = []
-    subtotal = Decimal('0')
-    
+    subtotal   = Decimal('0')
+
     for sku, item_data in cart.items():
         try:
-            product = Product.objects.get(SKU=sku)
-            quantity = item_data.get('quantity', 1)
+            product    = Product.objects.select_related('inventory').get(SKU=sku)
+            quantity   = int(item_data.get('quantity', 1))
             item_total = product.discounted_price * Decimal(str(quantity))
-            subtotal += item_total
-            
-            cart_items.append({
-                'product': product,
-                'quantity': quantity,
-                'item_total': item_total
-            })
+            subtotal  += item_total
+            cart_items.append({'product': product, 'quantity': quantity, 'item_total': item_total})
         except Product.DoesNotExist:
             continue
-    
-    # Read tax & shipping config for GET preview
-    config = SiteConfiguration.objects.first()
-    
-    # Calculate product-wise tax
-    tax_amount = Decimal('0.00')
-    if config and config.tax_enabled:
-        global_tax_rate = config.tax_rate
-        for sku, item_data in cart.items():
-            try:
-                product = Product.objects.get(SKU=sku)
-                quantity = item_data.get('quantity', 1)
-                item_total = product.discounted_price * Decimal(str(quantity))
-                
-                # Use product-specific tax rate if set, otherwise use global rate
-                if product.tax_exempt:
-                    item_tax = Decimal('0.00')
-                elif product.tax_rate is not None:
-                    item_tax = item_total * (product.tax_rate / Decimal('100'))
-                else:
-                    item_tax = item_total * (global_tax_rate / Decimal('100'))
-                
-                tax_amount += item_tax
-            except Product.DoesNotExist:
-                continue
-    
+
+    # Reuse service logic for tax + shipping preview
+    from .services import OrderService as _S
+    dummy = _S.__new__(_S)
+    dummy.cart   = cart
+    dummy.config = config
+
+    tax_amount = Decimal('0')
+    for sku, item_data in cart.items():
+        try:
+            product    = Product.objects.get(SKU=sku)
+            quantity   = int(item_data.get('quantity', 1))
+            line_total = product.discounted_price * Decimal(str(quantity))
+            tax_amount += dummy._get_item_tax(product, line_total)
+        except Product.DoesNotExist:
+            continue
+
     if config:
-        shipping_threshold = config.free_shipping_threshold
-        default_shipping = config.default_shipping_cost
+        threshold      = Decimal(str(config.free_shipping_threshold))
+        default_ship   = Decimal(str(config.default_shipping_cost))
     else:
-        shipping_threshold = Decimal('50')
-        default_shipping = Decimal('5.99')
-    shipping_cost = default_shipping if subtotal < shipping_threshold else Decimal('0.00')
-    total_amount = subtotal + tax_amount + shipping_cost
-    
-    context = {
-        'cart_items': cart_items,
-        'subtotal': subtotal,
-        'tax_amount': tax_amount,
+        threshold, default_ship = Decimal('50'), Decimal('5.99')
+    shipping_cost = Decimal('0') if subtotal >= threshold else default_ship
+    total_amount  = subtotal + tax_amount + shipping_cost
+
+    return {
+        'cart_items':    cart_items,
+        'subtotal':      subtotal,
+        'tax_amount':    tax_amount,
         'shipping_cost': shipping_cost,
-        'total_amount': total_amount,
-        'tax_rate': config.tax_rate if config else 0,
+        'total_amount':  total_amount,
+        'tax_rate':      config.tax_rate if config else 0,
     }
-    return render(request, 'orders/checkout.html', context)
 
 @login_required
 def order_confirmation(request, order_id):
@@ -460,7 +337,9 @@ def order_history(request):
 # ====================
 
 def custom_login(request):
-    """Custom login view that redirects staff users to dashboard"""
+    """Custom login view that syncs with Supabase Auth and redirects staff users"""
+    from techshop_proj.supabase_client import get_supabase_client
+    
     if request.method == 'POST':
         form = AuthenticationForm(request, data=request.POST)
         if form.is_valid():
@@ -468,7 +347,22 @@ def custom_login(request):
             password = form.cleaned_data.get('password')
             user = authenticate(username=username, password=password)
             if user is not None:
+                # 1. Log the user into Django session
                 login(request, user)
+                
+                # 2. Attempt to sign into Supabase Auth (to get JWT for frontend usage if needed)
+                try:
+                    supabase = get_supabase_client()
+                    response = supabase.auth.sign_in_with_password({
+                        "email": user.email,
+                        "password": password
+                    })
+                    # You could store response.session.access_token in cookies/session if the frontend needs it
+                    request.session['supabase_token'] = response.session.access_token
+                except Exception as e:
+                    # Supabase Auth failure (e.g. user not in Supabase) must not break Django login.
+                    logger.warning("Supabase auth login failed for user %s: %s", user.username, e)
+                
                 # Check if user is a staff member or has staff profile
                 if user.is_staff or hasattr(user, 'staff_profile'):
                     return redirect('admin_dashboard:dashboard')
@@ -485,11 +379,33 @@ def custom_login(request):
 # ====================
 
 def register(request):
-    """User registration view"""
+    """User registration view integrating Supabase Auth"""
+    from techshop_proj.supabase_client import get_supabase_admin_client
+    
     if request.method == 'POST':
         form = UserCreationForm(request.POST)
         if form.is_valid():
             user = form.save()
+            
+            # 1. Also create the user in Supabase Auth
+            try:
+                supabase = get_supabase_admin_client()
+                # Supabase requires an email for signup
+                email = request.POST.get('email', f"{user.username}@example.com") 
+                user.email = email
+                user.save()
+                
+                # Create user in Supabase Auth using the admin client
+                supabase.auth.admin.create_user({
+                    "email": email,
+                    "password": request.POST.get('password1'),
+                    "email_confirm": True
+                })
+            except Exception as e:
+                # Log error but don't break Django registration
+                logger.error("Failed to create user '%s' in Supabase Auth: %s", user.username, e)
+
+            # 2. Log them into Django
             login(request, user)
             messages.success(request, 'Account created successfully!')
             return redirect('store:home')

@@ -1,6 +1,43 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
+from django.core.exceptions import ValidationError
+from django.core.files.base import ContentFile
+from django.db.models.signals import post_delete, pre_save
+from django.dispatch import receiver
+from io import BytesIO
+from PIL import Image
+import os
+
+def compress_image(image_field, max_size_kb=200):
+    """Compress image to ensure it is under max_size_kb"""
+    if not image_field:
+        return
+    if getattr(image_field.file, 'size', 0) <= max_size_kb * 1024:
+        return
+
+    try:
+        img = Image.open(image_field)
+        if img.mode != 'RGB':
+            img = img.convert('RGB')
+        
+        output = BytesIO()
+        quality = 85
+        img.save(output, format='JPEG', quality=quality)
+        
+        while output.tell() > max_size_kb * 1024 and quality > 20:
+            output.seek(0)
+            output.truncate(0)
+            quality -= 5
+            img.save(output, format='JPEG', quality=quality)
+            
+        output.seek(0)
+        file_name = image_field.name.rsplit('.', 1)[0] + '.jpg'
+        image_field.save(file_name, ContentFile(output.read()), save=False)
+    except Exception as e:
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.error(f"Image compression failed: {e}")
 
 # ====================
 # LEGACY TABLES (Physical Shop Data)
@@ -77,6 +114,11 @@ class Product(models.Model):
             models.Index(fields=['category', 'is_available_online']),
         ]
     
+    def save(self, *args, **kwargs):
+        if self.featured_image:
+            compress_image(self.featured_image)
+        super().save(*args, **kwargs)
+
     def __str__(self):
         return f"{self.name} ({self.SKU})"
     
@@ -193,6 +235,17 @@ class ProductImage(models.Model):
         ordering = ['sort_order']
         verbose_name_plural = 'Product Images'
 
+    def clean(self):
+        # Enforce max 5 images per product
+        if not self.pk and self.product.images.count() >= 5:
+            raise ValidationError("A product can have a maximum of 5 gallery images.")
+
+    def save(self, *args, **kwargs):
+        self.clean()
+        if self.image:
+            compress_image(self.image)
+        super().save(*args, **kwargs)
+
     def __str__(self):
         return f"Image for {self.product.name} ({self.sort_order})"
 
@@ -255,10 +308,44 @@ class ContactMessage(models.Model):
     
     class Meta:
         db_table = 'contact_messages'
-        verbose_name_plural = 'Contact Messages'
         ordering = ['-created_at']
     
     def __str__(self):
         return f"Message from {self.name} - {self.subject}"
 
+# ====================
+# IMAGE CLEANUP SIGNALS
+# Delete actual files from storage when models are deleted or changed
+# ====================
 
+@receiver(post_delete, sender=Product)
+def delete_product_featured_image(sender, instance, **kwargs):
+    if instance.featured_image and os.path.isfile(instance.featured_image.path):
+        os.remove(instance.featured_image.path)
+
+@receiver(post_delete, sender=ProductImage)
+def delete_product_gallery_image(sender, instance, **kwargs):
+    if instance.image and os.path.isfile(instance.image.path):
+        os.remove(instance.image.path)
+
+@receiver(pre_save, sender=Product)
+def delete_old_featured_image(sender, instance, **kwargs):
+    if not instance.pk:
+        return
+    try:
+        old_file = Product.objects.get(pk=instance.pk).featured_image
+    except Product.DoesNotExist:
+        return
+    if old_file and old_file != instance.featured_image and os.path.isfile(old_file.path):
+        os.remove(old_file.path)
+
+@receiver(pre_save, sender=ProductImage)
+def delete_old_gallery_image(sender, instance, **kwargs):
+    if not instance.pk:
+        return
+    try:
+        old_file = ProductImage.objects.get(pk=instance.pk).image
+    except ProductImage.DoesNotExist:
+        return
+    if old_file and old_file != instance.image and os.path.isfile(old_file.path):
+        os.remove(old_file.path)
