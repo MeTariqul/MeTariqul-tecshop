@@ -5,7 +5,8 @@
       "src": "techshop/techshop_proj/wsgi.py",
       "use": "@vercel/python",
       "config": {
-        "maxLambdaSize": "15mb"
+        "maxLambdaSize": "15mb",
+        "includeFiles": "staticfiles/**"
       }
     }
   ],
