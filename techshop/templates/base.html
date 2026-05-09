@@ -13,15 +13,15 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <style>
         :root {
-            /* Premium Color Palette */
-            --bg-color: #fbfbfe;
+            /* Vibrant Amethyst & Mint Theme */
+            --bg-color: #faf5ff;      /* Very light purple */
             --surface-color: #ffffff;
-            --text-main: #0f172a;
-            --text-muted: #64748b;
-            --primary: #4f46e5;       /* Rich Indigo */
-            --primary-hover: #4338ca;
-            --accent: #ec4899;        /* Vibrant Pink */
-            --accent-hover: #db2777;
+            --text-main: #1e1b4b;     /* Deep indigo text */
+            --text-muted: #6b7280;
+            --primary: #8b5cf6;       /* Amethyst Violet */
+            --primary-hover: #7c3aed;
+            --accent: #14b8a6;        /* Mint Teal */
+            --accent-hover: #0d9488;
             --success: #10b981;
             --warning: #f59e0b;
             --danger: #ef4444;
@@ -532,15 +532,60 @@
             font-size: 14px;
         }
 
+        .mobile-menu-toggle {
+            display: none;
+        }
+        
+        .mobile-close {
+            display: none;
+        }
+
         /* Responsive Design */
         @media (max-width: 1024px) {
             .footer-grid {
                 grid-template-columns: 1fr 1fr;
                 gap: 40px;
             }
-            .nav-links {
-                display: none; /* Add hamburger menu logic later */
+            .mobile-menu-toggle {
+                display: flex;
             }
+            .nav-links {
+                position: fixed;
+                top: 0;
+                right: -100%;
+                width: 300px;
+                height: 100vh;
+                background: rgba(255, 255, 255, 0.95);
+                backdrop-filter: blur(20px);
+                -webkit-backdrop-filter: blur(20px);
+                flex-direction: column;
+                align-items: flex-start;
+                padding: 80px 32px 32px;
+                box-shadow: -10px 0 30px rgba(0,0,0,0.1);
+                transition: right var(--transition-bounce);
+                z-index: 1001;
+            }
+            .nav-links.show {
+                right: 0;
+            }
+            .mobile-close {
+                display: block;
+                position: absolute;
+                top: 24px;
+                right: 24px;
+                background: none;
+                border: none;
+                font-size: 24px;
+                color: var(--text-main);
+                cursor: pointer;
+            }
+            .nav-item {
+                font-size: 18px;
+                width: 100%;
+                padding: 12px 0;
+                border-bottom: 1px solid var(--border-color);
+            }
+            .nav-item::after { display: none; }
         }
 
         @media (max-width: 768px) {
@@ -549,6 +594,11 @@
             }
             .footer-grid {
                 grid-template-columns: 1fr;
+            }
+            .footer-bottom {
+                flex-direction: column;
+                gap: 16px;
+                text-align: center;
             }
         }
 
@@ -576,7 +626,8 @@
                 </form>
 
                 <!-- Navigation -->
-                <div class="nav-links">
+                <div class="nav-links" id="mobileNav">
+                    <button class="mobile-close" onclick="document.getElementById('mobileNav').classList.remove('show')"><i class="bi bi-x-lg"></i></button>
                     <a href="{% url 'store:home' %}" class="nav-item">Home</a>
                     <a href="{% url 'store:product_list' %}" class="nav-item">Products</a>
                     <a href="{% url 'store:about' %}" class="nav-item">About</a>
@@ -605,6 +656,11 @@
                     {% else %}
                     <a href="{% url 'login' %}" class="btn btn-primary" style="padding: 10px 24px; font-size: 14px;">Sign In</a>
                     {% endif %}
+                    
+                    <!-- Mobile Hamburger -->
+                    <button class="mobile-menu-toggle action-btn" onclick="document.getElementById('mobileNav').classList.add('show')" title="Menu">
+                        <i class="bi bi-list"></i>
+                    </button>
                 </div>
             </nav>
         </div>

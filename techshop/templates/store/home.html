@@ -5,30 +5,30 @@
 
 {% block extra_css %}
 <style>
-    /* Hero Section */
+    /* Redesigned Hero Section - Amethyst & Mint Theme */
     .hero {
         position: relative;
-        min-height: 85vh;
+        min-height: 90vh;
         display: flex;
         align-items: center;
-        background: radial-gradient(circle at 70% 50%, #1e1b4b 0%, #020617 100%);
+        background: linear-gradient(135deg, #f3e8ff 0%, #ffffff 100%);
         overflow: hidden;
         border-radius: 0 0 40px 40px;
         margin-top: -85px; /* Pull up under transparent navbar */
         padding-top: 120px;
-        color: white;
+        color: var(--text-main);
     }
 
-    /* Abstract shapes in background */
+    /* Vibrant Glowing Orbs */
     .hero-shape-1 {
         position: absolute;
-        top: -20%;
+        top: -10%;
         left: -10%;
         width: 800px;
         height: 800px;
-        background: radial-gradient(circle, rgba(79, 70, 229, 0.15) 0%, transparent 70%);
+        background: radial-gradient(circle, rgba(139, 92, 246, 0.2) 0%, transparent 70%);
         border-radius: 50%;
-        filter: blur(60px);
+        filter: blur(80px);
         animation: float 15s ease-in-out infinite;
     }
 
@@ -38,9 +38,9 @@
         right: -10%;
         width: 600px;
         height: 600px;
-        background: radial-gradient(circle, rgba(236, 72, 153, 0.15) 0%, transparent 70%);
+        background: radial-gradient(circle, rgba(20, 184, 166, 0.2) 0%, transparent 70%);
         border-radius: 50%;
-        filter: blur(60px);
+        filter: blur(80px);
         animation: float 20s ease-in-out infinite reverse;
     }
 
@@ -52,7 +52,9 @@
     .hero-content {
         position: relative;
         z-index: 10;
+        width: 50%;
         max-width: 650px;
+        animation: fadeInUp 0.8s ease-out;
     }
 
     .hero-badge {
@@ -61,47 +63,66 @@
         gap: 8px;
         padding: 8px 16px;
         border-radius: var(--radius-full);
-        background: rgba(255, 255, 255, 0.1);
-        border: 1px solid rgba(255, 255, 255, 0.2);
+        background: rgba(139, 92, 246, 0.1);
+        border: 1px solid rgba(139, 92, 246, 0.2);
         backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
         font-size: 14px;
-        font-weight: 600;
-        color: #e0e7ff;
+        font-weight: 700;
+        color: var(--primary);
         margin-bottom: 24px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        box-shadow: 0 4px 12px rgba(139, 92, 246, 0.1);
     }
 
     .hero-badge i {
-        color: #ec4899;
+        color: var(--primary);
     }
 
     .hero-title {
-        font-size: clamp(48px, 6vw, 72px);
+        font-size: clamp(40px, 6vw, 76px);
         font-weight: 800;
         line-height: 1.1;
         margin-bottom: 24px;
-        background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
+        color: var(--text-main);
+        letter-spacing: -0.03em;
     }
 
     .hero-title span {
-        background: linear-gradient(135deg, #818cf8 0%, #ec4899 100%);
+        color: var(--primary); /* Fallback */
+        background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
+        background-clip: text;
+        position: relative;
+        display: inline-block;
+    }
+    
+    .hero-title span::after {
+        content: '';
+        position: absolute;
+        bottom: 8px;
+        left: 0;
+        width: 100%;
+        height: 12px;
+        background: var(--accent);
+        opacity: 0.2;
+        z-index: -1;
+        transform: skewX(-15deg);
     }
 
     .hero-desc {
         font-size: 18px;
-        color: #94a3b8;
-        line-height: 1.7;
+        color: var(--text-muted);
+        line-height: 1.8;
         margin-bottom: 40px;
-        max-width: 500px;
+        max-width: 520px;
+        font-weight: 400;
     }
 
     .hero-actions {
         display: flex;
         gap: 16px;
+        flex-wrap: wrap;
     }
 
     .btn-hero {
@@ -110,36 +131,99 @@
     }
 
     .btn-glass {
-        background: rgba(255, 255, 255, 0.1);
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        color: white;
+        background: rgba(255, 255, 255, 0.8);
+        border: 1px solid rgba(139, 92, 246, 0.2);
+        color: var(--primary);
         backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        font-weight: 600;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
     }
     
     .btn-glass:hover {
-        background: rgba(255, 255, 255, 0.2);
+        background: white;
+        color: var(--primary-hover);
         transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(139, 92, 246, 0.15);
+        border-color: var(--primary);
     }
 
     .hero-visual {
-        position: absolute;
-        right: 5%;
-        top: 50%;
-        transform: translateY(-40%);
+        position: relative;
         z-index: 5;
         width: 45%;
-        perspective: 1000px;
+        perspective: 1200px;
+    }
+
+    .visual-wrapper {
+        position: relative;
+        width: 100%;
+        border-radius: 30px;
+        padding: 12px;
+        background: rgba(255, 255, 255, 0.4);
+        border: 1px solid rgba(255, 255, 255, 0.6);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        box-shadow: 0 30px 60px rgba(0,0,0,0.08), 0 0 40px rgba(139, 92, 246, 0.2);
+        transform: rotateY(-12deg) rotateX(4deg);
+        transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.8s ease;
+        animation: floatImg 8s ease-in-out infinite;
+    }
+
+    @keyframes floatImg {
+        0%, 100% { transform: rotateY(-12deg) rotateX(4deg) translateY(0); }
+        50% { transform: rotateY(-12deg) rotateX(4deg) translateY(-20px); }
+    }
+
+    .visual-wrapper:hover {
+        transform: rotateY(-5deg) rotateX(2deg) translateY(-10px);
+        box-shadow: 0 40px 80px rgba(0,0,0,0.12), 0 0 60px rgba(20, 184, 166, 0.3);
+        animation-play-state: paused;
     }
 
     .hero-visual img {
         width: 100%;
-        transform: rotateY(-15deg) rotateX(5deg);
-        filter: drop-shadow(0 30px 40px rgba(0,0,0,0.5));
-        transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        border-radius: 20px;
+        display: block;
     }
-
-    .hero-visual:hover img {
-        transform: rotateY(0deg) rotateX(0deg) translateY(-10px);
+    
+    /* Decorative floating elements */
+    .floating-pill {
+        position: absolute;
+        background: white;
+        padding: 12px 20px;
+        border-radius: 100px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-weight: 700;
+        font-size: 14px;
+        color: var(--text-main);
+        z-index: 20;
+        border: 1px solid rgba(255,255,255,0.8);
+    }
+    
+    .pill-1 {
+        top: 15%;
+        right: -5%;
+        animation: float 6s ease-in-out infinite 1s;
+    }
+    
+    .pill-2 {
+        bottom: 5%;
+        left: -15%;
+        animation: float 8s ease-in-out infinite 2s;
+    }
+    
+    .pill-icon {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
     }
 
     /* Section Utilities */
@@ -249,6 +333,7 @@
         text-transform: uppercase;
         letter-spacing: 0.05em;
         backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
     }
 
     .badge-new {
@@ -504,14 +589,35 @@
     }
 
     @media (max-width: 1024px) {
-        .hero-visual { display: none; }
-        .hero-content { margin: 0 auto; text-align: center; }
-        .hero-actions { justify-content: center; }
+        .hero .container {
+            flex-direction: column;
+            text-align: center;
+            gap: 48px;
+        }
+        .hero-content { 
+            width: 100%; 
+            margin: 0 auto; 
+            max-width: 800px;
+        }
+        .hero-desc {
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .hero-actions { 
+            justify-content: center; 
+        }
+        .hero-visual { 
+            width: 80%; 
+        }
         .features-grid { grid-template-columns: repeat(2, 1fr); gap: 48px; }
     }
 
     @media (max-width: 768px) {
-        .hero-title { font-size: 40px; }
+        .hero-title { font-size: 36px; }
+        .hero-visual { width: 100%; }
+        .floating-pill { display: none; }
+        .hero-actions { flex-direction: column; width: 100%; }
+        .btn-hero { width: 100%; text-align: center; }
         .section-header { flex-direction: column; align-items: flex-start; gap: 16px; }
         .features-grid { grid-template-columns: 1fr; }
         .promo-banner { padding: 40px 24px; text-align: center; }
@@ -527,7 +633,7 @@
     <div class="hero-shape-1"></div>
     <div class="hero-shape-2"></div>
     
-    <div class="container" style="position: relative; height: 100%;">
+    <div class="container" style="position: relative; height: 100%; display: flex; align-items: center; justify-content: space-between;">
         <div class="hero-content">
             <div class="hero-badge">
                 <i class="bi bi-stars"></i> Next Generation Tech
@@ -549,8 +655,18 @@
         </div>
 
         <div class="hero-visual">
-            <!-- Using a high-quality tech placeholder image -->
-            <img src="https://images.unsplash.com/photo-1603302576837-37561b2e2302?q=80&w=1000&auto=format&fit=crop" alt="Premium Tech Display" style="border-radius: 24px;">
+            <div class="visual-wrapper">
+                <div class="floating-pill pill-1">
+                    <div class="pill-icon" style="background: var(--success);"><i class="bi bi-shield-check"></i></div>
+                    2-Year Warranty
+                </div>
+                <div class="floating-pill pill-2">
+                    <div class="pill-icon" style="background: var(--accent);"><i class="bi bi-lightning-charge"></i></div>
+                    Express Shipping
+                </div>
+                <!-- Using a high-quality tech placeholder image -->
+                <img src="https://images.unsplash.com/photo-1603302576837-37561b2e2302?q=80&w=1000&auto=format&fit=crop" alt="Premium Tech Display">
+            </div>
         </div>
     </div>
 </section>
